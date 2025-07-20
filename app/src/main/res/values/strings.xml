@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Social</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_profile_screen">ProfileScreen</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_sign_up_in">SignUpIn</string>
+</resources>
