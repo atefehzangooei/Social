@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.widget.Space
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -16,21 +15,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.collection.mutableLongSetOf
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,16 +44,13 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -80,27 +69,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -110,25 +92,18 @@ import com.appcoding.social.Functions.RightToLeftLayout
 import com.appcoding.social.Functions.screenWidth
 import com.appcoding.social.Functions.uriToFile
 import com.appcoding.social.data.ApiService
-import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse
 import com.appcoding.social.models.Post
 import com.appcoding.social.ui.theme.SocialTheme
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import okhttp3.Callback
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Response
 import java.io.File
-import kotlin.time.Duration.Companion.seconds
 
 
 class MainActivity : ComponentActivity() {
@@ -143,28 +118,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-//data
-fun staticPostData() : List<Post>
-
-{
-    val npost = Post(
-        1,
-        1,
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu8Qi_EGuDWDLusHz6fyxhgaQWa6q0YsOiBH3adnqLx-6_JbLy_-ch2P3xcDxtTh-g9qY&usqp=CAU",
-        "user1",
-        "https://bouqs.com/blog/wp-content/uploads/2022/03/shutterstock_260182148-min.jpg",
-        20,
-        12,
-        "flowers",
-        "1404/02/10",
-        "12:30"
-    )
-
-    val posts = listOf(npost, npost, npost, npost, npost, npost, npost)
-
-    return posts
-
-}
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -304,7 +257,6 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
     val apiService = RetrofitInstance.api
     var toastMessage by remember { mutableStateOf("") }
     var uploadComplete by remember { mutableStateOf(false) }
-    var uploadMessage by remember { mutableStateOf("") }
 
 
     BackHandler(enabled = true) {
@@ -397,8 +349,7 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
                 Button(onClick = {
                     if(neveshtak.isNotEmpty() && selectedImageUri != null) {
                         isUploading = true
-                        val safeUri : Uri
-                        selectedImageUri?.let {safeUri ->
+                        selectedImageUri.let {safeUri ->
                             val imageFile = uriToFile(safeUri, context)
                             uploadPost(neveshtak, imageFile, apiService) { success, message ->
                                 isUploading = false
@@ -653,15 +604,16 @@ fun HomeScreen() {
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("ShowToast")
 @Composable
 fun MainData() {
 
+    val context = LocalContext.current
     var posts by remember { mutableStateOf<List<Post>>(emptyList()) }
     var isRefreshing by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
-    val isAtTop = listState.firstVisibleItemIndex == 0 &&
-            listState.firstVisibleItemScrollOffset == 0
+    val isAtTop = (listState.firstVisibleItemIndex == 0) &&
+            (listState.firstVisibleItemScrollOffset == 0)
 
     LaunchedEffect(Unit){
         try{
@@ -669,7 +621,7 @@ fun MainData() {
             posts = result
         }
         catch(e : Exception){
-
+            Toast.makeText(context,e.message, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -703,7 +655,7 @@ fun MainData() {
                         isRefreshing = false
                     }
                     catch(e : Exception){
-
+                        Toast.makeText(context,e.message, Toast.LENGTH_LONG).show()
                     }
 
             }
@@ -871,6 +823,7 @@ fun PostCard(post : Post){
 @Composable
 fun CommentBottomSheet(postId : Long){
 
+    val context = LocalContext.current
     var comments by remember { mutableStateOf<List<CommentResponse>>(emptyList()) }
     var newComment by remember { mutableStateOf("") }
 
@@ -879,6 +832,7 @@ fun CommentBottomSheet(postId : Long){
             comments = RetrofitInstance.api.getComments(postId)
         }
         catch (ex : Exception){
+            Toast.makeText(context,ex.message, Toast.LENGTH_LONG).show()
 
         }
     }
@@ -941,11 +895,11 @@ fun CommentBottomSheet(postId : Long){
                     )
                 )
 
-                Icon(imageVector = Icons.Filled.CheckCircle,
+                Icon(imageVector = Icons.Filled.Check,
                     contentDescription = "send comment",
                     tint = Colors.appcolor,
                     modifier = Modifier
-                        .size(50.dp)
+                        .size(40.dp)
                         .align(Alignment.CenterVertically)
                     )
 
