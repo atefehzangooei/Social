@@ -224,11 +224,11 @@ fun MyApp() {
                 AnimatedVisibility(
                     visible = isAddScreenVisible,
                     enter = slideInHorizontally(
-                        initialOffsetX = { fullWidth -> fullWidth },  // از راست وارد میشه
+                        initialOffsetX = { fullWidth -> fullWidth },
                         animationSpec = tween(600, easing = FastOutSlowInEasing)
                     ),
                     exit = slideOutHorizontally(
-                        targetOffsetX = { fullWidth -> fullWidth },  // به راست میره
+                        targetOffsetX = { fullWidth -> fullWidth },
                         animationSpec = tween(400, easing = FastOutSlowInEasing)
                     )
                 ){
@@ -604,7 +604,7 @@ fun HomeScreen() {
 
 }
 
-@SuppressLint("ShowToast")
+@SuppressLint("ShowToast", "FrequentlyChangedStateReadInComposition")
 @Composable
 fun MainData() {
 
