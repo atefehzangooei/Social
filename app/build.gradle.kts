@@ -94,6 +94,8 @@ dependencies {
 
     //implementation(libs.logging.interceptor)
 
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.33.1-alpha")
+    implementation(libs.accompanist.swiperefresh)
+
+    implementation(libs.androidx.datastore.preferences)
 
 }

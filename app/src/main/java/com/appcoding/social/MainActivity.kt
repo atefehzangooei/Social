@@ -69,6 +69,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -92,11 +93,16 @@ import com.appcoding.social.Functions.RightToLeftLayout
 import com.appcoding.social.Functions.screenWidth
 import com.appcoding.social.Functions.uriToFile
 import com.appcoding.social.data.ApiService
+import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse
 import com.appcoding.social.models.Post
 import com.appcoding.social.ui.theme.SocialTheme
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -125,6 +131,13 @@ fun MyApp() {
 
     var selectedIndex by remember { mutableStateOf(0) }
     var isAddScreenVisible by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val userScope = rememberCoroutineScope()
+
+    userScope.launch {
+        UserPreferences.saveUserId(context, 1)
+    }
 
     val navigationItems = listOf(
         NavigationItem("Home",
@@ -871,17 +884,21 @@ fun CommentBottomSheet(postId : Long){
                     model = userProfile,
                     contentDescription = "my profile",
                     modifier = Modifier
+                        .weight(1f)
                         .size(Dimens.comment_user_profile)
                         .clip(CircleShape)
                         .align(Alignment.CenterVertically)
+
                 )
+
 
                 TextField(
                     value = newComment,
                     onValueChange = { newComment = it },
                     textStyle = MaterialTheme.typography.bodyMedium,
                     placeholder = { Text("نظرت رو بگو") },
-                    modifier = Modifier.wrapContentWidth(),
+                    singleLine = true,
+                    modifier = Modifier.weight(5f),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
@@ -899,8 +916,16 @@ fun CommentBottomSheet(postId : Long){
                     contentDescription = "send comment",
                     tint = Colors.appcolor,
                     modifier = Modifier
-                        .size(40.dp)
+                        .weight(1f)
                         .align(Alignment.CenterVertically)
+                        .clickable {
+                            CoroutineScope(Dispatchers.IO){
+                                val commentRequest = CommentRequest(
+                                    postId = postId,
+                                    userId =
+                                )
+                            }
+                        }
                     )
 
             }
