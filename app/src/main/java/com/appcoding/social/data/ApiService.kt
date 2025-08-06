@@ -28,5 +28,5 @@ interface ApiService
      suspend fun getComments(@Path("postId") postId : Long) : List<CommentResponse>
 
      @POST("comments/add")
-     suspend fun addComment(@Body commentRequest : CommentRequest) : Response<CommentResponse>
+     suspend fun addComment(@Body commentRequest : CommentRequest) : CommentResponse
 }

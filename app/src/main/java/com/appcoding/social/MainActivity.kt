@@ -66,6 +66,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -101,6 +102,8 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import okhttp3.Dispatcher
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -125,7 +128,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @Composable
 fun MyApp() {
 
@@ -607,7 +610,8 @@ fun HomeScreen() {
     RightToLeftLayout {
 
         Column(modifier = Modifier
-            .fillMaxSize())
+            .fillMaxSize()
+            .background(Colors.background))
         {
             AppNameBar()
             DisplayStory()
@@ -839,6 +843,7 @@ fun CommentBottomSheet(postId : Long){
     val context = LocalContext.current
     var comments by remember { mutableStateOf<List<CommentResponse>>(emptyList()) }
     var newComment by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit){
         try{
@@ -884,7 +889,7 @@ fun CommentBottomSheet(postId : Long){
                     model = userProfile,
                     contentDescription = "my profile",
                     modifier = Modifier
-                        .weight(1f)
+                        //.weight(1f)
                         .size(Dimens.comment_user_profile)
                         .clip(CircleShape)
                         .align(Alignment.CenterVertically)
@@ -917,13 +922,25 @@ fun CommentBottomSheet(postId : Long){
                     tint = Colors.appcolor,
                     modifier = Modifier
                         .weight(1f)
+                        .size(Dimens.comment_user_profile)
+                        .clip(CircleShape)
                         .align(Alignment.CenterVertically)
                         .clickable {
-                            CoroutineScope(Dispatchers.IO){
-                                val commentRequest = CommentRequest(
-                                    postId = postId,
-                                    userId =
-                                )
+                            if(newComment.isNotEmpty()) {
+                                coroutineScope.launch(Dispatchers.IO) {
+                                    val commentRequest = CommentRequest(
+                                        postId = postId,
+                                        userId = UserPreferences.getUserIdFlow(context)
+                                            .first() ?: 0L,
+                                        comment = newComment,
+                                        date = "1404",
+                                        time = "18:00"
+                                    )
+                                    val addedComment =
+                                        RetrofitInstance.api.addComment(commentRequest)
+                                    comments = comments + addedComment
+                                    newComment = ""
+                                }
                             }
                         }
                     )
