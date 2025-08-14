@@ -16,7 +16,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -79,8 +82,11 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -96,6 +102,7 @@ import com.appcoding.social.Functions.uriToFile
 import com.appcoding.social.data.ApiService
 import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse
+import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.Post
 import com.appcoding.social.ui.theme.SocialTheme
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -728,6 +735,14 @@ fun PostCard(post : Post){
     var commentSheetState by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    var liked by remember { mutableStateOf(false) }
+    var saved by remember { mutableStateOf(false) }
+
+    val likeScope = rememberCoroutineScope()
+    val saveScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+
     RightToLeftLayout {
 
         Column(modifier = Modifier.wrapContentSize()) {
@@ -789,16 +804,68 @@ fun PostCard(post : Post){
                         .padding(10.dp)
                     ) {
 
-                        Icon(painter = painterResource(R.drawable.like),
+                      /*  val scale by animateFloatAsState(
+                            targetValue = if (liked) 1.4f else 1f,
+                            animationSpec = tween(durationMillis = 300,
+                                easing = FastOutSlowInEasing)
+                        )*/
+
+                        val scale = remember { Animatable(1f) }
+
+                        LaunchedEffect(liked) {
+                            if (liked) {
+                                // انیمیشن بزرگ شدن سریع
+                                scale.animateTo(1.5f, animationSpec = tween(150))
+                                // انیمیشن برگشت نرم به اندازه نرمال
+                                scale.animateTo(1f, animationSpec = tween(300, easing = FastOutSlowInEasing))
+                            } else {
+                                // وقتی آنلایک میشه، سریع کوچیک میشه بدون انیمیشن برگشت
+                                scale.snapTo(1f)
+                            }
+                        }
+
+
+                        Image(painter = if(liked)
+                            painterResource(R.drawable.red_heart)
+                            else
+                            painterResource(R.drawable.like)
+                            ,
                             contentDescription = "like",
-                            modifier = Modifier.size(Dimens.post_icons),
-                            tint = Color.Black)
+                            modifier = Modifier
+                                .size(Dimens.post_icons)
+                                .graphicsLayer(
+                                    scaleX = scale.value,
+                                    scaleY = scale.value
+                                )
+                                .clickable {
+                                    liked = !liked
+                                    likeScope.launch {
+                                        if (liked) {
+                                            val response = RetrofitInstance.api.likePost(
+                                                LikeRequest(
+                                                    postId = post.id,
+                                                    userId = UserPreferences.getUserIdFlow(context)
+                                                        .first() ?: 0L,
+                                                    date = "",
+                                                    time = ""
+                                                )
+                                            )
+                                        }
+                                        else{
+                                            val response = RetrofitInstance.api.disLikePost(
+                                                    postId = post.id,
+                                                    userId = UserPreferences.getUserIdFlow(context)
+                                                        .first() ?: 0L
+                                            )
+                                        }
+                                    }
+                                }
+                            )
 
                         Spacer(modifier = Modifier.size(15.dp))
 
-                        Icon(painter = painterResource(R.drawable.comment),
+                        Image(painter = painterResource(R.drawable.comment),
                             contentDescription = "comment",
-                            tint = Color.Black,
                             modifier = Modifier
                                 .size(Dimens.post_icons)
                                 .clickable { commentSheetState = true }
@@ -815,13 +882,24 @@ fun PostCard(post : Post){
                         }
                     }
 
-                    Icon(painter = painterResource(R.drawable.save),
-                        contentDescription = "save",
-                        modifier = Modifier.size(Dimens.post_icons),
-                        tint = Color.Black)
+                    Image(painter = if(saved)
+                        painterResource(R.drawable.save_filled)
+                                else
+                        painterResource(R.drawable.save),
+
+                                contentDescription = "save",
+                        modifier = Modifier
+                            .size(Dimens.post_icons)
+                            .clickable {
+                                
+                                saved = !saved
+                            }
+
+                    )
 
                 }
 
+            
             Spacer(modifier = Modifier.size(Dimens.normal_spacer))
 
             Text(text = post.caption,
@@ -895,8 +973,7 @@ fun CommentBottomSheet(postId : Long){
                         .align(Alignment.CenterVertically)
 
                 )
-
-
+                
                 TextField(
                     value = newComment,
                     onValueChange = { newComment = it },
@@ -984,6 +1061,49 @@ fun CommentCard(comment: CommentResponse) {
 
 }
 
+
+@Composable
+fun LikeHeartWithCustomIcon(
+    modifier: Modifier = Modifier,
+    isLikedInitial: Boolean = false,
+    onLikeChanged: (Boolean) -> Unit = {},
+    iconPainter: Painter
+) {
+    var liked by remember { mutableStateOf(isLikedInitial) }
+
+    val scale by animateFloatAsState(
+        targetValue = if (liked) 1.4f else 1f,
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
+    )
+
+    val tint by animateColorAsState(
+        targetValue = if (liked) Color.Red else Color.Gray,
+        animationSpec = tween(durationMillis = 300)
+    )
+
+    Box(
+        modifier = modifier
+            .size(48.dp)
+            .graphicsLayer(
+                scaleX = scale,
+                scaleY = scale,
+            )
+
+            .clickable {
+                liked = !liked
+                onLikeChanged(liked)
+            }
+    ) {
+        Image(
+            painter = iconPainter,
+            contentDescription = "Like Heart",
+            colorFilter = ColorFilter.tint(tint),
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+
 data class NavigationItem(
     val label : String,
     val unselected : Painter,
@@ -1010,6 +1130,7 @@ fun MyAppPreview() {
             1
         )
 
-        CommentBottomSheet(newComment.postId)
+        //CommentBottomSheet(newComment.postId)
+        HomeScreen()
     }
 }

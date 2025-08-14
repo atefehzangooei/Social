@@ -2,12 +2,15 @@ package com.appcoding.social.data
 
 import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse
+import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.Post
+import com.appcoding.social.models.StringMessage
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -29,4 +32,11 @@ interface ApiService
 
      @POST("comments/add")
      suspend fun addComment(@Body commentRequest : CommentRequest) : CommentResponse
+
+     @POST("likes")
+     suspend fun likePost(@Body likeRequest : LikeRequest) : StringMessage
+
+     @DELETE("likes/dislike/{postId}/{userId}")
+     suspend fun disLikePost(@Path("postId") postId: Long,
+                             @Path("userId") userId : Long)
 }
