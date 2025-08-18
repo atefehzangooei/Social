@@ -40,7 +40,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -69,7 +68,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -86,7 +84,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -94,6 +91,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.appcoding.social.Functions.RightToLeftLayout
@@ -103,16 +101,15 @@ import com.appcoding.social.data.ApiService
 import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse
 import com.appcoding.social.models.LikeRequest
-import com.appcoding.social.models.Post
+import com.appcoding.social.models.PostResponse
+import com.appcoding.social.models.SavePostRequest
 import com.appcoding.social.ui.theme.SocialTheme
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import okhttp3.Dispatcher
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -126,6 +123,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val context = this
+
+        lifecycleScope.launch {
+            UserPreferences.saveUserId(context, 1L)
+        }
+
         setContent {
             SocialTheme {
                 MyApp()
@@ -143,11 +147,8 @@ fun MyApp() {
     var isAddScreenVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val userScope = rememberCoroutineScope()
 
-    userScope.launch {
-        UserPreferences.saveUserId(context, 1)
-    }
+
 
     val navigationItems = listOf(
         NavigationItem("Home",
@@ -633,15 +634,21 @@ fun HomeScreen() {
 fun MainData() {
 
     val context = LocalContext.current
-    var posts by remember { mutableStateOf<List<Post>>(emptyList()) }
+    var posts by remember { mutableStateOf<List<PostResponse>>(emptyList()) }
     var isRefreshing by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val isAtTop = (listState.firstVisibleItemIndex == 0) &&
             (listState.firstVisibleItemScrollOffset == 0)
 
+    var userId by remember { mutableStateOf(0L) }
+
     LaunchedEffect(Unit){
+
         try{
-            val result = RetrofitInstance.api.getPost()
+            UserPreferences.getUserIdFlow(context).collectLatest { id ->
+                userId = id ?: 0L
+            }
+            val result = RetrofitInstance.api.getPost(userId)
             posts = result
         }
         catch(e : Exception){
@@ -666,7 +673,7 @@ fun MainData() {
             LazyColumn(modifier = Modifier.fillMaxSize())
             {
                 items(posts) { post ->
-                    PostCard(post)
+                    PostCard(post, userId)
                 }
             }
         }
@@ -674,7 +681,7 @@ fun MainData() {
             LaunchedEffect(Unit) {
                 //delay(1500)
                     try{
-                        val result = RetrofitInstance.api.getPost()
+                        val result = RetrofitInstance.api.getPost(userId)
                         posts = result
                         isRefreshing = false
                     }
@@ -730,18 +737,21 @@ fun AppNameBar() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostCard(post : Post){
+fun PostCard(post : PostResponse, userId : Long) {
 
     var commentSheetState by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    var liked by remember { mutableStateOf(false) }
-    var saved by remember { mutableStateOf(false) }
 
+    var liked by remember { mutableStateOf(post.isLike) }
+    var saved by remember { mutableStateOf(post.isSave) }
+
+   
     val likeScope = rememberCoroutineScope()
     val saveScope = rememberCoroutineScope()
     val context = LocalContext.current
-
+    var likeCount by remember { mutableStateOf(post.likeCount) }
+    var commentCount by remember { mutableStateOf(post.commentCount) }
 
     RightToLeftLayout {
 
@@ -768,25 +778,29 @@ fun PostCard(post : Post){
 
                 Spacer(modifier = Modifier.size(Dimens.normal_spacer))
 
-                Text(text = post.username,
+                Text(
+                    text = post.username,
                     style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold)
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             //Image
 
-
-                AsyncImage(model = post.image,
-                    contentDescription = "postImage",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(screenWidth()),
-                    contentScale = ContentScale.Crop)
-
-                //like/comment/save
-                Row(modifier = Modifier
+            AsyncImage(
+                model = post.image,
+                contentDescription = "postImage",
+                modifier = Modifier
                     .fillMaxWidth()
-                  /*  .background(brush = Brush.verticalGradient(
+                    .height(screenWidth()),
+                contentScale = ContentScale.Crop
+            )
+
+            //like/comment/save
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    /*  .background(brush = Brush.verticalGradient(
                         colors = listOf(
                             Color.Transparent,
                             Color(0x55000000),
@@ -795,119 +809,152 @@ fun PostCard(post : Post){
 
                         )))*/
                     .padding(5.dp),
-                   // .align(Alignment.BottomEnd),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically)
-                {
-                    Row(modifier = Modifier
+                // .align(Alignment.BottomEnd),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            )
+            {
+                Row(
+                    modifier = Modifier
                         .wrapContentSize()
-                        .padding(10.dp)
-                    ) {
+                        .padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
-                      /*  val scale by animateFloatAsState(
-                            targetValue = if (liked) 1.4f else 1f,
-                            animationSpec = tween(durationMillis = 300,
-                                easing = FastOutSlowInEasing)
-                        )*/
+                    val scale = remember { Animatable(1f) }
 
-                        val scale = remember { Animatable(1f) }
+                    LaunchedEffect(liked) {
+                        if (liked) {
 
-                        LaunchedEffect(liked) {
-                            if (liked) {
-                                // انیمیشن بزرگ شدن سریع
-                                scale.animateTo(1.5f, animationSpec = tween(150))
-                                // انیمیشن برگشت نرم به اندازه نرمال
-                                scale.animateTo(1f, animationSpec = tween(300, easing = FastOutSlowInEasing))
-                            } else {
-                                // وقتی آنلایک میشه، سریع کوچیک میشه بدون انیمیشن برگشت
-                                scale.snapTo(1f)
-                            }
-                        }
-
-
-                        Image(painter = if(liked)
-                            painterResource(R.drawable.red_heart)
-                            else
-                            painterResource(R.drawable.like)
-                            ,
-                            contentDescription = "like",
-                            modifier = Modifier
-                                .size(Dimens.post_icons)
-                                .graphicsLayer(
-                                    scaleX = scale.value,
-                                    scaleY = scale.value
-                                )
-                                .clickable {
-                                    liked = !liked
-                                    likeScope.launch {
-                                        if (liked) {
-                                            val response = RetrofitInstance.api.likePost(
-                                                LikeRequest(
-                                                    postId = post.id,
-                                                    userId = UserPreferences.getUserIdFlow(context)
-                                                        .first() ?: 0L,
-                                                    date = "",
-                                                    time = ""
-                                                )
-                                            )
-                                        }
-                                        else{
-                                            val response = RetrofitInstance.api.disLikePost(
-                                                    postId = post.id,
-                                                    userId = UserPreferences.getUserIdFlow(context)
-                                                        .first() ?: 0L
-                                            )
-                                        }
-                                    }
-                                }
+                            scale.animateTo(1.5f, animationSpec = tween(150))
+                            scale.animateTo(
+                                1f,
+                                animationSpec = tween(300, easing = FastOutSlowInEasing)
                             )
+                        } else {
 
-                        Spacer(modifier = Modifier.size(15.dp))
-
-                        Image(painter = painterResource(R.drawable.comment),
-                            contentDescription = "comment",
-                            modifier = Modifier
-                                .size(Dimens.post_icons)
-                                .clickable { commentSheetState = true }
-                          )
-
-                        if(commentSheetState){
-                            ModalBottomSheet(
-                                sheetState = sheetState,
-                                onDismissRequest = {commentSheetState = false},
-                                modifier = Modifier.background(Color.White)
-                            ) {
-                                CommentBottomSheet(post.id)
-                            }
+                            scale.snapTo(1f)
                         }
                     }
 
-                    Image(painter = if(saved)
-                        painterResource(R.drawable.save_filled)
-                                else
-                        painterResource(R.drawable.save),
 
-                                contentDescription = "save",
+                    Image(painter = if (liked)
+                        painterResource(R.drawable.red_heart)
+                    else
+                        painterResource(R.drawable.like),
+                        contentDescription = "like",
                         modifier = Modifier
                             .size(Dimens.post_icons)
+                            .graphicsLayer(
+                                scaleX = scale.value,
+                                scaleY = scale.value
+                            )
                             .clickable {
-                                
-                                saved = !saved
+                                liked = !liked
+                                likeScope.launch {
+                                    if (liked) {
+                                        likeCount++
+                                        val response = RetrofitInstance.api.likePost(
+                                            LikeRequest(
+                                                postId = post.id,
+                                                userId = userId,
+                                                date = "",
+                                                time = ""
+                                            )
+                                        )
+                                    } else {
+                                        likeCount--
+                                        val response = RetrofitInstance.api.disLikePost(
+                                            postId = post.id,
+                                            userId = userId
+                                        )
+                                    }
+                                }
                             }
-
                     )
 
+
+                    Spacer(modifier = Modifier.size(10.dp))
+
+                    Text(
+                        text = likeCount.toString(),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.size(15.dp))
+
+                    Image(painter = painterResource(R.drawable.comment),
+                        contentDescription = "comment",
+                        modifier = Modifier
+                            .size(Dimens.post_icons)
+                            .clickable { commentSheetState = true }
+                    )
+
+                    Spacer(modifier = Modifier.size(10.dp))
+
+                    Text(
+                        text = commentCount.toString(),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
 
-            
+                if (commentSheetState) {
+                    ModalBottomSheet(
+                        sheetState = sheetState,
+                        onDismissRequest = { commentSheetState = false },
+                        modifier = Modifier.background(Color.White)
+                    ) {
+                        CommentBottomSheet(post.id, userId)
+                    }
+                }
+
+                Image(painter = if (saved)
+                    painterResource(R.drawable.save_filled)
+                else
+                    painterResource(R.drawable.save),
+
+                    contentDescription = "save",
+                    modifier = Modifier
+                        .size(Dimens.post_icons)
+                        .clickable {
+                            saved = !saved
+                            saveScope.launch {
+                            if(saved){
+                                    val response = RetrofitInstance.api.savePost(
+                                        SavePostRequest(
+                                            userId = userId,
+                                            postId = post.id,
+                                            date = "14",
+                                            time = "14"
+                                        )
+                                    )
+                                }
+                                else{
+                                val response = RetrofitInstance.api.unSavePost(
+                                        userId = userId,
+                                        postId = post.id
+                                )
+                            }
+                            }
+                        }
+
+                )
+
+            }
+
+
             Spacer(modifier = Modifier.size(Dimens.normal_spacer))
 
-            Text(text = post.caption,
+            Text(
+                text = post.caption,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .padding(Dimens.normal_padding))
+                    .padding(Dimens.normal_padding)
+            )
 
 
         }
@@ -916,7 +963,7 @@ fun PostCard(post : Post){
 
 
 @Composable
-fun CommentBottomSheet(postId : Long){
+fun CommentBottomSheet(postId : Long, userId : Long){
 
     val context = LocalContext.current
     var comments by remember { mutableStateOf<List<CommentResponse>>(emptyList()) }
@@ -1007,8 +1054,7 @@ fun CommentBottomSheet(postId : Long){
                                 coroutineScope.launch(Dispatchers.IO) {
                                     val commentRequest = CommentRequest(
                                         postId = postId,
-                                        userId = UserPreferences.getUserIdFlow(context)
-                                            .first() ?: 0L,
+                                        userId = userId,
                                         comment = newComment,
                                         date = "1404",
                                         time = "18:00"
@@ -1131,6 +1177,11 @@ fun MyAppPreview() {
         )
 
         //CommentBottomSheet(newComment.postId)
-        HomeScreen()
+
+        val npost = PostResponse(0,"","","",0,
+            "","",0, 0, "",
+            false, false)
+
+        PostCard(npost, 1)
     }
 }

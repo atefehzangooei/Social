@@ -1,15 +1,18 @@
 package com.appcoding.social.models
 
-data class Post(
+data class PostResponse(
     val id : Long,
+    val caption : String,
+    val date : String,
+    val time : String,
     val userId : Long,
     val userProfile : String,
     val username : String,
-    val image : String,
     val likeCount : Long,
     val commentCount : Long,
-    val caption : String,
-    val date : String,
-    val time : String
+    val image : String,
+    val isLike : Boolean,
+    val isSave : Boolean
+
 
 )

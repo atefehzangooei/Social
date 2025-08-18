@@ -3,12 +3,13 @@ package com.appcoding.social.data
 import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse
 import com.appcoding.social.models.LikeRequest
-import com.appcoding.social.models.Post
+import com.appcoding.social.models.PostResponse
+import com.appcoding.social.models.SavePostRequest
+import com.appcoding.social.models.SavePostResponse
 import com.appcoding.social.models.StringMessage
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -24,8 +25,8 @@ interface ApiService
      fun addPost(@Part("neveshtak") neveshtak:RequestBody,
                         @Part image : MultipartBody.Part) : Call<String>
 
-     @GET("posts/all")
-     suspend fun getPost() : List<Post>
+     @GET("posts/all/{userId}")
+     suspend fun getPost(@Path("userId") userId : Long) : List<PostResponse>
 
      @GET("comments/{postId}")
      suspend fun getComments(@Path("postId") postId : Long) : List<CommentResponse>
@@ -39,4 +40,13 @@ interface ApiService
      @DELETE("likes/dislike/{postId}/{userId}")
      suspend fun disLikePost(@Path("postId") postId: Long,
                              @Path("userId") userId : Long)
+
+     @POST("save_post")
+     suspend fun savePost(@Body savePostRequest : SavePostRequest) : StringMessage
+
+     @DELETE("save_post/{postId}/{userId}")
+     suspend fun unSavePost(@Path("postId") postId: Long,
+                             @Path("userId") userId : Long)
+
+
 }

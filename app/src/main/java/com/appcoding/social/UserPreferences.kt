@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 object UserPreferences {
-    private val Context.dataStore by preferencesDataStore(name = "user_prefs")
+    private val Context.dataStore by preferencesDataStore(name = "user")
 
     private val USER_ID = longPreferencesKey("userid")
 
