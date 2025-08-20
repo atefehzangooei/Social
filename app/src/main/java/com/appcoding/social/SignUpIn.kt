@@ -75,20 +75,22 @@ fun SignUpsignIn(){
                     modifier = Modifier.fillMaxWidth(),
                     value = phone,
                     onValueChange = { phone = it },
-                    shape = RoundedCornerShape(Dimens.textfield_corner,
-                        Dimens.textfield_corner, 0.dp, 0.dp),
+                    shape = RoundedCornerShape(Dimens.textfield_corner),
                     placeholder = { Text(text = "شماره موبایل") },
-                    singleLine = true
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.bodyMedium
                 )
 
                 Spacer(modifier = Modifier.size(Dimens.login_spacer))
 
                   OutlinedTextField(
                       modifier = Modifier.fillMaxWidth(),
-                      value = phone,
-                    onValueChange = { phone = it },
-                    placeholder = { Text(text = "رمز عبور") },
-                    singleLine = true
+                      value = password,
+                    onValueChange = { password = it },
+                      shape = RoundedCornerShape(Dimens.textfield_corner),
+                      placeholder = { Text(text = "رمز عبور") },
+                    singleLine = true,
+                      textStyle = MaterialTheme.typography.bodyMedium
                 )
 
                 Spacer(modifier = Modifier.size(Dimens.login_spacer))
@@ -98,11 +100,10 @@ fun SignUpsignIn(){
                     Button(
                         modifier = Modifier
                             .wrapContentHeight()
-                            .weight(1f),
+                            .weight(2f),
                         onClick = {},
-                        shape = RoundedCornerShape(
-                            0.dp, 0.dp, 0.dp,
-                            Dimens.textfield_corner
+                        shape = RoundedCornerShape(Dimens.textfield_corner, 0.dp,
+                            0.dp, Dimens.textfield_corner
                         ),
                         colors = ButtonDefaults.buttonColors(
                             contentColor = Color.White,
@@ -120,8 +121,8 @@ fun SignUpsignIn(){
                         .wrapContentHeight()
                         .weight(1f),
                         onClick = {},
-                        shape = RoundedCornerShape( 0.dp, 0.dp, Dimens.textfield_corner,
-                            0.dp),
+                        shape = RoundedCornerShape(0.dp, Dimens.textfield_corner,
+                            Dimens.textfield_corner, 0.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Colors.cancel_button,
                             contentColor = Color.Black

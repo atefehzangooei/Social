@@ -26,6 +26,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -147,8 +149,6 @@ fun MyApp() {
     var isAddScreenVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-
-
 
     val navigationItems = listOf(
         NavigationItem("Home",
@@ -645,9 +645,9 @@ fun MainData() {
     LaunchedEffect(Unit){
 
         try{
-            UserPreferences.getUserIdFlow(context).collectLatest { id ->
-                userId = id ?: 0L
-            }
+            val id = UserPreferences.getUserIdFlow(context).first() ?: 0L
+            userId = id
+
             val result = RetrofitInstance.api.getPost(userId)
             posts = result
         }
@@ -823,6 +823,7 @@ fun PostCard(post : PostResponse, userId : Long) {
 
                     val scale = remember { Animatable(1f) }
 
+
                     LaunchedEffect(liked) {
                         if (liked) {
 
@@ -838,6 +839,7 @@ fun PostCard(post : PostResponse, userId : Long) {
                     }
 
 
+
                     Image(painter = if (liked)
                         painterResource(R.drawable.red_heart)
                     else
@@ -845,6 +847,8 @@ fun PostCard(post : PostResponse, userId : Long) {
                         contentDescription = "like",
                         modifier = Modifier
                             .size(Dimens.post_icons)
+                            .indication(interactionSource = remember { MutableInteractionSource() },
+                                indication = null)
                             .graphicsLayer(
                                 scaleX = scale.value,
                                 scaleY = scale.value
@@ -906,7 +910,7 @@ fun PostCard(post : PostResponse, userId : Long) {
                         onDismissRequest = { commentSheetState = false },
                         modifier = Modifier.background(Color.White)
                     ) {
-                        CommentBottomSheet(post.id, userId)
+                        CommentBottomSheet(post, userId)
                     }
                 }
 
@@ -963,7 +967,7 @@ fun PostCard(post : PostResponse, userId : Long) {
 
 
 @Composable
-fun CommentBottomSheet(postId : Long, userId : Long){
+fun CommentBottomSheet(post : PostResponse, userId : Long){
 
     val context = LocalContext.current
     var comments by remember { mutableStateOf<List<CommentResponse>>(emptyList()) }
@@ -972,7 +976,8 @@ fun CommentBottomSheet(postId : Long, userId : Long){
 
     LaunchedEffect(Unit){
         try{
-            comments = RetrofitInstance.api.getComments(postId)
+            comments = RetrofitInstance.api.getComments(post.id)
+            post.commentCount++
         }
         catch (ex : Exception){
             Toast.makeText(context,ex.message, Toast.LENGTH_LONG).show()
@@ -1053,7 +1058,7 @@ fun CommentBottomSheet(postId : Long, userId : Long){
                             if(newComment.isNotEmpty()) {
                                 coroutineScope.launch(Dispatchers.IO) {
                                     val commentRequest = CommentRequest(
-                                        postId = postId,
+                                        postId = post.id,
                                         userId = userId,
                                         comment = newComment,
                                         date = "1404",
