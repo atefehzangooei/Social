@@ -23,8 +23,12 @@ object Dimens {
     val profile_header_size = 200.dp
     val search_box_corner = 20.dp
     val search_box_icon_size = 25.dp
-    val textfield_corner = 20.dp
-    val login_spacer = 5.dp
+    val textfield_corner = 30.dp
+    val login_spacer = 10.dp
     val login_padding = 25.dp
     val comment_user_profile = 35.dp
+    val login_card_corner = 30.dp
+    val signup_button_height = 50.dp
+    val signup_user_profile = 70.dp
+
 }

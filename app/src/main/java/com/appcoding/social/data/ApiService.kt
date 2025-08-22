@@ -6,6 +6,7 @@ import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.SavePostRequest
 import com.appcoding.social.models.SavePostResponse
+import com.appcoding.social.models.SignupRequest
 import com.appcoding.social.models.StringMessage
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -47,6 +48,9 @@ interface ApiService
      @DELETE("save_post/{postId}/{userId}")
      suspend fun unSavePost(@Path("postId") postId: Long,
                              @Path("userId") userId : Long)
+
+     @POST("users/signup")
+     suspend fun signUp(@Body signupRequest: SignupRequest) : StringMessage
 
 
 }
