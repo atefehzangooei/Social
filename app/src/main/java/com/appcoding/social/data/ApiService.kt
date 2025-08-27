@@ -2,6 +2,7 @@ package com.appcoding.social.data
 
 import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse
+import com.appcoding.social.models.ForgetRequest
 import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.SavePostRequest
@@ -58,6 +59,7 @@ interface ApiService
      @POST("users/signin")
      suspend fun signIn(@Body signinRequest: SigninRequest) : Response<SigninResponse>
 
-
+     @POST("users/forgetpassword")
+     suspend fun forgetPassword(@Body forgetRequest: ForgetRequest) : StringMessage
 
 }

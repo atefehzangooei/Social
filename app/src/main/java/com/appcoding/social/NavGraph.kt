@@ -15,5 +15,6 @@ fun AppNavHost(navController: NavHostController, startDestination : String = "sp
         composable("signin"){ SignIn(navController) }
         composable("signup"){ SignUp(navController) }
         composable("main"){ MyApp(navController) }
+        composable("forgetpassword"){ ForgetPassword(navController) }
     }
 }

@@ -33,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,12 +48,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.appcoding.social.Functions.RightToLeftLayout
+import com.appcoding.social.models.ForgetRequest
 import com.appcoding.social.models.SigninRequest
 import com.appcoding.social.models.SignupRequest
 import com.appcoding.social.ui.theme.SocialTheme
@@ -100,11 +103,12 @@ fun SignUp(navController: NavHostController){
     var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
-    val context = LocalContext.current
     var signup by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val snackScope = rememberCoroutineScope()
     var message by remember { mutableStateOf("") }
+    var success by remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
 
     RightToLeftLayout{
@@ -163,9 +167,16 @@ fun SignUp(navController: NavHostController){
                             )
                         }
 
-
                         Spacer(modifier = Modifier.size(15.dp))
 
+                        Icon(painter = painterResource(R.drawable.profile_selected),
+                            contentDescription = "profile image",
+                            tint = Colors.appcolor,
+                            modifier = Modifier.size(Dimens.signup_user_profile))
+
+                        Spacer(modifier = Modifier.size(Dimens.normal_spacer))
+
+                        
                         OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth(),
@@ -230,6 +241,7 @@ fun SignUp(navController: NavHostController){
                                     .height(Dimens.signup_button_height)
                                     .fillMaxWidth(),
                                 onClick = {
+                                    keyboardController?.hide()
                                     if (phone.isBlank() || username.isBlank() || password.isBlank()) {
                                         message ="لطفا اطلاعات را به درستی وارد نمایید"
                                     } else {
@@ -249,23 +261,34 @@ fun SignUp(navController: NavHostController){
                                 )
                             }
 
-                            LaunchedEffect(signup) {
-                                signup = false
-                                val response = RetrofitInstance.api.signUp(
-                                    SignupRequest(
-                                        phone = phone,
-                                        username = username,
-                                        password = password
-                                    )
-                                )
-                                if (response.message == "repeated username") {
-                                    message =  "نام کاربری وارد شده تکراری است"
+                            if(signup) {
+                                LaunchedEffect(signup) {
 
-                                } else if (response.message == "success") {
+                                    try {
+                                        val response = RetrofitInstance.api.signUp(
+                                            SignupRequest(
+                                                phone = phone,
+                                                username = username,
+                                                password = password
+                                            )
+                                        )
+                                        if (response.message == "repeated username") {
+                                            message = "نام کاربری وارد شده تکراری است"
 
-                                } else {
-                                    message ="نام کاربری دیگری انتخاب کنید"
+                                        } else if (response.message == "success") {
+                                            success = true
+                                            message = "حساب شما با موفقیت ایجاد شد"
+                                        } else {
+                                            message = "نام کاربری دیگری انتخاب کنید"
 
+                                        }
+                                    }
+                                    catch(e : Exception){
+                                        message = e.toString()
+                                    }
+                                    finally {
+                                        signup = false
+                                    }
                                 }
                             }
 
@@ -274,6 +297,11 @@ fun SignUp(navController: NavHostController){
                                 if(message.isNotBlank()) {
                                     snackScope.launch {
                                         snackbarHostState.showSnackbar(message)
+                                    }
+                                    if(success){
+                                        navController.navigate("signin"){
+                                            popUpTo("signup"){inclusive = true}
+                                        }
                                     }
                                 }
                             }
@@ -293,7 +321,6 @@ fun SignIn(navController: NavHostController) {
 
     var password by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
-    val context = LocalContext.current
     var signin by remember { mutableStateOf(false) }
     val snackScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -380,7 +407,7 @@ fun SignIn(navController: NavHostController) {
                                     .height(Dimens.signup_button_height)
                                     .fillMaxWidth(),
                                 onClick = {
-                                    //keyboardController?.hide()
+                                    keyboardController?.hide()
                                     if (username.isBlank() || password.isBlank()) {
                                         message = "لطفا تمام اطلاعات را وارد کنید"
                                     } else {
@@ -402,8 +429,7 @@ fun SignIn(navController: NavHostController) {
                         }
 
                         if(signin) {
-                            LaunchedEffect(Unit) {
-                                signin = false
+                            LaunchedEffect(signin) {
                                 try {
                                     val response =
                                         RetrofitInstance.api.signIn(
@@ -425,6 +451,9 @@ fun SignIn(navController: NavHostController) {
                                 catch(e:Exception){
                                     message = e.toString()
                                 }
+                                finally {
+                                    signin = false
+                                }
                             }
                         }
 
@@ -438,24 +467,191 @@ fun SignIn(navController: NavHostController) {
                         Spacer(modifier = Modifier.size(Dimens.login_spacer))
 
 
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentHeight(),
-                            text = "رمز عبور خود را فراموش کرده ام",
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center
+                        TextButton(onClick = {
+                            navController.navigate("forgetpassword")
+                        }) {
+                            Text(text = "رمز عبور خود را فراموش کرده ام",
+                                style = MaterialTheme.typography.bodyMedium
 
-                        )
-
+                            )
+                        }
 
                     }
+                }
+
+                Box(modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.BottomCenter) {
+
+                    TextButton(onClick = {
+                        navController.navigate("signup") },
+                    ) { Text(text = "حساب کاربری ندارید؟ اینجا کلیک کنید",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Black)}
                 }
             }
 
         }
     }
 }
+
+
+@Composable
+fun ForgetPassword(navController: NavHostController) {
+
+    var phone by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var forget by remember { mutableStateOf(false) }
+    val snackScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    var message by remember { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    RightToLeftLayout {
+
+        Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) })
+        {contentPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding)
+                    .background(
+                        brush = Brush.linearGradient(
+                            listOf(
+                                Colors.signup_background_top,
+                                Colors.signup_background_bottom
+                            )
+                        )
+                    )
+                    .padding(Dimens.login_padding),
+                contentAlignment = Alignment.Center
+            )
+            {
+
+                Card(
+                    modifier = Modifier
+                        .wrapContentSize(),
+                    shape = RoundedCornerShape(Dimens.login_card_corner),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(30.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    )
+                    {
+
+                        OutlinedTextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = username,
+                            onValueChange = { username = it },
+                            shape = RoundedCornerShape(Dimens.textfield_corner),
+                            placeholder = { Text(text = "نام کاربری") },
+                            singleLine = true,
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            colors = TextFieldDefaults.colors(
+                                focusedPlaceholderColor = Colors.outline_textfield_border,
+                                unfocusedPlaceholderColor = Colors.outline_textfield_border,
+                                focusedIndicatorColor = Colors.outline_textfield_border,
+                                unfocusedIndicatorColor = Colors.outline_textfield_border
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.size(Dimens.login_spacer))
+
+
+                        OutlinedTextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = phone,
+                            onValueChange = { phone = it },
+                            shape = RoundedCornerShape(Dimens.textfield_corner),
+                            placeholder = { Text(text = "شماره موبایل") },
+                            singleLine = true,
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            colors = TextFieldDefaults.colors(
+                                focusedPlaceholderColor = Colors.outline_textfield_border,
+                                unfocusedPlaceholderColor = Colors.outline_textfield_border,
+                                focusedIndicatorColor = Colors.outline_textfield_border,
+                                unfocusedIndicatorColor = Colors.outline_textfield_border
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.size(Dimens.login_spacer))
+
+                        Row(modifier = Modifier.fillMaxWidth())
+                        {
+                            Button(
+                                modifier = Modifier
+                                    .height(Dimens.signup_button_height)
+                                    .fillMaxWidth(),
+                                onClick = {
+                                    keyboardController?.hide()
+                                    if (username.isBlank() || phone.isBlank()) {
+                                        message = "لطفا تمام اطلاعات را وارد کنید"
+                                    } else {
+                                        forget = true
+                                    }
+                                },
+                                shape = RoundedCornerShape(Dimens.textfield_corner),
+                                colors = ButtonDefaults.buttonColors(
+                                    contentColor = Color.White,
+                                    containerColor = Colors.appcolor
+
+                                )
+                            ) {
+                                Text(
+                                    text = "بازیابی رمز عبور",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+
+                        if(forget) {
+                            LaunchedEffect(forget) {
+                                try {
+                                    val response =
+                                        RetrofitInstance.api.forgetPassword(
+                                            ForgetRequest(
+                                                username,
+                                                phone
+                                            )
+                                        )
+                                    if (response.message == "no user") {
+                                       message = "کاربری با این نام کاربری و شماره تلفن همراه وجود ندارد"
+
+                                    } else if (response.message == "sms") {
+                                        message = "اطلاعات کاربری شما تا دقایقی دیگر برایتان ارسال می شود"
+                                    }
+                                }
+                                catch(e:Exception){
+                                    message = e.toString()
+                                }
+                                finally {
+                                    forget = false
+                                }
+                            }
+                        }
+
+                        LaunchedEffect(message) {
+                            if(message.isNotBlank()){
+                                snackScope.launch {
+                                    snackbarHostState.showSnackbar(message)
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+            }
+
+        }
+    }
+}
+
+
+
 
 @Preview(showBackground = true)
 @Composable
