@@ -6,11 +6,14 @@ import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.SavePostRequest
 import com.appcoding.social.models.SavePostResponse
+import com.appcoding.social.models.SigninRequest
+import com.appcoding.social.models.SigninResponse
 import com.appcoding.social.models.SignupRequest
 import com.appcoding.social.models.StringMessage
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -51,6 +54,10 @@ interface ApiService
 
      @POST("users/signup")
      suspend fun signUp(@Body signupRequest: SignupRequest) : StringMessage
+
+     @POST("users/signin")
+     suspend fun signIn(@Body signinRequest: SigninRequest) : Response<SigninResponse>
+
 
 
 }

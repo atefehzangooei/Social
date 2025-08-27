@@ -94,6 +94,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.appcoding.social.Functions.RightToLeftLayout
@@ -134,7 +135,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SocialTheme {
-                MyApp()
+
             }
         }
     }
@@ -143,7 +144,7 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @Composable
-fun MyApp() {
+fun MyApp(navController : NavHostController) {
 
     var selectedIndex by remember { mutableStateOf(0) }
     var isAddScreenVisible by remember { mutableStateOf(false) }
