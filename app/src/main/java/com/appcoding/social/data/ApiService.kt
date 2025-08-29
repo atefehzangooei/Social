@@ -11,6 +11,7 @@ import com.appcoding.social.models.SigninRequest
 import com.appcoding.social.models.SigninResponse
 import com.appcoding.social.models.SignupRequest
 import com.appcoding.social.models.StringMessage
+import com.appcoding.social.models.UserInfo
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -30,8 +31,8 @@ interface ApiService
      fun addPost(@Part("neveshtak") neveshtak:RequestBody,
                         @Part image : MultipartBody.Part) : Call<String>
 
-     @GET("posts/all/{userId}")
-     suspend fun getPost(@Path("userId") userId : Long) : List<PostResponse>
+     @GET("posts/follower/{userId}")
+     suspend fun getPostsByFollower(@Path("userId") userId : Long) : List<PostResponse>
 
      @GET("comments/{postId}")
      suspend fun getComments(@Path("postId") postId : Long) : List<CommentResponse>
@@ -61,5 +62,11 @@ interface ApiService
 
      @POST("users/forgetpassword")
      suspend fun forgetPassword(@Body forgetRequest: ForgetRequest) : StringMessage
+
+     @GET("posts/all/{userId}")
+     suspend fun getPostsByUserid(@Path("userId") userId : Long) : List<PostResponse>
+
+     @GET("users/{userid}")
+     suspend fun getUserInfo(@Path("userId") userId : Long) : UserInfo?
 
 }

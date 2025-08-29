@@ -52,6 +52,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.appcoding.social.Functions.RightToLeftLayout
@@ -61,6 +62,7 @@ import com.appcoding.social.models.SignupRequest
 import com.appcoding.social.ui.theme.SocialTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
@@ -79,7 +81,9 @@ class SignUpIn : ComponentActivity() {
 }
 
 @Composable
-fun Splash(navHostController: NavHostController){
+fun Splash(navController: NavHostController){
+
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -88,11 +92,19 @@ fun Splash(navHostController: NavHostController){
     )
 
     LaunchedEffect(Unit) {
-        delay(5000)
-        navHostController.navigate("signin"){
-            popUpTo("splash") { inclusive = true }
+        delay(3000)
+        val userid = UserPreferences.getUserIdFlow(context).first()?: 0L
+        if(userid > 0){
+            navController.navigate("main"){
+                popUpTo("splash"){inclusive = true}
+            }
         }
+        else {
+            navController.navigate("signin") {
+                popUpTo("splash") { inclusive = true }
+            }
 
+        }
 
     }
 }
@@ -326,6 +338,7 @@ fun SignIn(navController: NavHostController) {
     val snackbarHostState = remember { SnackbarHostState() }
     var message by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
 
     RightToLeftLayout {
 
@@ -440,6 +453,8 @@ fun SignIn(navController: NavHostController) {
                                         )
                                     if (response.isSuccessful) {
                                         val userInfo = response.body()
+                                        UserPreferences.saveUserId(context, userInfo!!.id)
+
                                         navController.navigate("main") {
                                             popUpTo("signin") { inclusive = true }
                                         }

@@ -127,12 +127,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val context = this
-
-        lifecycleScope.launch {
-            UserPreferences.saveUserId(context, 1L)
-        }
-
         setContent {
             SocialTheme {
 
@@ -649,7 +643,7 @@ fun MainData() {
             val id = UserPreferences.getUserIdFlow(context).first() ?: 0L
             userId = id
 
-            val result = RetrofitInstance.api.getPost(userId)
+            val result = RetrofitInstance.api.getPostsByFollower(userId)
             posts = result
         }
         catch(e : Exception){
@@ -682,7 +676,7 @@ fun MainData() {
             LaunchedEffect(Unit) {
                 //delay(1500)
                     try{
-                        val result = RetrofitInstance.api.getPost(userId)
+                        val result = RetrofitInstance.api.getPostsByFollower(userId)
                         posts = result
                         isRefreshing = false
                     }

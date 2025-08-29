@@ -1,7 +1,7 @@
 package com.appcoding.social.models
 
-data class User(
-    val userid : Int,
+data class UserInfo(
+    val userid : Long,
     val name : String,
     val username : String,
     val email : String,
