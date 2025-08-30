@@ -30,5 +30,6 @@ object Dimens {
     val login_card_corner = 30.dp
     val signup_button_height = 50.dp
     val signup_user_profile = 70.dp
+    val profile_activity_padding = 20.dp
 
 }

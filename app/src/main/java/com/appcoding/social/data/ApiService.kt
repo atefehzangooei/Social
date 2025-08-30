@@ -66,7 +66,7 @@ interface ApiService
      @GET("posts/all/{userId}")
      suspend fun getPostsByUserid(@Path("userId") userId : Long) : List<PostResponse>
 
-     @GET("users/{userid}")
+     @GET("users/{userId}")
      suspend fun getUserInfo(@Path("userId") userId : Long) : UserInfo?
 
 }

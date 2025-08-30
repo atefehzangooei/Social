@@ -142,8 +142,12 @@ fun MyApp(navController : NavHostController) {
 
     var selectedIndex by remember { mutableStateOf(0) }
     var isAddScreenVisible by remember { mutableStateOf(false) }
-
+    var userid by remember { mutableStateOf(0L) }
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        userid = UserPreferences.getUserIdFlow(context).first() ?: 0L
+    }
 
     val navigationItems = listOf(
         NavigationItem("Home",
@@ -233,10 +237,10 @@ fun MyApp(navController : NavHostController) {
             {
                 when(selectedIndex)
                 {
-                    0 -> HomeScreen()
+                    0 -> HomeScreen(userid, navController)
                     1 -> SearchScreen()
                     3 -> ReelsSCreen()
-                    4 -> ProfileScreen(myuser)
+                    4 -> ProfileScreen(userid)
                 }
 
 
@@ -608,7 +612,7 @@ fun getGalleryImages(context: Context): List<Uri> {
 
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(userid : Long, navController: NavHostController) {
 
     RightToLeftLayout {
 
@@ -618,7 +622,7 @@ fun HomeScreen() {
         {
             AppNameBar()
             DisplayStory()
-            MainData()
+            MainData(userid, navController)
         }
     }
 
@@ -626,7 +630,7 @@ fun HomeScreen() {
 
 @SuppressLint("ShowToast", "FrequentlyChangedStateReadInComposition")
 @Composable
-fun MainData() {
+fun MainData(userid : Long, navController: NavHostController) {
 
     val context = LocalContext.current
     var posts by remember { mutableStateOf<List<PostResponse>>(emptyList()) }
@@ -634,16 +638,11 @@ fun MainData() {
     val listState = rememberLazyListState()
     val isAtTop = (listState.firstVisibleItemIndex == 0) &&
             (listState.firstVisibleItemScrollOffset == 0)
-
-    var userId by remember { mutableStateOf(0L) }
-
+    
     LaunchedEffect(Unit){
 
         try{
-            val id = UserPreferences.getUserIdFlow(context).first() ?: 0L
-            userId = id
-
-            val result = RetrofitInstance.api.getPostsByFollower(userId)
+            val result = RetrofitInstance.api.getPostsByFollower(userid)
             posts = result
         }
         catch(e : Exception){
@@ -668,7 +667,7 @@ fun MainData() {
             LazyColumn(modifier = Modifier.fillMaxSize())
             {
                 items(posts) { post ->
-                    PostCard(post, userId)
+                    PostCard(post, userid, navController)
                 }
             }
         }
@@ -676,7 +675,7 @@ fun MainData() {
             LaunchedEffect(Unit) {
                 //delay(1500)
                     try{
-                        val result = RetrofitInstance.api.getPostsByFollower(userId)
+                        val result = RetrofitInstance.api.getPostsByFollower(userid)
                         posts = result
                         isRefreshing = false
                     }
@@ -732,7 +731,7 @@ fun AppNameBar() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostCard(post : PostResponse, userId : Long) {
+fun PostCard(post : PostResponse, userid : Long, navController: NavHostController) {
 
     var commentSheetState by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -747,6 +746,7 @@ fun PostCard(post : PostResponse, userId : Long) {
     val context = LocalContext.current
     var likeCount by remember { mutableStateOf(post.likeCount) }
     var commentCount by remember { mutableStateOf(post.commentCount) }
+
 
     RightToLeftLayout {
 
@@ -767,7 +767,10 @@ fun PostCard(post : PostResponse, userId : Long) {
                     contentDescription = "home_profile_image",
                     modifier = Modifier
                         .size(Dimens.home_profile_image_size)
-                        .clip(CircleShape),
+                        .clip(CircleShape)
+                        .clickable {
+                            navController.navigate("profile/${post.userId}")
+                        },
                     contentScale = ContentScale.Crop
                 )
 
@@ -856,7 +859,7 @@ fun PostCard(post : PostResponse, userId : Long) {
                                         val response = RetrofitInstance.api.likePost(
                                             LikeRequest(
                                                 postId = post.id,
-                                                userId = userId,
+                                                userId = userid,
                                                 date = "",
                                                 time = ""
                                             )
@@ -865,7 +868,7 @@ fun PostCard(post : PostResponse, userId : Long) {
                                         likeCount--
                                         val response = RetrofitInstance.api.disLikePost(
                                             postId = post.id,
-                                            userId = userId
+                                            userId = userid
                                         )
                                     }
                                 }
@@ -905,7 +908,7 @@ fun PostCard(post : PostResponse, userId : Long) {
                         onDismissRequest = { commentSheetState = false },
                         modifier = Modifier.background(Color.White)
                     ) {
-                        CommentBottomSheet(post, userId)
+                        CommentBottomSheet(post, userid)
                     }
                 }
 
@@ -923,7 +926,7 @@ fun PostCard(post : PostResponse, userId : Long) {
                             if(saved){
                                     val response = RetrofitInstance.api.savePost(
                                         SavePostRequest(
-                                            userId = userId,
+                                            userId = userid,
                                             postId = post.id,
                                             date = "14",
                                             time = "14"
@@ -932,7 +935,7 @@ fun PostCard(post : PostResponse, userId : Long) {
                                 }
                                 else{
                                 val response = RetrofitInstance.api.unSavePost(
-                                        userId = userId,
+                                        userId = userid,
                                         postId = post.id
                                 )
                             }
@@ -962,7 +965,7 @@ fun PostCard(post : PostResponse, userId : Long) {
 
 
 @Composable
-fun CommentBottomSheet(post : PostResponse, userId : Long){
+fun CommentBottomSheet(post : PostResponse, userid : Long){
 
     val context = LocalContext.current
     var comments by remember { mutableStateOf<List<CommentResponse>>(emptyList()) }
@@ -1054,7 +1057,7 @@ fun CommentBottomSheet(post : PostResponse, userId : Long){
                                 coroutineScope.launch(Dispatchers.IO) {
                                     val commentRequest = CommentRequest(
                                         postId = post.id,
-                                        userId = userId,
+                                        userId = userid,
                                         comment = newComment,
                                         date = "1404",
                                         time = "18:00"
@@ -1182,6 +1185,6 @@ fun MyAppPreview() {
             "","",0, 0, "",
             false, false)
 
-        PostCard(npost, 1)
+      //  PostCard(npost, 1)
     }
 }

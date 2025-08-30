@@ -501,7 +501,7 @@ fun SignIn(navController: NavHostController) {
                         navController.navigate("signup") },
                     ) { Text(text = "حساب کاربری ندارید؟ اینجا کلیک کنید",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Black)}
+                        color = Colors.signup_signuptext)}
                 }
             }
 

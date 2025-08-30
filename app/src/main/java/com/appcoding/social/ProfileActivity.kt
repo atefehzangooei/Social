@@ -1,6 +1,7 @@
 package com.appcoding.social
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -8,18 +9,24 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -69,57 +76,109 @@ class ProfileActivity : ComponentActivity() {
 }
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(userid : Long = 0) {
 
     RightToLeftLayout {
 
         val profileImageSizeHalf = Dimens.profile_profile_image_size / 2
         val profilePaddingTop = Dimens.profile_header_size - profileImageSizeHalf
         val context = LocalContext.current
-        var userid by remember { mutableStateOf<Long>(0L) }
+        var myUserid by remember { mutableStateOf<Long>(0L) }
         var userInfo by remember { mutableStateOf<UserInfo?>(null) }
+        var isLoading by remember { mutableStateOf(false) }
+        var myProfile by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
-             userid = UserPreferences.getUserIdFlow(context).first() ?: 0L
-             userInfo = RetrofitInstance.api.getUserInfo(userid)
+            try {
+                myUserid = UserPreferences.getUserIdFlow(context).first() ?: 0L
+                myProfile = userid == myUserid
+                userInfo = RetrofitInstance.api.getUserInfo(userid)
+            }
+            finally {
+                isLoading = true
+            }
         }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-
+            if(!isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(30.dp),
+                    color = Colors.progress_color)
+            }
+            else{
                 Username(userInfo!!.username)
                 ProfileInfo(userInfo)
                 Bio(userInfo!!.bio, userInfo!!.link)
                 Spacer(modifier = Modifier.size(Dimens.normal_spacer))
-                ProfileButtons()
+                ProfileButtons(myProfile)
                 Spacer(modifier = Modifier.size(Dimens.normal_spacer))
-                //displayPosts(userInfo!!.userid)
+                DisplayPosts(userInfo!!.userid)
+            }
 
         }
 
     }
 }
-/*
+
 @Composable
-fun displayPosts(userid : Long) : List<PostResponse>
-{
+fun DisplayPosts(userid : Long) {
+    var posts by remember { mutableStateOf<List<PostResponse>>(emptyList()) }
+    var loading by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
-        val posts = RetrofitInstance.api.getPostsByUserid(userid)
+        try {
+            posts = RetrofitInstance.api.getPostsByUserid(userid)
+
+        }
+        catch(e : Exception){
+            Toast.makeText(context, e.toString(),Toast.LENGTH_SHORT).show()
+        }
+        finally {
+            loading = true
+        }
+    }
+
+    if(loading) {
+        if (posts.isNotEmpty()) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(posts) { item ->
+                    ProfilePostCard(item)
+                }
+            }
+        }
+    }
+    else{
+
 
     }
 }
-*/
+
 
 @Composable
-fun ProfilePostCard(){
+fun ProfilePostCard(post : PostResponse){
 
+    AsyncImage(model = post.image,
+        modifier = Modifier
+        .padding(1.dp)
+        .aspectRatio(1f),
+        contentDescription = "post cover",
+        contentScale = ContentScale.Crop
+        )
 }
 
 
 @Composable
-fun ProfileButtons(){
+fun ProfileButtons(myProfile : Boolean){
 
     val followButtonWidth = screenWidth() /3
 
@@ -132,26 +191,31 @@ fun ProfileButtons(){
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        Button(onClick = {},
-            shape = RoundedCornerShape(Dimens.profile_follow_button_corner),
-            modifier = Modifier
-                .width(followButtonWidth)
-                .shadow(
-                    elevation = 5.dp,
-                    shape = RoundedCornerShape(Dimens.profile_follow_button_corner),
-                    ambientColor = Color.Black.copy(alpha = 0.25f),
-                    spotColor = Color.Black.copy(alpha = 0.25f)
-                ),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Colors.appcolor,
-                contentColor = Color.White)
+        if(!myProfile) {
+            Button(
+                onClick = {},
+                shape = RoundedCornerShape(Dimens.profile_follow_button_corner),
+                modifier = Modifier
+                    .width(followButtonWidth)
+                    .shadow(
+                        elevation = 5.dp,
+                        shape = RoundedCornerShape(Dimens.profile_follow_button_corner),
+                        ambientColor = Color.Black.copy(alpha = 0.25f),
+                        spotColor = Color.Black.copy(alpha = 0.25f)
+                    ),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Colors.appcolor,
+                    contentColor = Color.White
+                )
 
-        ) {
-            Text(text = "دنبال کردن",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White)
+            ) {
+                Text(
+                    text = "دنبال کردن",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White
+                )
+            }
         }
-
         Spacer(modifier = Modifier.size(Dimens.normal_spacer))
 
         Button(onClick = {},
@@ -167,10 +231,9 @@ fun ProfileButtons(){
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.White,
                 contentColor = Color.Black),
-            border = BorderStroke(width = 1.dp,
-                color = Colors.border_button)
+            border = BorderStroke(width = 1.dp, color = Colors.border_button)
         ) {
-            Text(text = "پیام",
+            Text(text = if(myProfile) "ویرایش پروفایل" else "پیام",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Black)
         }
@@ -209,7 +272,7 @@ fun Username(username : String){
 
     Text(modifier = Modifier
         .fillMaxWidth()
-        .padding(Dimens.normal_padding),
+        .padding(Dimens.profile_activity_padding),
         textAlign = TextAlign.Right,
         text = username,
         style = MaterialTheme.typography.bodyMedium,
@@ -226,7 +289,7 @@ fun ProfileInfo(user : UserInfo?){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(Dimens.normal_padding),
+                .padding(Dimens.profile_activity_padding),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
