@@ -58,6 +58,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -113,6 +114,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -142,12 +144,14 @@ fun MyApp(navController : NavHostController) {
 
     var selectedIndex by remember { mutableStateOf(0) }
     var isAddScreenVisible by remember { mutableStateOf(false) }
-    var userid by remember { mutableStateOf(0L) }
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        userid = UserPreferences.getUserIdFlow(context).first() ?: 0L
+    val initialUserId = runBlocking {
+        UserPreferences.getUserIdFlow(context).first() ?: 0L
     }
+    var userid by remember { mutableStateOf(initialUserId) }
+
+
 
     val navigationItems = listOf(
         NavigationItem("Home",
@@ -235,14 +239,17 @@ fun MyApp(navController : NavHostController) {
                 .padding(contentPadding)
                 .background(color = Colors.background))
             {
-                when(selectedIndex)
-                {
-                    0 -> HomeScreen(userid, navController)
-                    1 -> SearchScreen()
-                    3 -> ReelsSCreen()
-                    4 -> ProfileScreen(userid)
+                if(userid == 0L){
+                    CircularProgressIndicator()
                 }
-
+                else {
+                    when (selectedIndex) {
+                        0 -> HomeScreen(userid, navController)
+                        1 -> SearchScreen()
+                        3 -> ReelsSCreen()
+                        4 -> ProfileScreen(userid)
+                    }
+                }
 
                 AnimatedVisibility(
                     visible = isAddScreenVisible,
@@ -642,11 +649,19 @@ fun MainData(userid : Long, navController: NavHostController) {
     LaunchedEffect(Unit){
 
         try{
-            val result = RetrofitInstance.api.getPostsByFollower(userid)
-            posts = result
+            posts = RetrofitInstance.api.getPostsByFollower(userid)
         }
         catch(e : Exception){
             Toast.makeText(context,e.message, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    if(posts.isNotEmpty()) {
+        LazyColumn(modifier = Modifier.fillMaxSize())
+        {
+            items(posts) { post ->
+                PostCard(post, userid, navController)
+            }
         }
     }
 
@@ -654,6 +669,8 @@ fun MainData(userid : Long, navController: NavHostController) {
         .fillMaxSize()
         .background(Color.White)
     ){
+
+
 
         SwipeRefresh(
             state = rememberSwipeRefreshState(isRefreshing),
@@ -902,11 +919,14 @@ fun PostCard(post : PostResponse, userid : Long, navController: NavHostControlle
                     )
                 }
 
+
                 if (commentSheetState) {
                     ModalBottomSheet(
                         sheetState = sheetState,
                         onDismissRequest = { commentSheetState = false },
-                        modifier = Modifier.background(Color.White)
+                        modifier = Modifier.height(300.dp),
+                        containerColor = Color.White,
+                        scrimColor = Color.Black.copy(alpha = 0.5f)
                     ) {
                         CommentBottomSheet(post, userid)
                     }

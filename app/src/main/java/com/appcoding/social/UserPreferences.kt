@@ -21,7 +21,7 @@ object UserPreferences {
 
     fun getUserIdFlow(context: Context): Flow<Long?> {
         return context.dataStore.data.map { prefs ->
-            prefs[USER_ID]
+            prefs[USER_ID] ?: 0L
         }
     }
 }

@@ -16,7 +16,7 @@ object Colors{
     //val appcolor = Color(0xFF5790df)
     //val appcolor_purple = Color(0xFFD770C3)
     val border_button = Color(0x4D454444)
-    val signup_signuptext = Color(0x4D454444)
+    val signup_signuptext = Color(0x00000000)
     val outline_textfield_border = Color(0xFF939393)
     val close_color = Color(0xFF565656)
     val progress_color = Color(0xFF565656)

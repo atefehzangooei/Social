@@ -55,6 +55,7 @@ import com.appcoding.social.models.UserInfo
 import com.appcoding.social.ui.theme.SocialTheme
 import com.appcoding.social.models.PostResponse
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 
 const val profileImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwLOO_ZbFmHlHIE2lpbitsU6v-528Ms3cWXA&s"
@@ -83,14 +84,18 @@ fun ProfileScreen(userid : Long = 0) {
         val profileImageSizeHalf = Dimens.profile_profile_image_size / 2
         val profilePaddingTop = Dimens.profile_header_size - profileImageSizeHalf
         val context = LocalContext.current
-        var myUserid by remember { mutableStateOf<Long>(0L) }
+
+        val initialUserId = runBlocking {
+            UserPreferences.getUserIdFlow(context).first() ?: 0L
+        }
+        var myUserid by remember { mutableStateOf(initialUserId) }
+
         var userInfo by remember { mutableStateOf<UserInfo?>(null) }
         var isLoading by remember { mutableStateOf(false) }
         var myProfile by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
             try {
-                myUserid = UserPreferences.getUserIdFlow(context).first() ?: 0L
                 myProfile = userid == myUserid
                 userInfo = RetrofitInstance.api.getUserInfo(userid)
             }

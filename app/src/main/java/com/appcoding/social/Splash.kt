@@ -64,6 +64,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.Exception
 
 
@@ -91,9 +92,14 @@ fun Splash(navController: NavHostController){
             .background(Colors.appcolor)
     )
 
+    val initialUserId = runBlocking {
+        UserPreferences.getUserIdFlow(context).first() ?: 0L
+    }
+    var userid by remember { mutableStateOf(initialUserId) }
+
+
     LaunchedEffect(Unit) {
         delay(3000)
-        val userid = UserPreferences.getUserIdFlow(context).first()?: 0L
         if(userid > 0){
             navController.navigate("main"){
                 popUpTo("splash"){inclusive = true}
