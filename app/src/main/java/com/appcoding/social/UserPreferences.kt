@@ -29,7 +29,7 @@ object UserPreferences {
     }
 
     @Composable
-    fun getUserid(context : Context) : Long{
+    fun getUserid(context : Context) : Long?{
         val userid by getUserIdFlow(context).collectAsState(initial = 0L)
         return userid
     }
