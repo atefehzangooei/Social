@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.appcoding.social.Functions.RightToLeftLayout
+import com.appcoding.social.Functions.SpiralLoader
 import com.appcoding.social.Functions.screenWidth
 import com.appcoding.social.models.UserInfo
 import com.appcoding.social.ui.theme.SocialTheme
@@ -106,12 +107,12 @@ fun ProfileScreen(userid : Long = 0) {
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if(!isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(30.dp),
-                    color = Colors.progress_color)
+                Functions.myCircularProgress()
             }
             else{
                 Username(userInfo!!.username)

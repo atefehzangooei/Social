@@ -7,6 +7,7 @@ import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.SavePostRequest
 import com.appcoding.social.models.SavePostResponse
+import com.appcoding.social.models.SearchRequest
 import com.appcoding.social.models.SigninRequest
 import com.appcoding.social.models.SigninResponse
 import com.appcoding.social.models.SignupRequest
@@ -68,5 +69,8 @@ interface ApiService
 
      @GET("users/{userId}")
      suspend fun getUserInfo(@Path("userId") userId : Long) : UserInfo?
+
+     @GET("posts/search")
+     suspend fun searchPost(@Body searchRequest : SearchRequest) : List<PostResponse>
 
 }

@@ -71,6 +71,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -146,9 +147,10 @@ fun MyApp(navController : NavHostController) {
     var isAddScreenVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    val initialUserId = runBlocking {
+   /* val initialUserId = runBlocking {
         UserPreferences.getUserIdFlow(context).first() ?: 0L
-    }
+    }*/
+
     var userid by remember { mutableStateOf(initialUserId) }
 
 
@@ -240,7 +242,7 @@ fun MyApp(navController : NavHostController) {
                 .background(color = Colors.background))
             {
                 if(userid == 0L){
-                    CircularProgressIndicator()
+                    Functions.myCircularProgress()
                 }
                 else {
                     when (selectedIndex) {

@@ -279,35 +279,33 @@ fun SignUp(navController: NavHostController){
                                 )
                             }
 
-                            if(signup) {
+
                                 LaunchedEffect(signup) {
-
-                                    try {
-                                        val response = RetrofitInstance.api.signUp(
-                                            SignupRequest(
-                                                phone = phone,
-                                                username = username,
-                                                password = password
+                                    if(signup) {
+                                        try {
+                                            val response = RetrofitInstance.api.signUp(
+                                                SignupRequest(
+                                                    phone = phone,
+                                                    username = username,
+                                                    password = password
+                                                )
                                             )
-                                        )
-                                        if (response.message == "repeated username") {
-                                            message = "نام کاربری وارد شده تکراری است"
+                                            if (response.message == "repeated username") {
+                                                message = "نام کاربری وارد شده تکراری است"
 
-                                        } else if (response.message == "success") {
-                                            success = true
-                                            message = "حساب شما با موفقیت ایجاد شد"
-                                        } else {
-                                            message = "نام کاربری دیگری انتخاب کنید"
+                                            } else if (response.message == "success") {
+                                                success = true
+                                                message = "حساب شما با موفقیت ایجاد شد"
+                                            } else {
+                                                message = "نام کاربری دیگری انتخاب کنید"
 
+                                            }
+                                        } catch (e: Exception) {
+                                            message = e.toString()
+                                        } finally {
+                                            signup = false
                                         }
                                     }
-                                    catch(e : Exception){
-                                        message = e.toString()
-                                    }
-                                    finally {
-                                        signup = false
-                                    }
-                                }
                             }
 
                             LaunchedEffect(message)

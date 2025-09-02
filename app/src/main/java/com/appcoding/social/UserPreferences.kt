@@ -1,6 +1,9 @@
 package com.appcoding.social
 
 import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -23,5 +26,11 @@ object UserPreferences {
         return context.dataStore.data.map { prefs ->
             prefs[USER_ID] ?: 0L
         }
+    }
+
+    @Composable
+    fun getUserid(context : Context) : Long{
+        val userid by getUserIdFlow(context).collectAsState(initial = 0L)
+        return userid
     }
 }

@@ -21,7 +21,7 @@ object Dimens {
     val profile_follow_button_corner = 25.dp
     val profile_profile_image_size = 100.dp
     val profile_header_size = 200.dp
-    val search_box_corner = 20.dp
+    val search_box_corner = 10.dp
     val search_box_icon_size = 25.dp
     val textfield_corner = 30.dp
     val login_spacer = 10.dp
