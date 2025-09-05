@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.appcoding.social.Functions.RightToLeftLayout
-import com.appcoding.social.Functions.SpiralLoader
 import com.appcoding.social.Functions.screenWidth
 import com.appcoding.social.models.UserInfo
 import com.appcoding.social.ui.theme.SocialTheme

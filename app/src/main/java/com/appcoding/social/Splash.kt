@@ -101,7 +101,7 @@ fun Splash(navController: NavHostController){
     LaunchedEffect(Unit) {
         delay(3000)
         if(userid > 0){
-            navController.navigate("main"){
+            navController.navigate("main/$userid"){
                 popUpTo("splash"){inclusive = true}
             }
         }

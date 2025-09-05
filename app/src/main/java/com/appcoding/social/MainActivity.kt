@@ -141,7 +141,7 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @Composable
-fun MyApp(navController : NavHostController) {
+fun MyApp(userid : Long, navController : NavHostController) {
 
     var selectedIndex by remember { mutableStateOf(0) }
     var isAddScreenVisible by remember { mutableStateOf(false) }
@@ -150,9 +150,6 @@ fun MyApp(navController : NavHostController) {
    /* val initialUserId = runBlocking {
         UserPreferences.getUserIdFlow(context).first() ?: 0L
     }*/
-
-    var userid by remember { mutableStateOf(initialUserId) }
-
 
 
     val navigationItems = listOf(
@@ -178,6 +175,7 @@ fun MyApp(navController : NavHostController) {
         )
         
     )
+
     RightToLeftLayout{
 
         val btnShape = RoundedCornerShape(Dimens.bottom_navigation_corner,
@@ -239,7 +237,8 @@ fun MyApp(navController : NavHostController) {
             Box(modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
-                .background(color = Colors.background))
+                .background(color = Colors.background),
+                contentAlignment = Alignment.Center)
             {
                 if(userid == 0L){
                     Functions.myCircularProgress()
@@ -247,8 +246,8 @@ fun MyApp(navController : NavHostController) {
                 else {
                     when (selectedIndex) {
                         0 -> HomeScreen(userid, navController)
-                        1 -> SearchScreen()
-                        3 -> ReelsSCreen()
+                        1 -> SearchScreen(userid)
+                        3 -> ReelsScreen()
                         4 -> ProfileScreen(userid)
                     }
                 }
@@ -274,7 +273,7 @@ fun MyApp(navController : NavHostController) {
 
 
 @Composable
-fun ReelsSCreen() {
+fun ReelsScreen() {
 
 }
 

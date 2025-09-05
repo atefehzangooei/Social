@@ -16,8 +16,16 @@ fun AppNavHost(navController: NavHostController, startDestination : String = "sp
         composable("splash"){ Splash(navController) }
         composable("signin"){ SignIn(navController) }
         composable("signup"){ SignUp(navController) }
-        composable("main"){ MyApp(navController) }
+       // composable("main"){ MyApp(navController) }
         composable("forgetpassword"){ ForgetPassword(navController) }
+
+        composable(
+            route = "main/{userid}",
+            arguments = listOf(navArgument("userid") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val userid = backStackEntry.arguments!!.getLong("userid")
+            MyApp(userid, navController)
+        }
 
         composable(
             route = "profile/{userid}",

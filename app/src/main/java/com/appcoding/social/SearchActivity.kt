@@ -1,19 +1,29 @@
 package com.appcoding.social
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,18 +43,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.appcoding.social.Functions.RightToLeftLayout
 import com.appcoding.social.models.PostResponse
-import com.appcoding.social.models.SearchRequest
 import com.appcoding.social.ui.theme.SocialTheme
 import kotlinx.coroutines.launch
 
@@ -60,8 +72,9 @@ class SearchActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SearchScreen() {
+fun SearchScreen(userid : Long) {
 
     var searchText by remember { mutableStateOf("") }
     var isFocused by remember { mutableStateOf(false) }
@@ -74,11 +87,10 @@ fun SearchScreen() {
 
     RightToLeftLayout{
 
-        Scaffold( snackbarHost = { SnackbarHost(hostState = snackbarHostState)}
-        ) {contentPadding ->
+        Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState)}
+        ) {
         Column(modifier = Modifier
             .fillMaxSize()
-            .padding(contentPadding)
             .background(Colors.background)
             .padding(Dimens.normal_padding)
         ) {
@@ -139,15 +151,13 @@ fun SearchScreen() {
 
             Spacer(modifier = Modifier.size(10.dp))
 
-            if(searchAction) {
-                Functions.myCircularProgress()
-                LaunchedEffect(searchAction) {
+
+            LaunchedEffect(searchAction) {
+                if(searchAction) {
                     try {
                         posts = RetrofitInstance.api.searchPost(
-                            SearchRequest(
-                                userId = ,
-                                text = searchText
-                            )
+                            text = searchText,
+                            userId = userid
                         )
 
                     } catch (e: Exception) {
@@ -157,6 +167,32 @@ fun SearchScreen() {
                     } finally {
                         searchAction = false
                     }
+                }
+            }
+
+
+            if(posts.isNotEmpty()){
+                LazyColumn( modifier = Modifier
+                    .fillMaxSize()) {
+                    items(posts){ post ->
+                        AsyncImage(model = post.image,
+                            contentDescription = "post cover",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+            }
+
+            if(searchAction) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Functions.myCircularProgress()
                 }
             }
         }
@@ -170,6 +206,6 @@ fun SearchScreen() {
 @Composable
 fun GreetingPreview() {
     SocialTheme {
-        SearchScreen()
+        SearchScreen(1)
     }
 }
