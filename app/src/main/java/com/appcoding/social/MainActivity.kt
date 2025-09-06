@@ -192,11 +192,7 @@ fun MyApp(userid : Long, navController : NavHostController) {
                         modifier = Modifier
                             .wrapContentHeight()
                             .background(Color.White)
-                            .shadow(elevation = Dimens.bottom_appbar_shadow,
-                                shape = btnShape)
-                            .clip(btnShape)
-
-
+                            .shadow(elevation = Dimens.bottom_appbar_shadow)
                     )
                     {
                         Row(

@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,12 +22,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -50,10 +55,12 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.appcoding.social.Functions.RightToLeftLayout
 import com.appcoding.social.models.PostResponse
@@ -83,6 +90,7 @@ fun SearchScreen(userid : Long) {
     val snackbarHostState = remember { SnackbarHostState() }
     val snackScope = rememberCoroutineScope()
     var posts by remember { mutableStateOf<List<PostResponse>>(emptyList()) }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
 
     RightToLeftLayout{
@@ -92,18 +100,17 @@ fun SearchScreen(userid : Long) {
         Column(modifier = Modifier
             .fillMaxSize()
             .background(Colors.background)
-            .padding(Dimens.normal_padding)
         ) {
             TextField(value = searchText,
                 onValueChange = {
                     searchText = it
-                    if(searchText.isBlank()) {
-                        isTyping = true
-                    }
+                    isTyping = true
+
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onFocusChanged {focuseState ->
+                    .padding(Dimens.normal_padding)
+                    .onFocusChanged { focuseState ->
                         isFocused = focuseState.isFocused
                     },
                 shape = RoundedCornerShape(Dimens.search_box_corner),
@@ -145,6 +152,7 @@ fun SearchScreen(userid : Long) {
                 keyboardActions = KeyboardActions(
                     onSearch = {
                         searchAction = true
+                        keyboardController?.hide()
                     }
                 )
             )
@@ -153,6 +161,7 @@ fun SearchScreen(userid : Long) {
 
 
             LaunchedEffect(searchAction) {
+
                 if(searchAction) {
                     try {
                         posts = RetrofitInstance.api.searchPost(
@@ -172,19 +181,7 @@ fun SearchScreen(userid : Long) {
 
 
             if(posts.isNotEmpty()){
-                LazyColumn( modifier = Modifier
-                    .fillMaxSize()) {
-                    items(posts){ post ->
-                        AsyncImage(model = post.image,
-                            contentDescription = "post cover",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1f)
-                                .clip(RoundedCornerShape(8.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                }
+                DisplayStaggeredList(posts)
             }
 
             if(searchAction) {
@@ -200,6 +197,81 @@ fun SearchScreen(userid : Long) {
         }
 
 
+}
+
+/*  LazyVerticalStaggeredGrid (modifier = Modifier
+        .fillMaxSize(),
+        columns = StaggeredGridCells.Fixed(3),
+        verticalItemSpacing = 2.dp,
+        horizontalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        itemsIndexed(posts){ index  ,post ->
+            Display(index, post)
+
+        }
+    }*/
+
+@Composable
+fun DisplayStaggeredList(posts : List<PostResponse>){
+   /* val columns = List(3){ mutableListOf<PostResponse>() }
+    posts.forEachIndexed { index, post ->
+        columns[index % 3].add(post)
+    }
+    val scrollState = rememberScrollState()
+
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(scrollState)
+    ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            columns.forEachIndexed() { colIndex, columnPosts ->
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    columnPosts.forEachIndexed {index, post->
+                        Display(index, post, colIndex)
+                    }
+
+                }
+            }
+        }
+    }*/
+
+      LazyVerticalStaggeredGrid (modifier = Modifier
+        .fillMaxSize(),
+        columns = StaggeredGridCells.Fixed(3),
+         // verticalItemSpacing = 2.dp,
+         // horizontalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        itemsIndexed(posts){ index  ,post ->
+            Display(index, post, 1)
+
+        }
+    }
+
+}
+
+@Composable
+fun Display(index : Int, post : PostResponse, colIndex : Int){
+    Box(contentAlignment = Alignment.Center) {
+        AsyncImage(
+            model = post.image,
+            contentDescription = "post cover",
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(width = 1.dp, color = Color.White)
+                .aspectRatio(
+                    if(index % 10 in listOf(0,7)) 0.5f else 1f
+                ),
+            contentScale = ContentScale.Crop
+        )
+
+        Text(text = index.toString(),
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.Red,
+            modifier = Modifier.background(Color.White))
+    }
 }
 
 @Preview(showBackground = true)
