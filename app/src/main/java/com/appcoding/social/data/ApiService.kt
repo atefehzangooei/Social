@@ -31,8 +31,10 @@ interface ApiService
      fun addPost(@Part("neveshtak") neveshtak:RequestBody,
                         @Part image : MultipartBody.Part) : Call<String>
 
-     @GET("posts/follower/{userId}")
-     suspend fun getPostsByFollower(@Path("userId") userId : Long) : List<PostResponse>
+     @GET("posts/follower/{userId}/{lastSeenId}/{size}")
+     suspend fun getPostsByFollower(@Path("userId") userId : Long,
+                                    @Path("lastSeenId") lastSeenId : Long?,
+                                    @Path("size") size : Int) : List<PostResponse>
 
      @GET("comments/{postId}")
      suspend fun getComments(@Path("postId") postId : Long) : List<CommentResponse>

@@ -77,6 +77,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -639,22 +640,56 @@ fun MainData(userid : Long, navController: NavHostController) {
     val context = LocalContext.current
     var posts by remember { mutableStateOf<List<PostResponse>>(emptyList()) }
     var isRefreshing by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val isAtTop = (listState.firstVisibleItemIndex == 0) &&
             (listState.firstVisibleItemScrollOffset == 0)
+    var lastSeenId by remember { mutableStateOf<Long?>(-1) }
+    val pageSize = 10
     
     LaunchedEffect(Unit){
-
         try{
-            posts = RetrofitInstance.api.getPostsByFollower(userid)
+            isLoading = true
+            val response = RetrofitInstance.api.getPostsByFollower(userid, lastSeenId, pageSize)
+            posts = response
+            lastSeenId =response.lastOrNull()?.id
         }
         catch(e : Exception){
             Toast.makeText(context,e.message, Toast.LENGTH_LONG).show()
         }
+        finally {
+            isLoading = false
+        }
+    }
+
+    LaunchedEffect(listState) {
+        //Toast.makeText(context, "state", Toast.LENGTH_SHORT).show()
+        snapshotFlow {listState.layoutInfo}
+            .collect{ layoutInfo ->
+                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index
+                val totalItems = layoutInfo.totalItemsCount
+
+                if (!isLoading && lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
+                    try{
+                        isLoading = true
+                        val response = RetrofitInstance.api.getPostsByFollower(userid, lastSeenId, pageSize)
+                        posts = posts + response
+                        lastSeenId =response.lastOrNull()?.id
+                    }
+                    catch(e : Exception){
+                        Toast.makeText(context, e.toString(),Toast.LENGTH_LONG).show()
+                    }
+                    finally {
+                        isLoading = false
+                    }
+                }
+            }
     }
 
     if(posts.isNotEmpty()) {
-        LazyColumn(modifier = Modifier.fillMaxSize())
+        LazyColumn(modifier = Modifier
+            .fillMaxSize(),
+            state = listState)
         {
             items(posts) { post ->
                 PostCard(post, userid, navController)
@@ -662,12 +697,19 @@ fun MainData(userid : Long, navController: NavHostController) {
         }
     }
 
+    if(isLoading){
+        Box(modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center){
+            Functions.myCircularProgress()
+        }
+    }
+
+
+/*
     Box(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)
     ){
-
-
 
         SwipeRefresh(
             state = rememberSwipeRefreshState(isRefreshing),
@@ -700,8 +742,8 @@ fun MainData(userid : Long, navController: NavHostController) {
             }
         }
     }
+    */
 }
-
 
 
 @Composable

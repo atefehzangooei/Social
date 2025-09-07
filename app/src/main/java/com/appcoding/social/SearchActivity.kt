@@ -213,30 +213,6 @@ fun SearchScreen(userid : Long) {
 
 @Composable
 fun DisplayStaggeredList(posts : List<PostResponse>){
-   /* val columns = List(3){ mutableListOf<PostResponse>() }
-    posts.forEachIndexed { index, post ->
-        columns[index % 3].add(post)
-    }
-    val scrollState = rememberScrollState()
-
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .verticalScroll(scrollState)
-    ) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-            columns.forEachIndexed() { colIndex, columnPosts ->
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                ) {
-                    columnPosts.forEachIndexed {index, post->
-                        Display(index, post, colIndex)
-                    }
-
-                }
-            }
-        }
-    }*/
 
       LazyVerticalStaggeredGrid (modifier = Modifier
         .fillMaxSize(),
@@ -245,7 +221,17 @@ fun DisplayStaggeredList(posts : List<PostResponse>){
          // horizontalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         itemsIndexed(posts){ index  ,post ->
-            Display(index, post, 1)
+            AsyncImage(
+                model = post.image,
+                contentDescription = "post cover",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(width = 1.dp, color = Color.White)
+                    .aspectRatio(
+                        if(index % 10 in listOf(0,7)) 0.5f else 1f
+                    ),
+                contentScale = ContentScale.Crop
+            )
 
         }
     }
