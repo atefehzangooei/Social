@@ -94,7 +94,7 @@ dependencies {
 
     //implementation(libs.logging.interceptor)
 
-    implementation(libs.accompanist.swiperefresh)
+    //implementation(libs.accompanist.swiperefresh)
 
     implementation(libs.androidx.datastore.preferences)
 

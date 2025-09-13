@@ -71,8 +71,10 @@ interface ApiService
      @GET("users/{userId}")
      suspend fun getUserInfo(@Path("userId") userId : Long) : UserInfo?
 
-     @GET("posts/search/{text}/{userId}")
+     @GET("posts/search/{text}/{userId}/{lastSeenId}/{size}")
      suspend fun searchPost(@Path("text") text : String,
-                            @Path("userId") userId: Long) : List<PostResponse>
+                            @Path("userId") userId: Long,
+                            @Path("lastSeenId") lastSeenId: Long?,
+                            @Path("size") size : Int) : List<PostResponse>
 
 }

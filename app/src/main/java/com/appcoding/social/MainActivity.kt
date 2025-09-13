@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.WindowInsets
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -37,6 +38,8 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -56,6 +59,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -68,6 +73,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -83,6 +90,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -90,12 +99,14 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -110,8 +121,7 @@ import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.SavePostRequest
 import com.appcoding.social.ui.theme.SocialTheme
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
@@ -199,7 +209,7 @@ fun MyApp(userid : Long, navController : NavHostController) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight()
+                                .height(29.dp)
                                 .background(Color.White),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
@@ -597,6 +607,8 @@ fun getGalleryImages(context: Context): List<Uri> {
         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
         projection,
         null,
+
+
         null,
         sortOrder
     )?.use { cursor ->
@@ -640,6 +652,7 @@ fun MainData(userid : Long, navController: NavHostController) {
     val context = LocalContext.current
     var posts by remember { mutableStateOf<List<PostResponse>>(emptyList()) }
     var isRefreshing by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val isAtTop = (listState.firstVisibleItemIndex == 0) &&
@@ -647,6 +660,7 @@ fun MainData(userid : Long, navController: NavHostController) {
     var lastSeenId by remember { mutableStateOf<Long?>(-1) }
     val pageSize = 10
     
+
     LaunchedEffect(Unit){
         try{
             isLoading = true
@@ -685,17 +699,42 @@ fun MainData(userid : Long, navController: NavHostController) {
                 }
             }
     }
+  //  if(posts.isNotEmpty()) {
 
-    if(posts.isNotEmpty()) {
-        LazyColumn(modifier = Modifier
+        PullToRefreshLazyList(
+            items = posts,
+            content = { post -> PostCard(post, userid, navController)},
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                scope.launch {
+                    isRefreshing = true
+                    lastSeenId = -1
+                    try{
+                        isLoading = true
+                        val response = RetrofitInstance.api.getPostsByFollower(userid, lastSeenId, pageSize)
+                        posts = response
+                        lastSeenId =response.lastOrNull()?.id
+                    }
+                    catch(e : Exception){
+                        Toast.makeText(context,e.message, Toast.LENGTH_LONG).show()
+                    }
+                    finally {
+                        isLoading = false
+                        isRefreshing = false
+                    }
+                }
+            },
+            lazyListState = listState,
+        )
+       /* LazyColumn(modifier = Modifier
             .fillMaxSize(),
             state = listState)
         {
             items(posts) { post ->
                 PostCard(post, userid, navController)
             }
-        }
-    }
+        }*/
+    //}
 
     if(isLoading){
         Box(modifier = Modifier.fillMaxWidth(),
@@ -840,7 +879,6 @@ fun PostCard(post : PostResponse, userid : Long, navController: NavHostControlle
             }
 
             //Image
-
             AsyncImage(
                 model = post.image,
                 contentDescription = "postImage",
@@ -963,10 +1001,11 @@ fun PostCard(post : PostResponse, userid : Long, navController: NavHostControlle
                     ModalBottomSheet(
                         sheetState = sheetState,
                         onDismissRequest = { commentSheetState = false },
-                        modifier = Modifier.height(300.dp),
+                        //modifier = Modifier.height(300.dp),
                         containerColor = Color.White,
-                        scrimColor = Color.Black.copy(alpha = 0.5f)
-                    ) {
+                        scrimColor = Color.Black.copy(alpha = 0.5f),
+                        //dragHandle = {BottomSheetDefaults.DragHandle()}
+                        ) {
                         CommentBottomSheet(post, userid)
                     }
                 }
@@ -1030,110 +1069,114 @@ fun CommentBottomSheet(post : PostResponse, userid : Long){
     var comments by remember { mutableStateOf<List<CommentResponse>>(emptyList()) }
     var newComment by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
+   // val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit){
+        //focusRequester.requestFocus()
         try{
             comments = RetrofitInstance.api.getComments(post.id)
             post.commentCount++
         }
         catch (ex : Exception){
             Toast.makeText(context,ex.message, Toast.LENGTH_LONG).show()
-
         }
     }
 
     RightToLeftLayout {
 
-        Box(modifier = Modifier.fillMaxSize()) {
+       Column(modifier = Modifier.fillMaxSize()) {
+           LazyColumn(
+               modifier = Modifier
+                   .fillMaxWidth()
+                   .weight(1f)
+           ) {
+               items(comments) { comment ->
+                   CommentCard(comment)
+               }
+           }
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(comments) { comment ->
-                    CommentCard(comment)
-                }
-            }
+               Row(
+                   modifier = Modifier
+                       .fillMaxWidth()
+                       .imePadding()
+                       .wrapContentHeight()
+                       .padding(Dimens.normal_padding)
+                       .drawBehind {
+                           val strokeWidth = 1.dp.toPx()
+                           drawLine(
+                               color = Color.LightGray,
+                               start = Offset(0f, 0f),
+                               end = Offset(size.width, 0f),
+                               strokeWidth = strokeWidth
+                           )
+                       },
+                   verticalAlignment = Alignment.Bottom
+               ) {
+                   val userProfile =
+                       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu8Qi_EGuDWDLusHz6fyxhgaQWa6q0YsOiBH3adnqLx-6_JbLy_-ch2P3xcDxtTh-g9qY&usqp=CAU"
 
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(Dimens.normal_padding)
-                .align(Alignment.BottomEnd)
-                .drawBehind {
-                    val strokeWidth = 1.dp.toPx()
-                    drawLine(
-                        color = Color.LightGray,
-                        start = Offset(0f, 0f),
-                        end = Offset(size.width, 0f),
-                        strokeWidth = strokeWidth
-                    )
-                }
-            ) {
-                val userProfile =
-                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu8Qi_EGuDWDLusHz6fyxhgaQWa6q0YsOiBH3adnqLx-6_JbLy_-ch2P3xcDxtTh-g9qY&usqp=CAU"
+                   AsyncImage(
+                       model = userProfile,
+                       contentDescription = "my profile",
+                       modifier = Modifier
+                           //.weight(1f)
+                           .size(Dimens.comment_user_profile)
+                           .clip(CircleShape)
+                           .align(Alignment.CenterVertically)
 
-                AsyncImage(
-                    model = userProfile,
-                    contentDescription = "my profile",
-                    modifier = Modifier
-                        //.weight(1f)
-                        .size(Dimens.comment_user_profile)
-                        .clip(CircleShape)
-                        .align(Alignment.CenterVertically)
+                   )
 
-                )
-                
-                TextField(
-                    value = newComment,
-                    onValueChange = { newComment = it },
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                    placeholder = { Text("نظرت رو بگو") },
-                    singleLine = true,
-                    modifier = Modifier.weight(5f),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedPlaceholderColor = Colors.placeholder,
-                        unfocusedPlaceholderColor = Colors.placeholder
+                   TextField(
+                       value = newComment,
+                       onValueChange = { newComment = it },
+                       textStyle = MaterialTheme.typography.bodyMedium,
+                       placeholder = { Text("نظرت رو بگو") },
+                       singleLine = true,
+                       modifier = Modifier
+                           .weight(5f),
+                       // .focusRequester(focusRequester),
+                       colors = TextFieldDefaults.colors(
+                           focusedContainerColor = Color.Transparent,
+                           unfocusedContainerColor = Color.Transparent,
+                           focusedTextColor = Color.Black,
+                           unfocusedTextColor = Color.Black,
+                           focusedIndicatorColor = Color.Transparent,
+                           unfocusedIndicatorColor = Color.Transparent,
+                           focusedPlaceholderColor = Colors.placeholder,
+                           unfocusedPlaceholderColor = Colors.placeholder
 
-                    )
-                )
+                       )
+                   )
 
-                Icon(imageVector = Icons.Filled.Check,
-                    contentDescription = "send comment",
-                    tint = Colors.appcolor,
-                    modifier = Modifier
-                        .weight(1f)
-                        .size(Dimens.comment_user_profile)
-                        .clip(CircleShape)
-                        .align(Alignment.CenterVertically)
-                        .clickable {
-                            if(newComment.isNotEmpty()) {
-                                coroutineScope.launch(Dispatchers.IO) {
-                                    val commentRequest = CommentRequest(
-                                        postId = post.id,
-                                        userId = userid,
-                                        comment = newComment,
-                                        date = "1404",
-                                        time = "18:00"
-                                    )
-                                    val addedComment =
-                                        RetrofitInstance.api.addComment(commentRequest)
-                                    comments = comments + addedComment
-                                    newComment = ""
-                                }
-                            }
-                        }
-                    )
-
-            }
-        }
-    }
-
+                   Icon(imageVector = Icons.Filled.Check,
+                       contentDescription = "send comment",
+                       tint = Colors.appcolor,
+                       modifier = Modifier
+                           .weight(1f)
+                           .size(Dimens.comment_user_profile)
+                           .clip(CircleShape)
+                           .align(Alignment.CenterVertically)
+                           .clickable {
+                               if (newComment.isNotEmpty()) {
+                                   coroutineScope.launch(Dispatchers.IO) {
+                                       val commentRequest = CommentRequest(
+                                           postId = post.id,
+                                           userId = userid,
+                                           comment = newComment,
+                                           date = "1404",
+                                           time = "18:00"
+                                       )
+                                       val addedComment =
+                                           RetrofitInstance.api.addComment(commentRequest)
+                                       comments = comments + addedComment
+                                       newComment = ""
+                                   }
+                               }
+                           }
+                   )
+               }
+           }
+       }
 }
 
 @Composable

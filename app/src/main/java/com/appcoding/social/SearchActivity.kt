@@ -91,6 +91,9 @@ fun SearchScreen(userid : Long) {
     val snackScope = rememberCoroutineScope()
     var posts by remember { mutableStateOf<List<PostResponse>>(emptyList()) }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val size = 20
+    var lastSeenId by remember { mutableStateOf(-1L) }
+
 
 
     RightToLeftLayout{
@@ -166,7 +169,9 @@ fun SearchScreen(userid : Long) {
                     try {
                         posts = RetrofitInstance.api.searchPost(
                             text = searchText,
-                            userId = userid
+                            userId = userid,
+                            lastSeenId = lastSeenId,
+                            size = size
                         )
 
                     } catch (e: Exception) {

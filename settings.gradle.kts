@@ -10,7 +10,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         maven(url = "https://maven.myket.ir")
-        // google()
+         google()
 
     }
 }
