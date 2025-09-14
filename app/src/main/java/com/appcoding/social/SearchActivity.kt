@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,11 +21,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -53,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -110,6 +114,7 @@ fun SearchScreen(userid : Long) {
                     isTyping = true
 
                 },
+                singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(Dimens.normal_padding)
@@ -186,7 +191,7 @@ fun SearchScreen(userid : Long) {
 
 
             if(posts.isNotEmpty()){
-                DisplayStaggeredList(posts)
+                DisplayStaggeredList(posts, )
             }
 
             if(searchAction) {
@@ -200,21 +205,7 @@ fun SearchScreen(userid : Long) {
         }
     }
         }
-
-
 }
-
-/*  LazyVerticalStaggeredGrid (modifier = Modifier
-        .fillMaxSize(),
-        columns = StaggeredGridCells.Fixed(3),
-        verticalItemSpacing = 2.dp,
-        horizontalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        itemsIndexed(posts){ index  ,post ->
-            Display(index, post)
-
-        }
-    }*/
 
 @Composable
 fun DisplayStaggeredList(posts : List<PostResponse>){
@@ -222,12 +213,21 @@ fun DisplayStaggeredList(posts : List<PostResponse>){
       LazyVerticalStaggeredGrid (modifier = Modifier
         .fillMaxSize(),
         columns = StaggeredGridCells.Fixed(3),
-         // verticalItemSpacing = 2.dp,
-         // horizontalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        itemsIndexed(posts){ index  ,post ->
-            AsyncImage(
-                model = post.image,
+        itemsIndexed(items = posts
+      /*  ,
+            span = { index, _ ->
+                //index % 10 in listOf(0, 7)
+                if (index % 11 == 0) {
+                    StaggeredGridItemSpan.FullLine
+                }
+                else{
+                    StaggeredGridItemSpan.SingleLane
+                }
+            }*/
+        ){ index  ,post ->
+           /* AsyncImage(
+                model = ColorPainter(Color(android.graphics.Color.parseColor(post.image))),
                 contentDescription = "post cover",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -236,6 +236,17 @@ fun DisplayStaggeredList(posts : List<PostResponse>){
                         if(index % 10 in listOf(0,7)) 0.5f else 1f
                     ),
                 contentScale = ContentScale.Crop
+            )*/
+
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(android.graphics.Color.parseColor(post.image)))
+                .border(width = 1.dp, color = Color.White)
+                .aspectRatio(
+                    if(index % 10 in listOf(0,7)) 0.5f else 1f
+                )
+                .clickable {  }
+
             )
 
         }
@@ -244,26 +255,60 @@ fun DisplayStaggeredList(posts : List<PostResponse>){
 }
 
 @Composable
-fun Display(index : Int, post : PostResponse, colIndex : Int){
-    Box(contentAlignment = Alignment.Center) {
-        AsyncImage(
-            model = post.image,
-            contentDescription = "post cover",
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(width = 1.dp, color = Color.White)
-                .aspectRatio(
-                    if(index % 10 in listOf(0,7)) 0.5f else 1f
-                ),
-            contentScale = ContentScale.Crop
-        )
+fun DisplaySearchPosts(index : Int, posts : List<PostResponse>, searchText : String){
 
-        Text(text = index.toString(),
-            style = MaterialTheme.typography.titleMedium,
-            color = Color.Red,
-            modifier = Modifier.background(Color.White))
+    RightToLeftLayout {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Colors.search_view_post_background)
+        )
+        {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimens.normal_padding),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.search),
+                    contentDescription = "search",
+                    tint = Color.White
+                )
+
+                Row(
+                    modifier = Modifier
+                        .wrapContentSize(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = searchText)
+                }
+            }
+
+           /* AsyncImage(
+                model = post.image,
+                contentDescription = "post cover",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(width = 1.dp, color = Color.White)
+                    .aspectRatio(
+                        if (index % 10 in listOf(0, 7)) 0.5f else 1f
+                    ),
+                contentScale = ContentScale.Crop
+            )*/
+
+            Text(
+                text = index.toString(),
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.Red,
+                modifier = Modifier.background(Color.White)
+            )
+        }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

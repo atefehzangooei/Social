@@ -96,6 +96,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -879,14 +880,18 @@ fun PostCard(post : PostResponse, userid : Long, navController: NavHostControlle
             }
 
             //Image
-            AsyncImage(
-                model = post.image,
+            /*AsyncImage(
+                model = ColorPainter(Color(android.graphics.Color.parseColor(post.image))),
                 contentDescription = "postImage",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(screenWidth()),
                 contentScale = ContentScale.Crop
-            )
+            )*/
+            Box( modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(android.graphics.Color.parseColor(post.image)))
+                .height(screenWidth()))
 
             //like/comment/save
             Row(
@@ -993,6 +998,15 @@ fun PostCard(post : PostResponse, userid : Long, navController: NavHostControlle
                         text = commentCount.toString(),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.size(15.dp))
+
+                    Image(painter = painterResource(R.drawable.share),
+                        contentDescription = "share",
+                        modifier = Modifier
+                            .size(Dimens.post_icons)
+                            .clickable {}
                     )
                 }
 

@@ -34,5 +34,12 @@ fun AppNavHost(navController: NavHostController, startDestination : String = "sp
             val userid = backStackEntry.arguments!!.getLong("userid")
             ProfileScreen(userid)
         }
+
+        /*composable("displaysearch/{userid}",
+            arguments = listOf(navArgument("userid"){type = NavType.LongType})
+        ){backStackEntry ->
+            val userid = backStackEntry.arguments!!.getLong("userid")
+            DisplaySearchPosts()
+        }*/
     }
 }

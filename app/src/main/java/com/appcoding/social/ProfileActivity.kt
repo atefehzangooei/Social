@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -172,7 +173,7 @@ fun DisplayPosts(userid : Long) {
 @Composable
 fun ProfilePostCard(post : PostResponse){
 
-    AsyncImage(model = post.image,
+    AsyncImage(model = ColorPainter(Color(android.graphics.Color.parseColor(post.image))),
         modifier = Modifier
         .padding(1.dp)
         .aspectRatio(1f),
