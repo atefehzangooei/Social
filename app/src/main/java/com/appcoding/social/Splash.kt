@@ -37,6 +37,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,7 +53,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.appcoding.social.Functions.RightToLeftLayout
@@ -60,6 +63,8 @@ import com.appcoding.social.models.ForgetRequest
 import com.appcoding.social.models.SigninRequest
 import com.appcoding.social.models.SignupRequest
 import com.appcoding.social.ui.theme.SocialTheme
+import com.appcoding.social.viewmodel.SignupViewModel
+import com.appcoding.social.viewmodel.SplashViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -84,19 +89,15 @@ class SignUpIn : ComponentActivity() {
 @Composable
 fun Splash(navController: NavHostController){
 
-    val context = LocalContext.current
+
+    val viewModel : SplashViewModel = viewModel()
+    val userid by viewModel.userid.collectAsState()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Colors.appcolor)
     )
-
-    val initialUserId = runBlocking {
-        UserPreferences.getUserIdFlow(context).first() ?: 0L
-    }
-    var userid by remember { mutableStateOf(initialUserId) }
-
 
     LaunchedEffect(Unit) {
         delay(3000)
@@ -109,23 +110,22 @@ fun Splash(navController: NavHostController){
             navController.navigate("signin") {
                 popUpTo("splash") { inclusive = true }
             }
-
         }
-
     }
 }
 
 @Composable
 fun SignUp(navController: NavHostController){
 
-    var phone by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var signup by remember { mutableStateOf(false) }
+    val viewModel : SignupViewModel = viewModel()
+
+    val phone by viewModel.phone.collectAsState()
+    val password by viewModel.password.collectAsState()
+    val username by viewModel.usernanme.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val snackScope = rememberCoroutineScope()
-    var message by remember { mutableStateOf("") }
-    var success by remember { mutableStateOf(false) }
+    val message by viewModel.message.collectAsState()
+    val success by viewModel.success.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
 
@@ -199,7 +199,7 @@ fun SignUp(navController: NavHostController){
                             modifier = Modifier
                                 .fillMaxWidth(),
                             value = phone,
-                            onValueChange = { phone = it },
+                            onValueChange = { viewModel.onPhoneChange(it) },
                             shape = RoundedCornerShape(Dimens.textfield_corner),
                             placeholder = { Text(text = "شماره موبایل") },
                             singleLine = true,
@@ -218,7 +218,7 @@ fun SignUp(navController: NavHostController){
                         OutlinedTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = username,
-                            onValueChange = { username = it },
+                            onValueChange = { viewModel.usernanme.value = it },
                             shape = RoundedCornerShape(Dimens.textfield_corner),
                             placeholder = { Text(text = "نام کاربری") },
                             singleLine = true,
@@ -237,7 +237,7 @@ fun SignUp(navController: NavHostController){
                         OutlinedTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = password,
-                            onValueChange = { password = it },
+                            onValueChange = { viewModel.password.value = it },
                             shape = RoundedCornerShape(Dimens.textfield_corner),
                             placeholder = { Text(text = "رمز عبور") },
                             singleLine = true,
@@ -260,11 +260,7 @@ fun SignUp(navController: NavHostController){
                                     .fillMaxWidth(),
                                 onClick = {
                                     keyboardController?.hide()
-                                    if (phone.isBlank() || username.isBlank() || password.isBlank()) {
-                                        message ="لطفا اطلاعات را به درستی وارد نمایید"
-                                    } else {
-                                        signup = true
-                                    }
+                                    viewModel.signup()
                                 },
                                 shape = RoundedCornerShape(Dimens.textfield_corner),
                                 colors = ButtonDefaults.buttonColors(

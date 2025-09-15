@@ -11,7 +11,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-object UserPreferences {
+class UserPreferences(private val context: Context) {
     private val Context.dataStore by preferencesDataStore(name = "user")
 
     private val USER_ID = longPreferencesKey("userid")
@@ -22,7 +22,7 @@ object UserPreferences {
         }
     }
 
-    fun getUserIdFlow(context: Context): Flow<Long?> {
+    fun getUserIdFlow(): Flow<Long?> {
         return context.dataStore.data.map { prefs ->
             prefs[USER_ID] ?: 0L
         }

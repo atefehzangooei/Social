@@ -35,6 +35,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,6 +65,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -255,7 +260,7 @@ fun DisplayStaggeredList(posts : List<PostResponse>){
 }
 
 @Composable
-fun DisplaySearchPosts(index : Int, posts : List<PostResponse>, searchText : String){
+fun DisplaySearchPosts(index : Int, searchText : String){
 
     RightToLeftLayout {
 
@@ -268,14 +273,15 @@ fun DisplaySearchPosts(index : Int, posts : List<PostResponse>, searchText : Str
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(Dimens.normal_padding),
+                    .padding(Dimens.display_search_padding),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Icon(
                     painter = painterResource(R.drawable.search),
                     contentDescription = "search",
-                    tint = Color.White
+                    tint = Color.White,
+                    modifier = Modifier.size(Dimens.display_search_icon)
                 )
 
                 Row(
@@ -283,9 +289,22 @@ fun DisplaySearchPosts(index : Int, posts : List<PostResponse>, searchText : Str
                         .wrapContentSize(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = searchText)
+                    Text(text = searchText,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.size(20.dp))
+
+                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = "back",
+                        tint = Color.White,
+                        modifier = Modifier.size(Dimens.display_search_icon)
+                    )
                 }
             }
+
+            Spacer(modifier = Modifier.size(20.dp))
 
            /* AsyncImage(
                 model = post.image,
@@ -298,13 +317,15 @@ fun DisplaySearchPosts(index : Int, posts : List<PostResponse>, searchText : Str
                     ),
                 contentScale = ContentScale.Crop
             )*/
+            
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Red)
+                .aspectRatio(1f)
+                //.background(Color(android.graphics.Color.parseColor(post.image))),
+                )
 
-            Text(
-                text = index.toString(),
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.Red,
-                modifier = Modifier.background(Color.White)
-            )
+
         }
     }
 }
@@ -314,6 +335,6 @@ fun DisplaySearchPosts(index : Int, posts : List<PostResponse>, searchText : Str
 @Composable
 fun GreetingPreview() {
     SocialTheme {
-        SearchScreen(1)
+        DisplaySearchPosts(0, "برنامه نویسی")
     }
 }

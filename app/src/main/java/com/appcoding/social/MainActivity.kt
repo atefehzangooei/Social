@@ -157,12 +157,6 @@ fun MyApp(userid : Long, navController : NavHostController) {
 
     var selectedIndex by remember { mutableStateOf(0) }
     var isAddScreenVisible by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-
-   /* val initialUserId = runBlocking {
-        UserPreferences.getUserIdFlow(context).first() ?: 0L
-    }*/
-
 
     val navigationItems = listOf(
         NavigationItem("Home",
