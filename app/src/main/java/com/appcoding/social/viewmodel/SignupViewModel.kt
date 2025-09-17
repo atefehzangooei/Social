@@ -2,9 +2,12 @@ package com.appcoding.social.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.appcoding.social.RetrofitInstance
+import com.appcoding.social.models.SignupRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class SignupViewModel : ViewModel()
 {
@@ -38,6 +41,34 @@ class SignupViewModel : ViewModel()
             if (_phone.value.isBlank() || _usernanme.value.isBlank() || _password.value.isBlank()) {
                 _message.value ="لطفا اطلاعات را به درستی وارد نمایید"
                 return@launch
+            }
+            _isLoading.value = true
+
+
+            try {
+                val response = RetrofitInstance.api.signUp(
+                    SignupRequest(
+                        phone = _phone.value,
+                        username = _usernanme.value,
+                        password = _password.value
+                    )
+                )
+                when (response.message) {
+                    "repeated username" -> {
+                        _message.value = "نام کاربری وارد شده تکراری است"
+                    }
+                    "success" -> {
+                        _success.value = true
+                        _message.value = "حساب شما با موفقیت ایجاد شد"
+                    }
+                    else -> {
+                        _message.value = "نام کاربری دیگری انتخاب کنید"
+                    }
+                }
+            } catch (e: Exception) {
+                _message.value = e.toString()
+            } finally {
+                _isLoading.value = false
             }
 
         }

@@ -26,6 +26,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -63,6 +64,7 @@ import com.appcoding.social.models.ForgetRequest
 import com.appcoding.social.models.SigninRequest
 import com.appcoding.social.models.SignupRequest
 import com.appcoding.social.ui.theme.SocialTheme
+import com.appcoding.social.viewmodel.SigninViewModel
 import com.appcoding.social.viewmodel.SignupViewModel
 import com.appcoding.social.viewmodel.SplashViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -121,13 +123,30 @@ fun SignUp(navController: NavHostController){
 
     val phone by viewModel.phone.collectAsState()
     val password by viewModel.password.collectAsState()
-    val username by viewModel.usernanme.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val snackScope = rememberCoroutineScope()
+    val username by viewModel.username.collectAsState()
     val message by viewModel.message.collectAsState()
     val success by viewModel.success.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
 
+
+    LaunchedEffect(message)
+    {
+        if (success) {
+            navController.navigate("signin") {
+                popUpTo("signup") { inclusive = true }
+            }
+        } else {
+            if (message.isNotBlank()) {
+                snackScope.launch {
+                    snackbarHostState.showSnackbar(message)
+                }
+            }
+        }
+    }
 
     RightToLeftLayout{
 
@@ -178,8 +197,8 @@ fun SignUp(navController: NavHostController){
                                 modifier = Modifier
                                     .size(20.dp)
                                     .clickable {
-                                        navController.navigate("signin"){
-                                            popUpTo("signup"){inclusive = true}
+                                        navController.navigate("signin") {
+                                            popUpTo("signup") { inclusive = true }
                                         }
                                     },
                             )
@@ -187,14 +206,16 @@ fun SignUp(navController: NavHostController){
 
                         Spacer(modifier = Modifier.size(15.dp))
 
-                        Icon(painter = painterResource(R.drawable.profile_selected),
+                        Icon(
+                            painter = painterResource(R.drawable.profile_selected),
                             contentDescription = "profile image",
                             tint = Colors.appcolor,
-                            modifier = Modifier.size(Dimens.signup_user_profile))
+                            modifier = Modifier.size(Dimens.signup_user_profile)
+                        )
 
                         Spacer(modifier = Modifier.size(Dimens.normal_spacer))
 
-                        
+
                         OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth(),
@@ -218,7 +239,7 @@ fun SignUp(navController: NavHostController){
                         OutlinedTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = username,
-                            onValueChange = { viewModel.usernanme.value = it },
+                            onValueChange = { viewModel.onUsernameChange(it) },
                             shape = RoundedCornerShape(Dimens.textfield_corner),
                             placeholder = { Text(text = "نام کاربری") },
                             singleLine = true,
@@ -237,7 +258,7 @@ fun SignUp(navController: NavHostController){
                         OutlinedTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = password,
-                            onValueChange = { viewModel.password.value = it },
+                            onValueChange = { viewModel.onPasswordChange(it) },
                             shape = RoundedCornerShape(Dimens.textfield_corner),
                             placeholder = { Text(text = "رمز عبور") },
                             singleLine = true,
@@ -269,58 +290,22 @@ fun SignUp(navController: NavHostController){
 
                                 )
                             ) {
-                                Text(
-                                    text = "ایجاد حساب کاربری",
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-
-
-                                LaunchedEffect(signup) {
-                                    if(signup) {
-                                        try {
-                                            val response = RetrofitInstance.api.signUp(
-                                                SignupRequest(
-                                                    phone = phone,
-                                                    username = username,
-                                                    password = password
-                                                )
-                                            )
-                                            if (response.message == "repeated username") {
-                                                message = "نام کاربری وارد شده تکراری است"
-
-                                            } else if (response.message == "success") {
-                                                success = true
-                                                message = "حساب شما با موفقیت ایجاد شد"
-                                            } else {
-                                                message = "نام کاربری دیگری انتخاب کنید"
-
-                                            }
-                                        } catch (e: Exception) {
-                                            message = e.toString()
-                                        } finally {
-                                            signup = false
-                                        }
-                                    }
-                            }
-
-                            LaunchedEffect(message)
-                            {
-                                if(message.isNotBlank()) {
-                                    snackScope.launch {
-                                        snackbarHostState.showSnackbar(message)
-                                    }
-                                    if(success){
-                                        navController.navigate("signin"){
-                                            popUpTo("signup"){inclusive = true}
-                                        }
-                                    }
+                                if (isLoading) {
+                                    CircularProgressIndicator(
+                                        color = Color.White,
+                                        modifier = Modifier.size(20.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    Text(
+                                        text = "ایجاد حساب کاربری",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
                                 }
                             }
+
                         }
-
                     }
-
                 }
             }
         }
@@ -331,14 +316,34 @@ fun SignUp(navController: NavHostController){
 @Composable
 fun SignIn(navController: NavHostController) {
 
-    var password by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var signin by remember { mutableStateOf(false) }
+    val viewModel : SigninViewModel = viewModel()
+
+    val password by viewModel.password.collectAsState()
+    val username by viewModel.username.collectAsState()
+    val message by viewModel.message.collectAsState()
+    val success by viewModel.success.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
+
+    val keyboardController = LocalSoftwareKeyboardController.current
     val snackScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    var message by remember { mutableStateOf("") }
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val context = LocalContext.current
+
+
+    LaunchedEffect(success) {
+       if(success) {
+           navController.navigate("main") {
+               popUpTo("signin") { inclusive = true }
+           }
+       }
+        else{
+           if(message.isNotBlank()){
+               snackScope.launch {
+                   snackbarHostState.showSnackbar(message)
+               }
+           }
+       }
+    }
 
     RightToLeftLayout {
 
@@ -360,7 +365,6 @@ fun SignIn(navController: NavHostController) {
                 contentAlignment = Alignment.Center
             )
             {
-
                 Card(
                     modifier = Modifier
                         .wrapContentSize(),
@@ -375,11 +379,10 @@ fun SignIn(navController: NavHostController) {
                         verticalArrangement = Arrangement.Center
                     )
                     {
-
                         OutlinedTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = username,
-                            onValueChange = { username = it },
+                            onValueChange = { viewModel.onUsernameChanged(it) },
                             shape = RoundedCornerShape(Dimens.textfield_corner),
                             placeholder = { Text(text = "نام کاربری") },
                             singleLine = true,
@@ -394,11 +397,10 @@ fun SignIn(navController: NavHostController) {
 
                         Spacer(modifier = Modifier.size(Dimens.login_spacer))
 
-
                         OutlinedTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = password,
-                            onValueChange = { password = it },
+                            onValueChange = { viewModel.onPasswordChanged(it) },
                             shape = RoundedCornerShape(Dimens.textfield_corner),
                             placeholder = { Text(text = "رمز عبور") },
                             singleLine = true,
@@ -421,19 +423,21 @@ fun SignIn(navController: NavHostController) {
                                     .fillMaxWidth(),
                                 onClick = {
                                     keyboardController?.hide()
-                                    if (username.isBlank() || password.isBlank()) {
-                                        message = "لطفا تمام اطلاعات را وارد کنید"
-                                    } else {
-                                        signin = true
-                                    }
+                                   viewModel.signin()
                                 },
                                 shape = RoundedCornerShape(Dimens.textfield_corner),
                                 colors = ButtonDefaults.buttonColors(
                                     contentColor = Color.White,
                                     containerColor = Colors.appcolor
-
                                 )
                             ) {
+                                if (isLoading) {
+                                    CircularProgressIndicator(
+                                        color = Color.White,
+                                        modifier = Modifier.size(20.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                }
                                 Text(
                                     text = "ورود",
                                     style = MaterialTheme.typography.bodyMedium
@@ -441,46 +445,7 @@ fun SignIn(navController: NavHostController) {
                             }
                         }
 
-                        if(signin) {
-                            LaunchedEffect(signin) {
-                                try {
-                                    val response =
-                                        RetrofitInstance.api.signIn(
-                                            SigninRequest(
-                                                username,
-                                                password
-                                            )
-                                        )
-                                    if (response.isSuccessful) {
-                                        val userInfo = response.body()
-                                        UserPreferences.saveUserId(context, userInfo!!.id)
-
-                                        navController.navigate("main") {
-                                            popUpTo("signin") { inclusive = true }
-                                        }
-
-                                    } else if (response.code() == 401) {
-                                        message = "نام کاربری یا کلمه عبور اشتباه است!"
-                                    }
-                                }
-                                catch(e:Exception){
-                                    message = e.toString()
-                                }
-                                finally {
-                                    signin = false
-                                }
-                            }
-                        }
-
-                        LaunchedEffect(message) {
-                            if(message.isNotBlank()){
-                                snackScope.launch {
-                                    snackbarHostState.showSnackbar(message)
-                                }
-                            }
-                        }
                         Spacer(modifier = Modifier.size(Dimens.login_spacer))
-
 
                         TextButton(onClick = {
                             navController.navigate("forgetpassword")
