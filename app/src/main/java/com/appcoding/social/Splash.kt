@@ -64,6 +64,7 @@ import com.appcoding.social.models.ForgetRequest
 import com.appcoding.social.models.SigninRequest
 import com.appcoding.social.models.SignupRequest
 import com.appcoding.social.ui.theme.SocialTheme
+import com.appcoding.social.viewmodel.ForgetPasswordViewModel
 import com.appcoding.social.viewmodel.SigninViewModel
 import com.appcoding.social.viewmodel.SignupViewModel
 import com.appcoding.social.viewmodel.SplashViewModel
@@ -478,13 +479,23 @@ fun SignIn(navController: NavHostController) {
 @Composable
 fun ForgetPassword(navController: NavHostController) {
 
-    var phone by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var forget by remember { mutableStateOf(false) }
+    val viewModel : ForgetPasswordViewModel = viewModel()
+
+    val phone by viewModel.phone.collectAsState()
+    val username by viewModel.username.collectAsState()
+    val message by viewModel.message.collectAsState()
+
+    val keyboardController = LocalSoftwareKeyboardController.current
     val snackScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    var message by remember { mutableStateOf("") }
-    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(message) {
+        if(message.isNotBlank()){
+            snackScope.launch {
+                snackbarHostState.showSnackbar(message)
+            }
+        }
+    }
 
     RightToLeftLayout {
 
@@ -525,7 +536,7 @@ fun ForgetPassword(navController: NavHostController) {
                         OutlinedTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = username,
-                            onValueChange = { username = it },
+                            onValueChange = { viewModel.onUsernameChanged(it) },
                             shape = RoundedCornerShape(Dimens.textfield_corner),
                             placeholder = { Text(text = "نام کاربری") },
                             singleLine = true,
@@ -544,7 +555,7 @@ fun ForgetPassword(navController: NavHostController) {
                         OutlinedTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = phone,
-                            onValueChange = { phone = it },
+                            onValueChange = { viewModel.onPhoneChanged(it) },
                             shape = RoundedCornerShape(Dimens.textfield_corner),
                             placeholder = { Text(text = "شماره موبایل") },
                             singleLine = true,
@@ -567,11 +578,7 @@ fun ForgetPassword(navController: NavHostController) {
                                     .fillMaxWidth(),
                                 onClick = {
                                     keyboardController?.hide()
-                                    if (username.isBlank() || phone.isBlank()) {
-                                        message = "لطفا تمام اطلاعات را وارد کنید"
-                                    } else {
-                                        forget = true
-                                    }
+                                    viewModel.forgtPassword()
                                 },
                                 shape = RoundedCornerShape(Dimens.textfield_corner),
                                 colors = ButtonDefaults.buttonColors(
@@ -587,39 +594,7 @@ fun ForgetPassword(navController: NavHostController) {
                             }
                         }
 
-                        if(forget) {
-                            LaunchedEffect(forget) {
-                                try {
-                                    val response =
-                                        RetrofitInstance.api.forgetPassword(
-                                            ForgetRequest(
-                                                username,
-                                                phone
-                                            )
-                                        )
-                                    if (response.message == "no user") {
-                                       message = "کاربری با این نام کاربری و شماره تلفن همراه وجود ندارد"
 
-                                    } else if (response.message == "sms") {
-                                        message = "اطلاعات کاربری شما تا دقایقی دیگر برایتان ارسال می شود"
-                                    }
-                                }
-                                catch(e:Exception){
-                                    message = e.toString()
-                                }
-                                finally {
-                                    forget = false
-                                }
-                            }
-                        }
-
-                        LaunchedEffect(message) {
-                            if(message.isNotBlank()){
-                                snackScope.launch {
-                                    snackbarHostState.showSnackbar(message)
-                                }
-                            }
-                        }
 
                     }
                 }
