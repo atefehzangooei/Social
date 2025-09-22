@@ -470,7 +470,6 @@ fun SignIn(navController: NavHostController) {
                         color = Colors.signup_signuptext)}
                 }
             }
-
         }
     }
 }
@@ -484,15 +483,23 @@ fun ForgetPassword(navController: NavHostController) {
     val phone by viewModel.phone.collectAsState()
     val username by viewModel.username.collectAsState()
     val message by viewModel.message.collectAsState()
+    val success by viewModel.success.collectAsState()
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val snackScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(message) {
-        if(message.isNotBlank()){
-            snackScope.launch {
-                snackbarHostState.showSnackbar(message)
+    LaunchedEffect(success) {
+        if(success){
+            navController.navigate("signin"){
+                popUpTo("forgetpassword"){ inclusive = true }
+            }
+        }
+        else {
+            if (message.isNotBlank()) {
+                snackScope.launch {
+                    snackbarHostState.showSnackbar(message)
+                }
             }
         }
     }
@@ -578,7 +585,7 @@ fun ForgetPassword(navController: NavHostController) {
                                     .fillMaxWidth(),
                                 onClick = {
                                     keyboardController?.hide()
-                                    viewModel.forgtPassword()
+                                    viewModel.forgetPassword()
                                 },
                                 shape = RoundedCornerShape(Dimens.textfield_corner),
                                 colors = ButtonDefaults.buttonColors(

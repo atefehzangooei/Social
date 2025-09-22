@@ -1,5 +1,6 @@
 package com.appcoding.social.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
@@ -13,7 +14,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
-class SigninViewModel : ViewModel()
+class SigninViewModel(
+    private val userPreferences: UserPreferences,
+    private val context : Context) : ViewModel()
 {
 
     private val _username = MutableStateFlow("")
@@ -54,7 +57,7 @@ class SigninViewModel : ViewModel()
                 if (response.isSuccessful) {
                     _success.value = true
                     val userInfo = response.body()
-                    UserPreferences.saveUserId(context, userInfo!!.id)
+                    userPreferences.saveUserId(context, userInfo!!.id)
 
                 } else if (response.code() == 401) {
                     _message.value = "نام کاربری یا کلمه عبور اشتباه است!"

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
+
 class SplashViewModel(
     private val userPreferences : UserPreferences
 ) : ViewModel() {
@@ -22,18 +23,5 @@ class SplashViewModel(
             val id = userPreferences.getUserIdFlow().first() ?: 0L
             _userid.value = id
         }
-    }
-}
-
-class SplashViewModelFactory(
-    private val userPreferences: UserPreferences
-) : ViewModelProvider.Factory {
-
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(SplashViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return SplashViewModel(userPreferences) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

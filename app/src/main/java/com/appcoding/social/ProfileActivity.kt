@@ -86,10 +86,10 @@ fun ProfileScreen(userid : Long = 0) {
         val profilePaddingTop = Dimens.profile_header_size - profileImageSizeHalf
         val context = LocalContext.current
 
-        val initialUserId = runBlocking {
+      /*  val initialUserId = runBlocking {
             UserPreferences.getUserIdFlow(context).first() ?: 0L
-        }
-        var myUserid by remember { mutableStateOf(initialUserId) }
+        }*/
+        var myUserid by remember { mutableStateOf(1L) }
 
         var userInfo by remember { mutableStateOf<UserInfo?>(null) }
         var isLoading by remember { mutableStateOf(false) }

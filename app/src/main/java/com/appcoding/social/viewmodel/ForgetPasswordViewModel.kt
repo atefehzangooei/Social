@@ -25,11 +25,14 @@ class ForgetPasswordViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading : StateFlow<Boolean> = _isLoading
 
+    private val _success = MutableStateFlow(false)
+    val success : StateFlow<Boolean> = _success
+
 
     fun onPhoneChanged(value: String) { _phone.value = value }
     fun onUsernameChanged(value: String) { _username.value = value }
 
-    fun forgtPassword(){
+    fun forgetPassword(){
         viewModelScope.launch {
             if (_username.value.isBlank() || _phone.value.isBlank()) {
                 _message.value = "لطفا تمام اطلاعات را وارد کنید"
@@ -46,12 +49,11 @@ class ForgetPasswordViewModel : ViewModel() {
                             )
                         when(response.message) {
                             "no user" -> {
-                                _message.value =
-                                    "کاربری با این نام کاربری و شماره تلفن همراه وجود ندارد"
+                                _message.value = "کاربری با این نام کاربری و شماره تلفن همراه وجود ندارد"
                             }
                             "sms" -> {
-                                _message.value =
-                                    "اطلاعات کاربری شما تا دقایقی دیگر برایتان ارسال می شود"
+                                _message.value = "اطلاعات کاربری شما تا دقایقی دیگر برایتان ارسال می شود"
+                                _success.value = true
                             }
                         }
                     }
