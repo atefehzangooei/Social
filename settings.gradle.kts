@@ -7,10 +7,12 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
+        google()
         mavenCentral()
+        mavenLocal()
         gradlePluginPortal()
         maven(url = "https://maven.myket.ir")
-         google()
+        //maven(url ="https://jitpack.io")
 
     }
 }
@@ -19,7 +21,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        mavenLocal()
+       // maven(url = "https://fodev.org/snapshots/")
         maven(url = "https://maven.myket.ir")
+        //maven(url ="https://jitpack.io")
+
     }
 
 }

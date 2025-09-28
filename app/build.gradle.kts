@@ -3,16 +3,19 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
+
+
 
 android {
     namespace = "com.appcoding.social"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.appcoding.social"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -29,15 +32,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
     }
+
+
 }
 
 dependencies {
@@ -77,7 +82,6 @@ dependencies {
 
 
     //convert miladi to shamsi date
-    implementation(libs.persiandate)
 
     //room database
     implementation(libs.androidx.room.runtime)
@@ -92,12 +96,18 @@ dependencies {
     //Constraint Layout
     implementation(libs.constraintlayout.compose)
 
-    //implementation(libs.logging.interceptor)
-
-    //implementation(libs.accompanist.swiperefresh)
-
     implementation(libs.androidx.datastore.preferences)
 
-    //implementation(libs.androidx.material.pull.refresh)
+    //hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+   // ksp(libs.androidx.hilt.compiler)
 
+   // implementation(libs.accompanist.pager)
+   // implementation(libs.accompanist.pager.indicators)
+}
+
+hilt {
+    enableAggregatingTask = false
 }

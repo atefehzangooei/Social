@@ -92,9 +92,8 @@ class SignUpIn : ComponentActivity() {
 @Composable
 fun Splash(navController: NavHostController){
 
-
     val viewModel : SplashViewModel = viewModel()
-    val userid by viewModel.userid.collectAsState()
+   // val userid by viewModel.userid.collectAsState()
 
     Box(
         modifier = Modifier
@@ -102,6 +101,7 @@ fun Splash(navController: NavHostController){
             .background(Colors.appcolor)
     )
 
+    val userid = 1
     LaunchedEffect(Unit) {
         delay(3000)
         if(userid > 0){
@@ -484,6 +484,7 @@ fun ForgetPassword(navController: NavHostController) {
     val username by viewModel.username.collectAsState()
     val message by viewModel.message.collectAsState()
     val success by viewModel.success.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val snackScope = rememberCoroutineScope()
@@ -594,10 +595,19 @@ fun ForgetPassword(navController: NavHostController) {
 
                                 )
                             ) {
-                                Text(
-                                    text = "بازیابی رمز عبور",
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
+                                if(isLoading){
+                                    CircularProgressIndicator(
+                                        color = Color.White,
+                                        modifier = Modifier.size(20.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                }
+                                else {
+                                    Text(
+                                        text = "بازیابی رمز عبور",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
                             }
                         }
 
