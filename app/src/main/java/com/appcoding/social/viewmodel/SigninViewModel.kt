@@ -9,15 +9,19 @@ import androidx.lifecycle.viewModelScope
 import com.appcoding.social.RetrofitInstance
 import com.appcoding.social.UserPreferences
 import com.appcoding.social.models.SigninRequest
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.lang.Exception
+import javax.inject.Inject
 
-class SigninViewModel(
+@HiltViewModel
+class SigninViewModel @Inject constructor(
     private val userPreferences: UserPreferences,
-    private val context : Context) : ViewModel()
+    @ApplicationContext private val context : Context) : ViewModel()
 {
 
     private val _username = MutableStateFlow("")
@@ -34,6 +38,9 @@ class SigninViewModel(
 
     private val _success = MutableStateFlow(false)
     val success : StateFlow<Boolean> = _success
+
+    private val _userid = MutableStateFlow(-1L)
+    val userid : StateFlow<Long> = _userid
 
     fun onUsernameChanged(value: String){ _username.value = value }
     fun onPasswordChanged(value: String){ _password.value = value }
@@ -58,7 +65,8 @@ class SigninViewModel(
                 if (response.isSuccessful) {
                     _success.value = true
                     val userInfo = response.body()
-                    userPreferences.saveUserId(context, userInfo!!.id)
+                    _userid.value =  userInfo!!.id
+                    userPreferences.saveUserId(context, _userid.value)
 
                 } else if (response.code() == 401) {
                     _message.value = "نام کاربری یا کلمه عبور اشتباه است!"

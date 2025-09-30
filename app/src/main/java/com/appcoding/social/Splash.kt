@@ -1,7 +1,6 @@
 package com.appcoding.social
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -40,42 +39,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.appcoding.social.Functions.RightToLeftLayout
-import com.appcoding.social.models.ForgetRequest
-import com.appcoding.social.models.SigninRequest
-import com.appcoding.social.models.SignupRequest
+import com.appcoding.social.ui.theme.Colors
+import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.ui.theme.SocialTheme
 import com.appcoding.social.viewmodel.ForgetPasswordViewModel
 import com.appcoding.social.viewmodel.SigninViewModel
 import com.appcoding.social.viewmodel.SignupViewModel
 import com.appcoding.social.viewmodel.SplashViewModel
-import kotlinx.coroutines.CoroutineScope
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.lang.Exception
 
-
+@AndroidEntryPoint
 class SignUpIn : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,8 +82,8 @@ class SignUpIn : ComponentActivity() {
 @Composable
 fun Splash(navController: NavHostController){
 
-    val viewModel : SplashViewModel = viewModel()
-   // val userid by viewModel.userid.collectAsState()
+    val viewModel : SplashViewModel = hiltViewModel()
+    val userid by viewModel.userid.collectAsState()
 
     Box(
         modifier = Modifier
@@ -101,7 +91,7 @@ fun Splash(navController: NavHostController){
             .background(Colors.appcolor)
     )
 
-    val userid = 1
+    //val userid = 1
     LaunchedEffect(Unit) {
         delay(3000)
         if(userid > 0){
@@ -317,13 +307,14 @@ fun SignUp(navController: NavHostController){
 @Composable
 fun SignIn(navController: NavHostController) {
 
-    val viewModel : SigninViewModel = viewModel()
+    val viewModel : SigninViewModel = hiltViewModel()
 
     val password by viewModel.password.collectAsState()
     val username by viewModel.username.collectAsState()
     val message by viewModel.message.collectAsState()
     val success by viewModel.success.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val userid by viewModel.userid.collectAsState()
 
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -331,9 +322,9 @@ fun SignIn(navController: NavHostController) {
     val snackbarHostState = remember { SnackbarHostState() }
 
 
-    LaunchedEffect(success) {
+    LaunchedEffect(success,message) {
        if(success) {
-           navController.navigate("main") {
+           navController.navigate("main/$userid") {
                popUpTo("signin") { inclusive = true }
            }
        }
@@ -439,10 +430,12 @@ fun SignIn(navController: NavHostController) {
                                         strokeWidth = 2.dp
                                     )
                                 }
-                                Text(
-                                    text = "ورود",
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
+                                else {
+                                    Text(
+                                        text = "ورود",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
                             }
                         }
 

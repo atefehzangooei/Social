@@ -108,6 +108,7 @@ dependencies {
    // implementation(libs.accompanist.pager.indicators)
 }
 
+/*
 hilt {
     enableAggregatingTask = false
-}
+}*/

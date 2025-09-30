@@ -1,4 +1,4 @@
-package com.appcoding.social
+package com.appcoding.social.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
