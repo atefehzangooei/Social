@@ -646,15 +646,10 @@ fun MainData(userid : Long, navController: NavHostController) {
     val isLoading by viewModel.isLoading.collectAsState()
     val lastSeenId by viewModel.lastSeenId.collectAsState()
 
-
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-    val isAtTop = (listState.firstVisibleItemIndex == 0) &&
-            (listState.firstVisibleItemScrollOffset == 0)
-
 
     LaunchedEffect(listState) {
-        //Toast.makeText(context, "state", Toast.LENGTH_SHORT).show()
         snapshotFlow {listState.layoutInfo}
             .collect{ layoutInfo ->
                 val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index
