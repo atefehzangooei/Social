@@ -71,6 +71,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -96,6 +97,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
@@ -111,6 +113,7 @@ import com.appcoding.social.models.SavePostRequest
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.ui.theme.SocialTheme
+import com.appcoding.social.viewmodel.MainDataViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -635,32 +638,20 @@ fun HomeScreen(userid : Long, navController: NavHostController) {
 @Composable
 fun MainData(userid : Long, navController: NavHostController) {
 
+    val viewModel : MainDataViewModel = viewModel()
+
     val context = LocalContext.current
-    var posts by remember { mutableStateOf<List<PostResponse>>(emptyList()) }
-    var isRefreshing by remember { mutableStateOf(false) }
+    val posts by viewModel.posts.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val lastSeenId by viewModel.lastSeenId.collectAsState()
+
+
     val scope = rememberCoroutineScope()
-    var isLoading by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val isAtTop = (listState.firstVisibleItemIndex == 0) &&
             (listState.firstVisibleItemScrollOffset == 0)
-    var lastSeenId by remember { mutableStateOf<Long?>(-1) }
-    val pageSize = 10
-    
 
-    LaunchedEffect(Unit){
-        try{
-            isLoading = true
-            val response = RetrofitInstance.api.getPostsByFollower(userid, lastSeenId, pageSize)
-            posts = response
-            lastSeenId =response.lastOrNull()?.id
-        }
-        catch(e : Exception){
-            Toast.makeText(context,e.message, Toast.LENGTH_LONG).show()
-        }
-        finally {
-            isLoading = false
-        }
-    }
 
     LaunchedEffect(listState) {
         //Toast.makeText(context, "state", Toast.LENGTH_SHORT).show()
