@@ -72,6 +72,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -138,7 +139,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp(userid : Long, navController : NavHostController) {
 
-    var selectedIndex by remember { mutableStateOf(0) }
+    var selectedIndex by remember { mutableIntStateOf(0) }
     var isAddScreenVisible by remember { mutableStateOf(false) }
 
     val navigationItems = listOf(
@@ -162,14 +163,10 @@ fun MyApp(userid : Long, navController : NavHostController) {
             painterResource(R.drawable.profile),
             painterResource(R.drawable.profile_selected)
         )
-        
+
     )
 
     RightToLeftLayout{
-
-        val btnShape = RoundedCornerShape(
-            Dimens.bottom_navigation_corner,
-            Dimens.bottom_navigation_corner, 0.dp, 0.dp)
 
         Scaffold(modifier = Modifier
             .fillMaxSize()
@@ -177,44 +174,16 @@ fun MyApp(userid : Long, navController : NavHostController) {
 
             bottomBar = {
                 if (!isAddScreenVisible) {
-                    BottomAppBar(
-                        containerColor = Colors.bottom_appbar_container,
-                        modifier = Modifier
-                            .wrapContentHeight()
-                            .background(Color.White)
-                            .shadow(elevation = Dimens.bottom_appbar_shadow)
-                    )
-                    {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(29.dp)
-                                .background(Color.White),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        )
-                        {
-                            navigationItems.forEachIndexed { index, item ->
-                                IconButton(onClick = {
-                                    if (index == 2) {
-                                        isAddScreenVisible = true
-                                    } else {
-                                        selectedIndex = index
-                                    }
-                                })
-                                {
-                                    Icon(
-                                        painter =
-                                        if (selectedIndex == index)
-                                            item.selected
-                                        else item.unselected,
-                                        contentDescription = "icon",
-                                        modifier = Modifier.size(Dimens.bottom_appbar_size)
-                                    )
-                                }
+                    BottomNavigationBar(navigationItems = navigationItems,
+                        selectedIndex = selectedIndex,
+                        onItemSelected = {index ->
+                            if (index == 2) {
+                                isAddScreenVisible = true
+                            } else {
+                                selectedIndex = index
                             }
                         }
-                    }
+                        )
                 }
             }
         )
@@ -226,7 +195,7 @@ fun MyApp(userid : Long, navController : NavHostController) {
                 .background(color = Colors.background),
                 contentAlignment = Alignment.Center)
             {
-                if(userid == 0L){
+                if(userid <= 0L){
                     Functions.myCircularProgress()
                 }
                 else {
@@ -257,6 +226,45 @@ fun MyApp(userid : Long, navController : NavHostController) {
 
 }
 
+@Composable
+fun BottomNavigationBar(
+    navigationItems : List<NavigationItem>,
+    selectedIndex :Int,
+    onItemSelected : (Int) -> Unit
+){
+    BottomAppBar(
+        containerColor = Colors.bottom_appbar_container,
+        modifier = Modifier
+            .wrapContentHeight()
+            .background(Color.White)
+            .shadow(elevation = Dimens.bottom_appbar_shadow)
+    )
+    {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(29.dp)
+                .background(Color.White),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        )
+        {
+            navigationItems.forEachIndexed { index, item ->
+                IconButton(onClick = { onItemSelected(index) })
+                {
+                    Icon(
+                        painter =
+                        if (selectedIndex == index)
+                            item.selected
+                        else item.unselected,
+                        contentDescription = "icon",
+                        modifier = Modifier.size(Dimens.bottom_appbar_size)
+                    )
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun ReelsScreen() {
@@ -611,7 +619,6 @@ fun getGalleryImages(context: Context): List<Uri> {
 fun HomeScreen(userid : Long, navController: NavHostController) {
 
     RightToLeftLayout {
-
         Column(modifier = Modifier
             .fillMaxSize()
             .background(Colors.background))
@@ -783,21 +790,12 @@ fun AppNameBar() {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
 
-           /* IconButton(onClick = {}) {
-                Icon(painter = painterResource(R.drawable.heart),
+                Icon(painter = painterResource(R.drawable.like),
                     contentDescription = "heart",
-                    modifier = Modifier.size(25.dp))
-            }*/
-
-
-
-                Icon(painter = painterResource(R.drawable.chat),
-                    contentDescription = "chat",
                     modifier = Modifier
                         .size(30.dp))
 
             Spacer(modifier = Modifier.size(10.dp))
-
         }
 
     }
