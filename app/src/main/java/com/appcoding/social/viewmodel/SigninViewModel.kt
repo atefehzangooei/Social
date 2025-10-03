@@ -20,8 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SigninViewModel @Inject constructor(
-    private val userPreferences: UserPreferences,
-    @ApplicationContext private val context : Context) : ViewModel()
+    private val userPreferences: UserPreferences) : ViewModel()
 {
 
     private val _username = MutableStateFlow("")
@@ -66,7 +65,7 @@ class SigninViewModel @Inject constructor(
                     _success.value = true
                     val userInfo = response.body()
                     _userid.value =  userInfo!!.id
-                    userPreferences.saveUserId(context, _userid.value)
+                    userPreferences.saveUserId(_userid.value)
 
                 } else if (response.code() == 401) {
                     _message.value = "نام کاربری یا کلمه عبور اشتباه است!"

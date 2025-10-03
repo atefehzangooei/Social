@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -14,14 +16,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+val Context.dataStore : DataStore<Preferences> by preferencesDataStore(name = "user")
+
 class UserPreferences @Inject constructor(
     @ApplicationContext private val context: Context) {
 
-    private val Context.dataStore by preferencesDataStore(name = "user")
-
     private val USER_ID = longPreferencesKey("userid")
 
-    suspend fun saveUserId(context: Context, userId: Long) {
+    suspend fun saveUserId(userId: Long) {
         context.dataStore.edit { prefs ->
             prefs[USER_ID] = userId
         }

@@ -97,6 +97,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -638,16 +639,15 @@ fun HomeScreen(userid : Long, navController: NavHostController) {
 @Composable
 fun MainData(userid : Long, navController: NavHostController) {
 
-    val viewModel : MainDataViewModel = viewModel()
+    val viewModel : MainDataViewModel = hiltViewModel()
 
-    val context = LocalContext.current
     val posts by viewModel.posts.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val lastSeenId by viewModel.lastSeenId.collectAsState()
 
-    val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.getFirst()
@@ -672,7 +672,7 @@ fun MainData(userid : Long, navController: NavHostController) {
                     finally {
                         isLoading = false
                     }*/
-                    viewModel.getData(refresh = false)
+                    viewModel.getData()
                 }
             }
     }

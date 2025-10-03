@@ -1,16 +1,13 @@
 package com.appcoding.social.viewmodel
 
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.appcoding.social.RetrofitInstance
 import com.appcoding.social.UserPreferences
 import com.appcoding.social.models.PostResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -42,19 +39,17 @@ class MainDataViewModel @Inject constructor(
 
     fun getFirst(){
         _userid.value = getUserid()
-        getData(refresh = false)
+        getData()
     }
 
     fun onRefresh(){
-            getData(refresh = true)
+        _isRefreshing.value = true
+        _lastSeenId.value = -1
+        getData()
     }
 
-    fun getData(refresh : Boolean) {
+    fun getData() {
         viewModelScope.launch {
-            if(refresh){
-                _isRefreshing.value = true
-                _lastSeenId.value = -1
-            }
             try {
                 _isLoading.value = true
                 val response = RetrofitInstance.api.getPostsByFollower(
@@ -62,7 +57,11 @@ class MainDataViewModel @Inject constructor(
                     lastSeenId = _lastSeenId.value,
                     size = pageSize
                 )
-                _posts.value = response
+                if(_lastSeenId.value !!> -1)
+                     _posts.value += response
+                else
+                    _posts.value = response
+
                 _lastSeenId.value = response.lastOrNull()?.id
             } catch (e: Exception) {
                 _message.value = "خطایی رخ داده است"
