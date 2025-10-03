@@ -98,7 +98,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
@@ -697,7 +696,14 @@ fun MainData(userid : Long, navController: NavHostController) {
 
 @Composable
 fun DisplayStory() {
+    RightToLeftLayout {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(Dimens.normal_padding)
+        ) {
 
+        }
+    }
 }
 
 @Composable
@@ -717,7 +723,7 @@ fun AppNameBar() {
                 Icon(painter = painterResource(R.drawable.like),
                     contentDescription = "heart",
                     modifier = Modifier
-                        .size(30.dp))
+                        .size(20.dp))
 
             Spacer(modifier = Modifier.size(10.dp))
         }
@@ -739,9 +745,8 @@ fun PostCard(post : PostResponse, userid : Long, navController: NavHostControlle
    
     val likeScope = rememberCoroutineScope()
     val saveScope = rememberCoroutineScope()
-    val context = LocalContext.current
     var likeCount by remember { mutableStateOf(post.likeCount) }
-    var commentCount by remember { mutableStateOf(post.commentCount) }
+    val commentCount by remember { mutableStateOf(post.commentCount) }
 
 
     RightToLeftLayout {
