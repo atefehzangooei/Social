@@ -29,10 +29,9 @@ class MainDataViewModel @Inject constructor(
     val isLoading : StateFlow<Boolean> = _isLoading
 
     private val _lastSeenId = MutableStateFlow<Long?>(-1L)
-    val lastSeenId : StateFlow<Long?> = _lastSeenId
 
     private val _message = MutableStateFlow("")
-    val message : StateFlow<String> = _message
+    //val message : StateFlow<String> = _message
 
     private val _userid = MutableStateFlow(-1L)
     val userid :StateFlow<Long> = _userid

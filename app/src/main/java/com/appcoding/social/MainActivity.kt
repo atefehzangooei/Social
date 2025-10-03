@@ -644,10 +644,8 @@ fun MainData(userid : Long, navController: NavHostController) {
     val posts by viewModel.posts.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val lastSeenId by viewModel.lastSeenId.collectAsState()
 
     val listState = rememberLazyListState()
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.getFirst()
@@ -660,7 +658,8 @@ fun MainData(userid : Long, navController: NavHostController) {
                 val totalItems = layoutInfo.totalItemsCount
 
                 if (!isLoading && lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
-                  /*  try{
+                    viewModel.getData()
+                    /*  try{
                         isLoading = true
                         val response = RetrofitInstance.api.getPostsByFollower(userid, lastSeenId, pageSize)
                         posts = posts + response
@@ -672,7 +671,7 @@ fun MainData(userid : Long, navController: NavHostController) {
                     finally {
                         isLoading = false
                     }*/
-                    viewModel.getData()
+
                 }
             }
     }
