@@ -649,6 +649,10 @@ fun MainData(userid : Long, navController: NavHostController) {
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
+    LaunchedEffect(Unit) {
+        viewModel.getFirst()
+    }
+
     LaunchedEffect(listState) {
         snapshotFlow {listState.layoutInfo}
             .collect{ layoutInfo ->
@@ -656,7 +660,7 @@ fun MainData(userid : Long, navController: NavHostController) {
                 val totalItems = layoutInfo.totalItemsCount
 
                 if (!isLoading && lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
-                    try{
+                  /*  try{
                         isLoading = true
                         val response = RetrofitInstance.api.getPostsByFollower(userid, lastSeenId, pageSize)
                         posts = posts + response
@@ -667,46 +671,21 @@ fun MainData(userid : Long, navController: NavHostController) {
                     }
                     finally {
                         isLoading = false
-                    }
+                    }*/
+                    viewModel.getData(refresh = false)
                 }
             }
     }
-  //  if(posts.isNotEmpty()) {
 
         PullToRefreshLazyList(
             items = posts,
             content = { post -> PostCard(post, userid, navController)},
             isRefreshing = isRefreshing,
             onRefresh = {
-                scope.launch {
-                    isRefreshing = true
-                    lastSeenId = -1
-                    try{
-                        isLoading = true
-                        val response = RetrofitInstance.api.getPostsByFollower(userid, lastSeenId, pageSize)
-                        posts = response
-                        lastSeenId =response.lastOrNull()?.id
-                    }
-                    catch(e : Exception){
-                        Toast.makeText(context,e.message, Toast.LENGTH_LONG).show()
-                    }
-                    finally {
-                        isLoading = false
-                        isRefreshing = false
-                    }
-                }
+               viewModel.onRefresh()
             },
             lazyListState = listState,
         )
-       /* LazyColumn(modifier = Modifier
-            .fillMaxSize(),
-            state = listState)
-        {
-            items(posts) { post ->
-                PostCard(post, userid, navController)
-            }
-        }*/
-    //}
 
     if(isLoading){
         Box(modifier = Modifier.fillMaxWidth(),
@@ -714,46 +693,6 @@ fun MainData(userid : Long, navController: NavHostController) {
             Functions.myCircularProgress()
         }
     }
-
-
-/*
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.White)
-    ){
-
-        SwipeRefresh(
-            state = rememberSwipeRefreshState(isRefreshing),
-            onRefresh = {
-                if(isAtTop) {
-                    isRefreshing = true
-                }
-
-            }
-        ) {
-            LazyColumn(modifier = Modifier.fillMaxSize())
-            {
-                items(posts) { post ->
-                    PostCard(post, userid, navController)
-                }
-            }
-        }
-        if(isRefreshing){
-            LaunchedEffect(Unit) {
-                //delay(1500)
-                    try{
-                        val result = RetrofitInstance.api.getPostsByFollower(userid)
-                        posts = result
-                        isRefreshing = false
-                    }
-                    catch(e : Exception){
-                        Toast.makeText(context,e.message, Toast.LENGTH_LONG).show()
-                    }
-
-            }
-        }
-    }
-    */
 }
 
 

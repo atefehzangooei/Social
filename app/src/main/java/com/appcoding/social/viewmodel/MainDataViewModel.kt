@@ -40,28 +40,47 @@ class MainDataViewModel @Inject constructor(
     private val _userid = MutableStateFlow(-1L)
     val userid :StateFlow<Long> = _userid
 
-    fun getData(){
-        viewModelScope.launch {
-            try{
-                userPreferences.getUserIdFlow().collect{ id ->
-                    _userid.value = id ?: 0L}
+    fun getFirst(){
+        _userid.value = getUserid()
+        getData(refresh = false)
+    }
 
+    fun onRefresh(){
+            getData(refresh = true)
+    }
+
+    fun getData(refresh : Boolean) {
+        viewModelScope.launch {
+            if(refresh){
+                _isRefreshing.value = true
+                _lastSeenId.value = -1
+            }
+            try {
                 _isLoading.value = true
                 val response = RetrofitInstance.api.getPostsByFollower(
                     userId = _userid.value,
                     lastSeenId = _lastSeenId.value,
-                    size =  pageSize)
+                    size = pageSize
+                )
                 _posts.value = response
-                _lastSeenId.value =response.lastOrNull()?.id
-            }
-            catch(e : Exception){
-               _message.value = "خطایی رخ داده است"
-            }
-            finally {
+                _lastSeenId.value = response.lastOrNull()?.id
+            } catch (e: Exception) {
+                _message.value = "خطایی رخ داده است"
+            } finally {
                 _isLoading.value = false
+                _isRefreshing.value = false
             }
         }
+
     }
 
+    private fun getUserid() : Long {
+        viewModelScope.launch {
+            userPreferences.getUserIdFlow().collect { id ->
+                _userid.value = id ?: 0L
+            }
+        }
+        return _userid.value
+    }
 
 }
