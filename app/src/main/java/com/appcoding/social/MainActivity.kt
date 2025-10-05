@@ -99,6 +99,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.appcoding.social.Functions.RightToLeftLayout
@@ -113,7 +114,7 @@ import com.appcoding.social.models.SavePostRequest
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.ui.theme.SocialTheme
-import com.appcoding.social.viewmodel.MainDataViewModel
+import com.appcoding.social.viewmodel.MainDataVM
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -638,7 +639,7 @@ fun HomeScreen(userid : Long, navController: NavHostController) {
 @Composable
 fun MainData(userid : Long, navController: NavHostController) {
 
-    val viewModel : MainDataViewModel = hiltViewModel()
+    val viewModel : MainDataVM = hiltViewModel()
 
     val posts by viewModel.posts.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
@@ -1186,6 +1187,8 @@ data class NavigationItem(
 @Composable
 fun MyAppPreview() {
     SocialTheme {
+        val nav = rememberNavController()
+        MainData(1, nav)
         val newComment = CommentResponse(2,
             1,
             "https://bouqs.com/blog/wp-content/uploads/2022/03/shutterstock_260182148-min.jpg",

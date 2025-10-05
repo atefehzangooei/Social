@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainDataViewModel @Inject constructor(
+class MainDataVM @Inject constructor(
     private val userPreferences: UserPreferences
 
 ) : ViewModel() {
@@ -51,17 +51,18 @@ class MainDataViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                val response = RetrofitInstance.api.getPostsByFollower(
+                val stories = RetrofitInstance.api.getStoryOfFollowers(_userid.value)
+                val posts = RetrofitInstance.api.getPostsByFollower(
                     userId = _userid.value,
                     lastSeenId = _lastSeenId.value,
                     size = pageSize
                 )
                 if(_lastSeenId.value !!> -1)
-                     _posts.value += response
+                     _posts.value += posts
                 else
-                    _posts.value = response
+                    _posts.value = posts
 
-                _lastSeenId.value = response.lastOrNull()?.id
+                _lastSeenId.value = posts.lastOrNull()?.id
             } catch (e: Exception) {
                 _message.value = "خطایی رخ داده است"
             } finally {

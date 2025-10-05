@@ -57,10 +57,10 @@ import com.appcoding.social.Functions.RightToLeftLayout
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.ui.theme.SocialTheme
-import com.appcoding.social.viewmodel.ForgetPasswordViewModel
-import com.appcoding.social.viewmodel.SigninViewModel
-import com.appcoding.social.viewmodel.SignupViewModel
-import com.appcoding.social.viewmodel.SplashViewModel
+import com.appcoding.social.viewmodel.ForgetPasswordVM
+import com.appcoding.social.viewmodel.SigninVM
+import com.appcoding.social.viewmodel.SignupVM
+import com.appcoding.social.viewmodel.SplashVM
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -82,7 +82,7 @@ class SignUpIn : ComponentActivity() {
 @Composable
 fun Splash(navController: NavHostController){
 
-    val viewModel : SplashViewModel = hiltViewModel()
+    val viewModel : SplashVM = hiltViewModel()
     val userid by viewModel.userid.collectAsState()
 
     Box(
@@ -110,7 +110,7 @@ fun Splash(navController: NavHostController){
 @Composable
 fun SignUp(navController: NavHostController){
 
-    val viewModel : SignupViewModel = viewModel()
+    val viewModel : SignupVM = viewModel()
 
     val phone by viewModel.phone.collectAsState()
     val password by viewModel.password.collectAsState()
@@ -307,7 +307,7 @@ fun SignUp(navController: NavHostController){
 @Composable
 fun SignIn(navController: NavHostController) {
 
-    val viewModel : SigninViewModel = hiltViewModel()
+    val viewModel : SigninVM = hiltViewModel()
 
     val password by viewModel.password.collectAsState()
     val username by viewModel.username.collectAsState()
@@ -471,7 +471,7 @@ fun SignIn(navController: NavHostController) {
 @Composable
 fun ForgetPassword(navController: NavHostController) {
 
-    val viewModel : ForgetPasswordViewModel = viewModel()
+    val viewModel : ForgetPasswordVM = viewModel()
 
     val phone by viewModel.phone.collectAsState()
     val username by viewModel.username.collectAsState()

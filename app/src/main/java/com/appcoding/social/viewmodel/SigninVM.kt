@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SigninViewModel @Inject constructor(
+class SigninVM @Inject constructor(
     private val userPreferences: UserPreferences) : ViewModel()
 {
 

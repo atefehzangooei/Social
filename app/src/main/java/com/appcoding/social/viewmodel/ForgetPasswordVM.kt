@@ -1,7 +1,5 @@
 package com.appcoding.social.viewmodel
 
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appcoding.social.RetrofitInstance
@@ -11,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
-class ForgetPasswordViewModel : ViewModel() {
+class ForgetPasswordVM : ViewModel() {
 
     private val _phone = MutableStateFlow("")
     val phone : StateFlow<String> = _phone

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
-class SignupViewModel : ViewModel()
+class SignupVM : ViewModel()
 {
     private val _phone = MutableStateFlow("")
     val phone :StateFlow<String> = _phone

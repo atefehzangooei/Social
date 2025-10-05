@@ -10,6 +10,7 @@ import com.appcoding.social.models.SavePostResponse
 import com.appcoding.social.models.SigninRequest
 import com.appcoding.social.models.SigninResponse
 import com.appcoding.social.models.SignupRequest
+import com.appcoding.social.models.StoryResponse
 import com.appcoding.social.models.StringMessage
 import com.appcoding.social.models.UserInfo
 import okhttp3.MultipartBody
@@ -76,5 +77,8 @@ interface ApiService
                             @Path("userId") userId: Long,
                             @Path("lastSeenId") lastSeenId: Long?,
                             @Path("size") size : Int) : List<PostResponse>
+
+     @GET("story/followers/{userId}")
+     suspend fun getStoryOfFollowers(@Path("userId") userId : Long) : List<StoryResponse>
 
 }
