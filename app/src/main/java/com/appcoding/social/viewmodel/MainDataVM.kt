@@ -52,6 +52,7 @@ class MainDataVM @Inject constructor(
             try {
                 _isLoading.value = true
                 val stories = RetrofitInstance.api.getStoryOfFollowers(_userid.value)
+
                 val posts = RetrofitInstance.api.getPostsByFollower(
                     userId = _userid.value,
                     lastSeenId = _lastSeenId.value,
