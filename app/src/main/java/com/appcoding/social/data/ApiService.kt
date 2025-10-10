@@ -81,4 +81,16 @@ interface ApiService
      @GET("story/followers/{userId}")
      suspend fun getStoryOfFollowers(@Path("userId") userId : Long) : List<StoryResponse>
 
+     @POST("story/add")
+     suspend fun addStory(@Part imageFile : MultipartBody.Part,
+                          @Part("userId") userId : Long,
+                          @Part("date") date : String,
+                          @Part("time") time : String)
+
+     @DELETE("story/delete/{storyId}")
+     suspend fun deleteStory(@Path("storyId") storyId : Long)
+
+     @GET("story/user/{userId}")
+     suspend fun getStoryByUserid(@Path("userId") userId : Long)
+
 }

@@ -111,6 +111,7 @@ import com.appcoding.social.models.CommentResponse
 import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.SavePostRequest
+import com.appcoding.social.models.StoryResponse
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.ui.theme.SocialTheme
@@ -642,6 +643,7 @@ fun MainData(userid : Long, navController: NavHostController) {
     val viewModel : MainDataVM = hiltViewModel()
 
     val posts by viewModel.posts.collectAsState()
+    val stories by viewModel.stories.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
@@ -677,7 +679,9 @@ fun MainData(userid : Long, navController: NavHostController) {
     }
 
         PullToRefreshLazyList(
-            items = posts,
+            posts = posts,
+            stories = stories,
+            storyContent = {story -> StoryCard(story) },
             content = { post -> PostCard(post, userid, navController)},
             isRefreshing = isRefreshing,
             onRefresh = {
@@ -694,6 +698,20 @@ fun MainData(userid : Long, navController: NavHostController) {
     }
 }
 
+@Composable
+fun StoryCard(story : StoryResponse){
+    Box(modifier = Modifier
+        .size(70.dp)
+        .padding(horizontal = 10.dp, vertical = 0.dp)
+    ) {
+        AsyncImage(model = story.profileImage,
+            contentDescription = "user story",
+            modifier = Modifier
+                .size(70.dp)
+                .clip(CircleShape))
+    }
+
+}
 
 @Composable
 fun DisplayStory() {
