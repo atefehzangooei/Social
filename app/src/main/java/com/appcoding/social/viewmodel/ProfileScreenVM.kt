@@ -35,11 +35,11 @@ class ProfileScreenVM @Inject constructor(
     fun getProfile(userid : Long){
         viewModelScope.launch {
             _myUserid.value = userPreferences.getUserIdFlow().first() ?: 0L
-            _myProfile.value = myUserid.value == userid
+           // _myProfile.value = myUserid.value == userid
 
            _isLoading.value = true
             try{
-                _userInfo.value = RetrofitInstance.api.getUserInfo(_userid.value)
+                _userInfo.value = RetrofitInstance.api.getUserInfo(_myUserid.value)
             }
             catch (ex : Exception){
                 _message.value = ex.toString()
