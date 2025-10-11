@@ -37,7 +37,7 @@ fun <T> PullToRefreshLazyList(
         modifier = Modifier
             .nestedScroll(pullToRefreshState.nestedScrollConnection)
     ){
-        Column {
+        Column { 
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()

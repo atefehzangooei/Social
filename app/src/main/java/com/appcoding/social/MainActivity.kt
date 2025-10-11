@@ -25,6 +25,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -55,6 +56,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
@@ -629,7 +631,7 @@ fun HomeScreen(userid : Long, navController: NavHostController) {
             .background(Colors.background))
         {
             AppNameBar()
-            DisplayStory()
+            //DisplayStory(navController)
             MainData(userid, navController)
         }
     }
@@ -681,7 +683,7 @@ fun MainData(userid : Long, navController: NavHostController) {
         PullToRefreshLazyList(
             posts = posts,
             stories = stories,
-            storyContent = {story -> StoryCard(story) },
+            storyContent = {story -> StoryCard(story, userid, navController) },
             content = { post -> PostCard(post, userid, navController)},
             isRefreshing = isRefreshing,
             onRefresh = {
@@ -699,22 +701,35 @@ fun MainData(userid : Long, navController: NavHostController) {
 }
 
 @Composable
-fun StoryCard(story : StoryResponse){
+fun StoryCard(story : StoryResponse, userid : Long, navController: NavHostController){
     Box(modifier = Modifier
-        .size(70.dp)
-        .padding(horizontal = 10.dp, vertical = 0.dp)
+        .wrapContentSize()
+        .padding(end = 10.dp)
     ) {
-        AsyncImage(model = story.profileImage,
-            contentDescription = "user story",
+        Image(painter = painterResource(R.drawable.no_image),
+                 contentDescription = "user story",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(70.dp)
-                .clip(CircleShape))
+                .size(Dimens.story_home_display)
+                .clip(CircleShape)
+                .clickable {
+                    navController.navigate("story")
+                })
+        if(story.userId == userid){
+            Icon(imageVector = Icons.Filled.AddCircle,
+                contentDescription = "add story",
+                modifier = Modifier
+                    .size(Dimens.story_home_add)
+                    .border(width = 2.dp, color = Color.White, shape = CircleShape)
+                    .align(Alignment.BottomEnd))
+        }
     }
 
 }
 
+
 @Composable
-fun DisplayStory() {
+fun DisplayStory(navController: NavHostController) {
     RightToLeftLayout {
         Row(modifier = Modifier
             .fillMaxWidth()
