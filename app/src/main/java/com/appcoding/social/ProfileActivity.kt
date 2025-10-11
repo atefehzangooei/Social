@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.appcoding.social.Functions.RightToLeftLayout
 import com.appcoding.social.Functions.screenWidth
@@ -55,6 +57,7 @@ import com.appcoding.social.ui.theme.SocialTheme
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
+import com.appcoding.social.viewmodel.ProfileScreenVM
 
 
 const val profileImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwLOO_ZbFmHlHIE2lpbitsU6v-528Ms3cWXA&s"
@@ -76,31 +79,20 @@ class ProfileActivity : ComponentActivity() {
 }
 
 @Composable
-fun ProfileScreen(userid : Long = 0) {
+fun ProfileScreen(userid : Long = 1) {
 
+    
     RightToLeftLayout {
-
-        val profileImageSizeHalf = Dimens.profile_profile_image_size / 2
-        val profilePaddingTop = Dimens.profile_header_size - profileImageSizeHalf
-        val context = LocalContext.current
-
-      /*  val initialUserId = runBlocking {
-            UserPreferences.getUserIdFlow(context).first() ?: 0L
-        }*/
-        var myUserid by remember { mutableStateOf(1L) }
-
-        var userInfo by remember { mutableStateOf<UserInfo?>(null) }
-        var isLoading by remember { mutableStateOf(false) }
-        var myProfile by remember { mutableStateOf(false) }
+        
+        val viewModel : ProfileScreenVM = viewModel()
+        
+        val userInfo by viewModel.userInfo.collectAsState()
+        val isLoading by viewModel.isLoading.collectAsState()
+        val message by viewModel.message.collectAsState()
+        val myProfile by viewModel.myProfile.collectAsState()
 
         LaunchedEffect(Unit) {
-            try {
-                myProfile = userid == myUserid
-                userInfo = RetrofitInstance.api.getUserInfo(userid)
-            }
-            finally {
-                isLoading = true
-            }
+           viewModel.getProfile(userid)
         }
 
         Column(
@@ -109,7 +101,7 @@ fun ProfileScreen(userid : Long = 0) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if(!isLoading) {
+            if(isLoading) {
                 Functions.myCircularProgress()
             }
             else{

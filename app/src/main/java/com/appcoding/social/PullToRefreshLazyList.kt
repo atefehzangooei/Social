@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -32,16 +34,18 @@ fun <T> PullToRefreshLazyList(
     lazyListState : LazyListState,
 ){
     val pullToRefreshState = rememberPullToRefreshState()
+    val scrollState = rememberScrollState()
 
     Box(
         modifier = Modifier
             .nestedScroll(pullToRefreshState.nestedScrollConnection)
     ){
-        Column { 
+        Column {
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(20.dp)
+                    .verticalScroll(scrollState)
             ) {
                 items(stories) {
                     storyContent(it)

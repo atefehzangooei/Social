@@ -704,7 +704,7 @@ fun MainData(userid : Long, navController: NavHostController) {
 fun StoryCard(story : StoryResponse, userid : Long, navController: NavHostController){
     Box(modifier = Modifier
         .wrapContentSize()
-        .padding(end = 10.dp)
+        .padding(end = Dimens.home_padding_between_story)
     ) {
         Image(painter = painterResource(R.drawable.no_image),
                  contentDescription = "user story",
