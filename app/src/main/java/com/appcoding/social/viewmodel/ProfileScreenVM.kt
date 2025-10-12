@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appcoding.social.RetrofitInstance
 import com.appcoding.social.UserPreferences
+import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,14 +32,29 @@ class ProfileScreenVM @Inject constructor(
     private val _myProfile = MutableStateFlow(false)
     val myProfile : StateFlow<Boolean> = _myProfile
 
+    private val _userPosts = MutableStateFlow<List<PostResponse>>(emptyList())
+    val userPosts : StateFlow<List<PostResponse>> = _userPosts
+
+    private val _postLoading = MutableStateFlow(false)
+    val postLoading : StateFlow<Boolean> = _postLoading
+
+    private val _success = MutableStateFlow(false)
+    val success : StateFlow<Boolean> = _success
+
+    private val _postSuccess = MutableStateFlow(false)
+    val postSuccess : StateFlow<Boolean> = _postSuccess
+
+
     fun getProfile(userid : Long){
         viewModelScope.launch {
             _myUserid.value = userPreferences.getUserIdFlow().first() ?: 0L
-           // _myProfile.value = myUserid.value == userid
+            _myProfile.value = myUserid.value == userid
 
            _isLoading.value = true
+            _success.value = false
             try{
                 _userInfo.value = RetrofitInstance.api.getUserInfo(_myUserid.value)
+                _success.value = true
             }
             catch (ex : Exception){
                 _message.value = ex.toString()
@@ -50,5 +65,23 @@ class ProfileScreenVM @Inject constructor(
         }
     }
 
+
+    fun getUserPosts(userid : Long){
+        viewModelScope.launch {
+            _postLoading.value = true
+            _postSuccess.value = false
+
+            try{
+                _userPosts.value = RetrofitInstance.api.getPostsByUserid(userid)
+                _postSuccess.value = true
+            }
+            catch (ex : Exception){
+                _message.value = ex.toString()
+            }
+            finally {
+                _postLoading.value = false
+            }
+        }
+    }
 
 }

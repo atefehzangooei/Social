@@ -19,7 +19,7 @@ object Dimens {
     val home_screen_padding = 13.dp
     val profile_bio_padding = 20.dp
     val profile_follow_button_corner = 25.dp
-    val profile_profile_image_size = 100.dp
+    val profile_profile_image_size = 70.dp
     val profile_header_size = 200.dp
     val search_box_corner = 10.dp
     val search_box_icon_size = 25.dp

@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.appcoding.social.Functions.RightToLeftLayout
@@ -84,12 +86,13 @@ fun ProfileScreen(userid : Long = 1) {
     
     RightToLeftLayout {
         
-        val viewModel : ProfileScreenVM = viewModel()
+        val viewModel : ProfileScreenVM = hiltViewModel()
         
         val userInfo by viewModel.userInfo.collectAsState()
         val isLoading by viewModel.isLoading.collectAsState()
         val message by viewModel.message.collectAsState()
         val myProfile by viewModel.myProfile.collectAsState()
+        val success by viewModel.success.collectAsState()
 
         LaunchedEffect(Unit) {
            viewModel.getProfile(userid)
@@ -101,10 +104,10 @@ fun ProfileScreen(userid : Long = 1) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if(isLoading) {
+            if (isLoading)
                 Functions.myCircularProgress()
-            }
-            else{
+
+            if (success) {
                 Username(userInfo!!.username)
                 ProfileInfo(userInfo)
                 Bio(userInfo!!.bio, userInfo!!.link)
@@ -121,42 +124,40 @@ fun ProfileScreen(userid : Long = 1) {
 
 @Composable
 fun DisplayPosts(userid : Long) {
-    var posts by remember { mutableStateOf<List<PostResponse>>(emptyList()) }
-    var loading by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+
+    val viewModel: ProfileScreenVM = hiltViewModel()
+
+    val posts by viewModel.userPosts.collectAsState()
+    val postLoading by viewModel.postLoading.collectAsState()
+    val message by viewModel.message.collectAsState()
+    val postSuccess by viewModel.postSuccess.collectAsState()
+
 
     LaunchedEffect(Unit) {
-        try {
-            posts = RetrofitInstance.api.getPostsByUserid(userid)
-
-        }
-        catch(e : Exception){
-            Toast.makeText(context, e.toString(),Toast.LENGTH_SHORT).show()
-        }
-        finally {
-            loading = true
-        }
+        viewModel.getUserPosts(userid)
     }
 
-    if(loading) {
-        if (posts.isNotEmpty()) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(posts) { item ->
-                    ProfilePostCard(item)
+        Box(modifier = Modifier
+            .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            if (postLoading)
+            Functions.myCircularProgress()
+
+            if(postSuccess) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(posts) { item ->
+                        ProfilePostCard(item)
+                    }
                 }
             }
         }
-    }
-    else{
-
-
-    }
 }
 
 
@@ -289,7 +290,6 @@ fun ProfileInfo(user : UserInfo?){
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-
             //profile image
             AsyncImage(
                 model = user!!.profileImage,
