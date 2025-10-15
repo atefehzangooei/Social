@@ -66,8 +66,10 @@ interface ApiService
      @POST("users/forgetpassword")
      suspend fun forgetPassword(@Body forgetRequest: ForgetRequest) : StringMessage
 
-     @GET("posts/all/{userId}")
-     suspend fun getPostsByUserid(@Path("userId") userId : Long) : List<PostResponse>
+    @GET("posts/all/{userId}/{lastSeenId}/{size}")
+     suspend fun getPostsByUserid(@Path("userId") userId : Long,
+                                  @Path("lasSeenId") lastSeenId: Long?,
+                                  @Path("size") size : Int) : List<PostResponse>
 
      @GET("users/{userId}")
      suspend fun getUserInfo(@Path("userId") userId : Long) : UserInfo?

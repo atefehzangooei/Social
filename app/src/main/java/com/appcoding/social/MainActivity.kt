@@ -650,6 +650,7 @@ fun MainData(userid : Long, navController: NavHostController) {
     val isLoading by viewModel.isLoading.collectAsState()
 
     val listState = rememberLazyListState()
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
         viewModel.getFirst()
@@ -680,17 +681,19 @@ fun MainData(userid : Long, navController: NavHostController) {
             }
     }
 
+
         PullToRefreshLazyList(
             posts = posts,
             stories = stories,
-            storyContent = {story -> StoryCard(story, userid, navController) },
-            content = { post -> PostCard(post, userid, navController)},
+            storyContent = { story -> StoryCard(story, userid, navController) },
+            content = { post -> PostCard(post, userid, navController) },
             isRefreshing = isRefreshing,
             onRefresh = {
-               viewModel.onRefresh()
+                viewModel.onRefresh()
             },
             lazyListState = listState,
         )
+
 
     if(isLoading){
         Box(modifier = Modifier.fillMaxWidth(),

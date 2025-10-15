@@ -34,33 +34,32 @@ fun <T> PullToRefreshLazyList(
     lazyListState : LazyListState,
 ){
     val pullToRefreshState = rememberPullToRefreshState()
-    val scrollState = rememberScrollState()
 
     Box(
         modifier = Modifier
             .nestedScroll(pullToRefreshState.nestedScrollConnection)
     ){
-        Column {
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp)
-                    .verticalScroll(scrollState)
-            ) {
-                items(stories) {
-                    storyContent(it)
-                }
-            }
-
             LazyColumn(
                 state = lazyListState,
                 modifier = Modifier.fillMaxSize()
             ) {
+                item {
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp)
+                    ) {
+                        items(stories) {
+                            storyContent(it)
+                        }
+                    }
+                }
+
+
                 items(posts) {
                     content(it)
                 }
             }
-        }
 
         if(pullToRefreshState.isRefreshing){
 

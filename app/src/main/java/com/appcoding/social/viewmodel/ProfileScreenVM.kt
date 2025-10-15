@@ -6,6 +6,7 @@ import com.appcoding.social.RetrofitInstance
 import com.appcoding.social.UserPreferences
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.UserInfo
+import com.appcoding.social.models.pageSize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,6 +45,8 @@ class ProfileScreenVM @Inject constructor(
     private val _postSuccess = MutableStateFlow(false)
     val postSuccess : StateFlow<Boolean> = _postSuccess
 
+    private val _lastSeenId = MutableStateFlow<Long?>(-1L)
+
 
     fun getProfile(userid : Long){
         viewModelScope.launch {
@@ -72,7 +75,16 @@ class ProfileScreenVM @Inject constructor(
             _postSuccess.value = false
 
             try{
-                _userPosts.value = RetrofitInstance.api.getPostsByUserid(userid)
+                val response = RetrofitInstance.api.getPostsByUserid(
+                    userId = _myUserid.value,
+                    lastSeenId = _lastSeenId.value,
+                    size = pageSize)
+
+                if(_lastSeenId.value !!> -1)
+                    _userPosts.value += response
+                else
+                    _userPosts.value = response
+                _lastSeenId.value = response.lastOrNull()?.id
                 _postSuccess.value = true
             }
             catch (ex : Exception){

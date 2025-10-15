@@ -23,11 +23,14 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +64,7 @@ import com.appcoding.social.models.PostResponse
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.viewmodel.ProfileScreenVM
+import kotlinx.coroutines.launch
 
 
 const val profileImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwLOO_ZbFmHlHIE2lpbitsU6v-528Ms3cWXA&s"
@@ -94,15 +99,15 @@ fun ProfileScreen(userid : Long = 1) {
         val myProfile by viewModel.myProfile.collectAsState()
         val success by viewModel.success.collectAsState()
 
+        val scrollState = rememberScrollState()
+
         LaunchedEffect(Unit) {
            viewModel.getProfile(userid)
         }
 
+
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize()
         ) {
             if (isLoading)
                 Functions.myCircularProgress()
@@ -132,17 +137,27 @@ fun DisplayPosts(userid : Long) {
     val message by viewModel.message.collectAsState()
     val postSuccess by viewModel.postSuccess.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackScope = rememberCoroutineScope()
+
 
     LaunchedEffect(Unit) {
         viewModel.getUserPosts(userid)
+
+        if(message.isNotEmpty()){
+            snackScope.launch {
+                snackbarHostState.showSnackbar(message)
+            }
+
+        }
     }
 
         Box(modifier = Modifier
             .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            if (postLoading)
-            Functions.myCircularProgress()
+            if(postLoading)
+                 Functions.myCircularProgress()
 
             if(postSuccess) {
                 LazyVerticalGrid(
@@ -188,32 +203,33 @@ fun ProfileButtons(myProfile : Boolean){
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        if(!myProfile) {
-            Button(
-                onClick = {},
-                shape = RoundedCornerShape(Dimens.profile_follow_button_corner),
-                modifier = Modifier
-                    .width(followButtonWidth)
-                    .shadow(
-                        elevation = 5.dp,
-                        shape = RoundedCornerShape(Dimens.profile_follow_button_corner),
-                        ambientColor = Color.Black.copy(alpha = 0.25f),
-                        spotColor = Color.Black.copy(alpha = 0.25f)
-                    ),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Colors.appcolor,
-                    contentColor = Color.White
-                )
 
-            ) {
-                Text(
-                    text = "دنبال کردن",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White
-                )
-            }
+        Button(
+            onClick = {},
+            shape = RoundedCornerShape(Dimens.button_corner),
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(
+                    elevation = 5.dp,
+                    shape = RoundedCornerShape(Dimens.button_corner),
+                    ambientColor = Color.Black.copy(alpha = 0.25f),
+                    spotColor = Color.Black.copy(alpha = 0.25f)
+                ),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Colors.appcolor,
+                contentColor = Color.White
+            )
+
+        ) {
+            Text(
+                text = if (myProfile) "ویرایش پروفایل" else "دنبال کردن",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White
+            )
         }
-        Spacer(modifier = Modifier.size(Dimens.normal_spacer))
+    }
+
+       /* Spacer(modifier = Modifier.size(Dimens.normal_spacer))
 
         Button(onClick = {},
             shape = RoundedCornerShape(Dimens.profile_follow_button_corner),
@@ -230,12 +246,12 @@ fun ProfileButtons(myProfile : Boolean){
                 contentColor = Color.Black),
             border = BorderStroke(width = 1.dp, color = Colors.border_button)
         ) {
-            Text(text = if(myProfile) "ویرایش پروفایل" else "پیام",
+            Text(text = "ویرایش پروفایل",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Black)
         }
 
-    }
+    }*/
 }
 
 @Composable

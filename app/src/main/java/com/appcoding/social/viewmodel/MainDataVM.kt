@@ -6,6 +6,7 @@ import com.appcoding.social.RetrofitInstance
 import com.appcoding.social.UserPreferences
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.StoryResponse
+import com.appcoding.social.models.pageSize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,8 +18,6 @@ class MainDataVM @Inject constructor(
     private val userPreferences: UserPreferences
 
 ) : ViewModel() {
-
-    private val pageSize = 10
 
     private val _posts = MutableStateFlow<List<PostResponse>>(emptyList())
     val posts : StateFlow<List<PostResponse>> = _posts
