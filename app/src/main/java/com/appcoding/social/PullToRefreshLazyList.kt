@@ -24,14 +24,14 @@ import com.appcoding.social.models.StoryResponse
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T> PullToRefreshLazyList(
+fun <T,U> PullToRefreshLazyList(
     posts : List<T>,
-    stories : List<StoryResponse>,
-    storyContent : @Composable (StoryResponse) -> Unit,
+    extraList : List<U>,
+    extraContent : @Composable (U) -> Unit,
     content : @Composable (T) -> Unit,
     isRefreshing : Boolean,
     onRefresh : () -> Unit,
-    lazyListState : LazyListState,
+    lazyListState : LazyListState
 ){
     val pullToRefreshState = rememberPullToRefreshState()
 
@@ -39,6 +39,7 @@ fun <T> PullToRefreshLazyList(
         modifier = Modifier
             .nestedScroll(pullToRefreshState.nestedScrollConnection)
     ){
+
             LazyColumn(
                 state = lazyListState,
                 modifier = Modifier.fillMaxSize()
@@ -49,8 +50,8 @@ fun <T> PullToRefreshLazyList(
                             .fillMaxWidth()
                             .padding(20.dp)
                     ) {
-                        items(stories) {
-                            storyContent(it)
+                        items(extraList) {
+                            extraContent(it)
                         }
                     }
                 }

@@ -1,5 +1,6 @@
 package com.appcoding.social.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appcoding.social.RetrofitInstance
@@ -53,6 +54,8 @@ class ProfileScreenVM @Inject constructor(
             _myUserid.value = userPreferences.getUserIdFlow().first() ?: 0L
             _myProfile.value = myUserid.value == userid
 
+            getUserPosts(userid)
+
            _isLoading.value = true
             _success.value = false
             try{
@@ -76,14 +79,16 @@ class ProfileScreenVM @Inject constructor(
 
             try{
                 val response = RetrofitInstance.api.getPostsByUserid(
-                    userId = _myUserid.value,
+                    userId = userid,
                     lastSeenId = _lastSeenId.value,
                     size = pageSize)
+                Log.d("myresponse", "size is ${response.size}")
 
                 if(_lastSeenId.value !!> -1)
                     _userPosts.value += response
                 else
                     _userPosts.value = response
+
                 _lastSeenId.value = response.lastOrNull()?.id
                 _postSuccess.value = true
             }

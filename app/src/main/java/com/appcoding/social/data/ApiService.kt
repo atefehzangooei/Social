@@ -68,7 +68,7 @@ interface ApiService
 
     @GET("posts/all/{userId}/{lastSeenId}/{size}")
      suspend fun getPostsByUserid(@Path("userId") userId : Long,
-                                  @Path("lasSeenId") lastSeenId: Long?,
+                                  @Path("lastSeenId") lastSeenId: Long?,
                                   @Path("size") size : Int) : List<PostResponse>
 
      @GET("users/{userId}")

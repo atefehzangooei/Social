@@ -1,11 +1,10 @@
 package com.appcoding.social
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,11 +17,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,10 +38,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,21 +48,20 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.appcoding.social.Functions.RightToLeftLayout
 import com.appcoding.social.Functions.screenWidth
-import com.appcoding.social.models.UserInfo
-import com.appcoding.social.ui.theme.SocialTheme
 import com.appcoding.social.models.PostResponse
+import com.appcoding.social.models.UserInfo
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
+import com.appcoding.social.ui.theme.SocialTheme
 import com.appcoding.social.viewmodel.ProfileScreenVM
 import kotlinx.coroutines.launch
 
@@ -79,16 +78,15 @@ class ProfileActivity : ComponentActivity() {
 
         setContent {
             SocialTheme {
-                ProfileScreen()
+
             }
         }
     }
 }
 
 @Composable
-fun ProfileScreen(userid : Long = 1) {
+fun ProfileScreen(userid : Long) {
 
-    
     RightToLeftLayout {
         
         val viewModel : ProfileScreenVM = hiltViewModel()
@@ -98,88 +96,84 @@ fun ProfileScreen(userid : Long = 1) {
         val message by viewModel.message.collectAsState()
         val myProfile by viewModel.myProfile.collectAsState()
         val success by viewModel.success.collectAsState()
+        val posts by viewModel.userPosts.collectAsState()
+        val postLoading by viewModel.postLoading.collectAsState()
+        val postSuccess by viewModel.postSuccess.collectAsState()
 
-        val scrollState = rememberScrollState()
+        val snackbarHostState = remember { SnackbarHostState() }
+        val snackScope = rememberCoroutineScope()
+        val listState = rememberLazyListState()
 
         LaunchedEffect(Unit) {
            viewModel.getProfile(userid)
         }
 
+        LaunchedEffect(message) {
+            if(message.isNotEmpty()){
+                snackScope.launch {
+                    snackbarHostState.showSnackbar(message)
+                }
+
+            }
+        }
+
+        LaunchedEffect(listState) {
+            snapshotFlow {listState.layoutInfo}
+                .collect{ layoutInfo ->
+                    val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index
+                    val totalItems = layoutInfo.totalItemsCount
+
+                    if (!isLoading && lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
+                        viewModel.getUserPosts(userid)
+                    }
+                }
+        }
 
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            if (isLoading)
-                Functions.myCircularProgress()
+            if (isLoading && postLoading)
+                Box(modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center) {
+                    Functions.myCircularProgress()
+                }
 
-            if (success) {
-                Username(userInfo!!.username)
-                ProfileInfo(userInfo)
-                Bio(userInfo!!.bio, userInfo!!.link)
-                Spacer(modifier = Modifier.size(Dimens.normal_spacer))
-                ProfileButtons(myProfile)
-                Spacer(modifier = Modifier.size(Dimens.normal_spacer))
-                DisplayPosts(userInfo!!.userid)
-            }
-
-        }
-
-    }
-}
-
-@Composable
-fun DisplayPosts(userid : Long) {
-
-    val viewModel: ProfileScreenVM = hiltViewModel()
-
-    val posts by viewModel.userPosts.collectAsState()
-    val postLoading by viewModel.postLoading.collectAsState()
-    val message by viewModel.message.collectAsState()
-    val postSuccess by viewModel.postSuccess.collectAsState()
-
-    val snackbarHostState = remember { SnackbarHostState() }
-    val snackScope = rememberCoroutineScope()
-
-
-    LaunchedEffect(Unit) {
-        viewModel.getUserPosts(userid)
-
-        if(message.isNotEmpty()){
-            snackScope.launch {
-                snackbarHostState.showSnackbar(message)
-            }
-
-        }
-    }
-
-        Box(modifier = Modifier
-            .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            if(postLoading)
-                 Functions.myCircularProgress()
-
-            if(postSuccess) {
+            if (success && postSuccess) {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    contentPadding = PaddingValues(1.dp)
                 ) {
+                    item(span = {GridItemSpan(maxLineSpan)}) {
+                        DisplayUserInfo(userInfo, myProfile)
+                    }
+
                     items(posts) { item ->
                         ProfilePostCard(item)
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun DisplayUserInfo(userInfo : UserInfo?, myProfile: Boolean){
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Username(userInfo!!.username)
+        ProfileInfo(userInfo)
+        Bio(userInfo.bio, userInfo.link)
+        Spacer(modifier = Modifier.size(Dimens.normal_spacer))
+        ProfileButtons(myProfile)
+        Spacer(modifier = Modifier.size(Dimens.normal_spacer))
+    }
 }
 
 
 @Composable
 fun ProfilePostCard(post : PostResponse){
 
-    AsyncImage(model = ColorPainter(Color(android.graphics.Color.parseColor(post.image))),
+    Image(painter = ColorPainter(Color(android.graphics.Color.parseColor(post.image))),
         modifier = Modifier
         .padding(1.dp)
         .aspectRatio(1f),
@@ -189,11 +183,9 @@ fun ProfilePostCard(post : PostResponse){
 }
 
 
+
 @Composable
 fun ProfileButtons(myProfile : Boolean){
-
-    val followButtonWidth = screenWidth() /3
-
 
     //follow , message buttons Row
     Row(
@@ -353,6 +345,6 @@ fun ProfileNumbers(title : String, number: Int)
 fun ProfilePreview() {
     SocialTheme {
 
-        ProfileScreen()
+        //ProfileScreen()
     }
 }

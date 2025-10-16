@@ -664,19 +664,6 @@ fun MainData(userid : Long, navController: NavHostController) {
 
                 if (!isLoading && lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
                     viewModel.getData()
-                    /*  try{
-                        isLoading = true
-                        val response = RetrofitInstance.api.getPostsByFollower(userid, lastSeenId, pageSize)
-                        posts = posts + response
-                        lastSeenId =response.lastOrNull()?.id
-                    }
-                    catch(e : Exception){
-                        Toast.makeText(context, e.toString(),Toast.LENGTH_LONG).show()
-                    }
-                    finally {
-                        isLoading = false
-                    }*/
-
                 }
             }
     }
@@ -774,7 +761,6 @@ fun PostCard(post : PostResponse, userid : Long, navController: NavHostControlle
 
     var commentSheetState by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
 
     var liked by remember { mutableStateOf(post.isLike) }
     var saved by remember { mutableStateOf(post.isSave) }
