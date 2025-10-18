@@ -67,6 +67,7 @@ fun <T,U> PullToRefreshLazyList(
             }
             "profile" -> {
                 LazyVerticalGrid(
+                    state = lazyListState,
                     columns = GridCells.Fixed(3),
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(1.dp)

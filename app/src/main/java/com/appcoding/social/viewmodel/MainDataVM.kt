@@ -6,7 +6,7 @@ import com.appcoding.social.RetrofitInstance
 import com.appcoding.social.UserPreferences
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.StoryResponse
-import com.appcoding.social.models.pageSize
+import com.appcoding.social.models.pageSizeHome
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -80,7 +80,7 @@ class MainDataVM @Inject constructor(
                 val postRes = RetrofitInstance.api.getPostsByFollower(
                     userId = _userid.value,
                     lastSeenId = _lastSeenId.value,
-                    size = pageSize
+                    size = pageSizeHome
                 )
                 if(_lastSeenId.value !!> -1)
                      _posts.value += postRes

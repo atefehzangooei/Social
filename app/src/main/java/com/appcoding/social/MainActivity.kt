@@ -656,12 +656,12 @@ fun MainData(userid : Long, navController: NavHostController) {
     }
 
     LaunchedEffect(listState) {
-        snapshotFlow {listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index}
-            .collect{ lastVisibleItemIndex ->
-               // val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index
-                val totalItems = listState.layoutInfo.totalItemsCount
+        snapshotFlow {listState.layoutInfo}
+            .collect{ layoutInfo ->
+                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index
+                val totalItems = layoutInfo.totalItemsCount
 
-                if (!isLoading && lastVisibleItemIndex != null && lastVisibleItemIndex >= totalItems - 3) {
+                if (!isLoading && lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
                     viewModel.getData()
                 }
             }

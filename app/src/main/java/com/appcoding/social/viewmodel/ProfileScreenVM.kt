@@ -7,7 +7,7 @@ import com.appcoding.social.RetrofitInstance
 import com.appcoding.social.UserPreferences
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.UserInfo
-import com.appcoding.social.models.pageSize
+import com.appcoding.social.models.pageSizeProfile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -89,7 +89,7 @@ class ProfileScreenVM @Inject constructor(
                 val response = RetrofitInstance.api.getPostsByUserid(
                     userId = userid,
                     lastSeenId = _lastSeenId.value,
-                    size = pageSize)
+                    size = pageSizeProfile)
                 Log.d("myresponse", "size is ${response.size}")
 
                 if(_lastSeenId.value !!> -1)

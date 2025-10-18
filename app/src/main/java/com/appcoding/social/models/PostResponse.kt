@@ -1,6 +1,7 @@
 package com.appcoding.social.models
 
-const val pageSize = 10
+const val pageSizeHome = 10
+const val pageSizeProfile = 12
 
 data class PostResponse(
     val id : Long,

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -109,12 +110,12 @@ fun ProfileScreen(userid : Long) {
         }
 
         LaunchedEffect(listState) {
-            snapshotFlow {listState.layoutInfo}
-                .collect{ layoutInfo ->
-                    val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            snapshotFlow { listState.layoutInfo }
+                .collect { layoutInfo ->
+                    val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index
                     val totalItems = layoutInfo.totalItemsCount
 
-                    if (!isLoading && lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
+                    if (lastVisibleItemIndex != null && lastVisibleItemIndex >= totalItems - 1) {
                         viewModel.getUserPosts(userid)
                     }
                 }
