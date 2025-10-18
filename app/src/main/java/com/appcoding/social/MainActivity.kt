@@ -650,19 +650,18 @@ fun MainData(userid : Long, navController: NavHostController) {
     val isLoading by viewModel.isLoading.collectAsState()
 
     val listState = rememberLazyListState()
-    val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
         viewModel.getFirst()
     }
 
     LaunchedEffect(listState) {
-        snapshotFlow {listState.layoutInfo}
-            .collect{ layoutInfo ->
-                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index
-                val totalItems = layoutInfo.totalItemsCount
+        snapshotFlow {listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index}
+            .collect{ lastVisibleItemIndex ->
+               // val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index
+                val totalItems = listState.layoutInfo.totalItemsCount
 
-                if (!isLoading && lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
+                if (!isLoading && lastVisibleItemIndex != null && lastVisibleItemIndex >= totalItems - 3) {
                     viewModel.getData()
                 }
             }
@@ -671,14 +670,15 @@ fun MainData(userid : Long, navController: NavHostController) {
 
         PullToRefreshLazyList(
             posts = posts,
-            stories = stories,
-            storyContent = { story -> StoryCard(story, userid, navController) },
+            extraList = stories,
+            extraContent = { story -> StoryCard(story, userid, navController) },
             content = { post -> PostCard(post, userid, navController) },
             isRefreshing = isRefreshing,
             onRefresh = {
                 viewModel.onRefresh()
             },
             lazyListState = listState,
+            tag = "main"
         )
 
 

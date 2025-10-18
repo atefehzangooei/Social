@@ -29,7 +29,6 @@ class ProfileScreenVM @Inject constructor(
     val message : StateFlow<String> = _message
 
     private val _myUserid = MutableStateFlow(0L)
-    val myUserid : StateFlow<Long> = _myUserid
 
     private val _myProfile = MutableStateFlow(false)
     val myProfile : StateFlow<Boolean> = _myProfile
@@ -48,11 +47,20 @@ class ProfileScreenVM @Inject constructor(
 
     private val _lastSeenId = MutableStateFlow<Long?>(-1L)
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing : StateFlow<Boolean> = _isRefreshing
+
+
+    fun onRefresh(userid : Long){
+        _lastSeenId.value = -1
+        _isRefreshing.value = true
+        getProfile(userid)
+    }
 
     fun getProfile(userid : Long){
         viewModelScope.launch {
             _myUserid.value = userPreferences.getUserIdFlow().first() ?: 0L
-            _myProfile.value = myUserid.value == userid
+            _myProfile.value = _myUserid.value == userid
 
             getUserPosts(userid)
 
@@ -97,6 +105,7 @@ class ProfileScreenVM @Inject constructor(
             }
             finally {
                 _postLoading.value = false
+                _isRefreshing.value = false
             }
         }
     }

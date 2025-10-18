@@ -1,16 +1,18 @@
 package com.appcoding.social
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -20,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import com.appcoding.social.models.StoryResponse
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,7 +32,8 @@ fun <T,U> PullToRefreshLazyList(
     content : @Composable (T) -> Unit,
     isRefreshing : Boolean,
     onRefresh : () -> Unit,
-    lazyListState : LazyListState
+    lazyListState : LazyListState,
+    tag : String
 ){
     val pullToRefreshState = rememberPullToRefreshState()
 
@@ -39,28 +41,50 @@ fun <T,U> PullToRefreshLazyList(
         modifier = Modifier
             .nestedScroll(pullToRefreshState.nestedScrollConnection)
     ){
-
-            LazyColumn(
-                state = lazyListState,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                item {
-                    LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp)
-                    ) {
-                        items(extraList) {
-                            extraContent(it)
+        when(tag){
+            "main" -> {
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    item {
+                        LazyRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp)
+                        ) {
+                            items(extraList) {
+                                extraContent(it)
+                            }
                         }
                     }
-                }
 
 
-                items(posts) {
-                    content(it)
+                    items(posts) {
+                        content(it)
+                    }
                 }
             }
+            "profile" -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(1.dp)
+                ) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        extraContent(extraList[0])
+                    }
+
+                    items(posts) {
+                        content(it)
+                    }
+                }
+            }
+            "search" -> {
+
+            }
+        }
+
 
         if(pullToRefreshState.isRefreshing){
 
