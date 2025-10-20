@@ -54,6 +54,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.appcoding.social.Functions.RightToLeftLayout
+import com.appcoding.social.screen.AppNavHost
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.ui.theme.SocialTheme

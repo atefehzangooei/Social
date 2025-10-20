@@ -1,4 +1,4 @@
-package com.appcoding.social.data
+package com.appcoding.social.data.api
 
 import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse
@@ -6,7 +6,6 @@ import com.appcoding.social.models.ForgetRequest
 import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.SavePostRequest
-import com.appcoding.social.models.SavePostResponse
 import com.appcoding.social.models.SigninRequest
 import com.appcoding.social.models.SigninResponse
 import com.appcoding.social.models.SignupRequest

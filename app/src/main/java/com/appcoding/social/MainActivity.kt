@@ -107,7 +107,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.appcoding.social.Functions.RightToLeftLayout
 import com.appcoding.social.Functions.screenWidth
 import com.appcoding.social.Functions.uriToFile
-import com.appcoding.social.data.ApiService
+import com.appcoding.social.data.api.ApiService
 import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse
 import com.appcoding.social.models.LikeRequest
@@ -421,7 +421,7 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
     }
 }
 
-private fun uploadPost(neveshtak : String , imageFile : File,
+private fun uploadPost(neveshtak : String, imageFile : File,
                        apiService : ApiService, callback : (Boolean, String) -> Unit){
     val textPart = neveshtak.toRequestBody("text/plain".toMediaTypeOrNull())
     val imagePart = MultipartBody.Part.createFormData(

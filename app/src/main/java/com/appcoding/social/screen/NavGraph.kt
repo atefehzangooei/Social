@@ -1,12 +1,18 @@
-package com.appcoding.social
+package com.appcoding.social.screen
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.appcoding.social.DisplayStory
+import com.appcoding.social.ForgetPassword
+import com.appcoding.social.MyApp
+import com.appcoding.social.ProfileScreen
+import com.appcoding.social.SignIn
+import com.appcoding.social.SignUp
+import com.appcoding.social.Splash
 
 
 @Composable
