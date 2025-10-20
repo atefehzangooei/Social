@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
@@ -32,10 +33,12 @@ fun <T,U> PullToRefreshLazyList(
     content : @Composable (T) -> Unit,
     isRefreshing : Boolean,
     onRefresh : () -> Unit,
-    lazyListState : LazyListState,
+    lazyListState : LazyListState? = null,
+    lazyGridState : LazyGridState? = null,
     tag : String
 ){
     val pullToRefreshState = rememberPullToRefreshState()
+
 
     Box(
         modifier = Modifier
@@ -44,7 +47,7 @@ fun <T,U> PullToRefreshLazyList(
         when(tag){
             "main" -> {
                 LazyColumn(
-                    state = lazyListState,
+                    state = lazyListState!!,
                     modifier = Modifier.fillMaxSize()
                 ) {
                     item {
@@ -67,7 +70,7 @@ fun <T,U> PullToRefreshLazyList(
             }
             "profile" -> {
                 LazyVerticalGrid(
-                    state = lazyListState,
+                    state = lazyGridState!!,
                     columns = GridCells.Fixed(3),
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(1.dp)

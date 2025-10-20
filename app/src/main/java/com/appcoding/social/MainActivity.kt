@@ -481,7 +481,9 @@ fun  AddPostScreen(onBack: () -> Unit) {
             == PackageManager.PERMISSION_GRANTED
         ) {
             images = getGalleryImages(context)
-            selectedImageUri = images[0]
+            if(images.isNotEmpty()) {
+                selectedImageUri = images[0]
+            }
         } else {
             permissionLauncher.launch(permission)
         }

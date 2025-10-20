@@ -94,7 +94,7 @@ fun ProfileScreen(userid : Long) {
 
         val snackbarHostState = remember { SnackbarHostState() }
         val snackScope = rememberCoroutineScope()
-        val listState = rememberLazyListState()
+        val gridState = rememberLazyGridState()
 
         LaunchedEffect(Unit) {
            viewModel.getProfile(userid)
@@ -105,12 +105,11 @@ fun ProfileScreen(userid : Long) {
                 snackScope.launch {
                     snackbarHostState.showSnackbar(message)
                 }
-
             }
         }
 
-        LaunchedEffect(listState) {
-            snapshotFlow { listState.layoutInfo }
+        LaunchedEffect(gridState) {
+            snapshotFlow { gridState.layoutInfo }
                 .collect { layoutInfo ->
                     val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index
                     val totalItems = layoutInfo.totalItemsCount
@@ -141,7 +140,7 @@ fun ProfileScreen(userid : Long) {
                     onRefresh = {
                         viewModel.onRefresh(userid)
                     },
-                    lazyListState = listState,
+                    lazyGridState = gridState,
                     tag = "profile"
 
                 )
