@@ -381,7 +381,7 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
                     .background(Colors.line))
 
                 Button(onClick = {
-                    if(neveshtak.isNotEmpty() && selectedImageUri != null) {
+                  /*  if(neveshtak.isNotEmpty() && selectedImageUri != null) {
                         isUploading = true
                         selectedImageUri.let {safeUri ->
                             val imageFile = uriToFile(safeUri, context)
@@ -389,15 +389,10 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
                                 isUploading = false
                                 uploadComplete = true
                                 toastMessage = message
-                               /* if (success)
-                                    toastMessage = "موفقیت آمیز بود"
-                                else
-                                    toastMessage = "خطا در آپلود"
-*/
                             }
                         }
 
-                    }
+                    }*/
 
                 },
                     modifier = Modifier.width(imageSize),

@@ -17,7 +17,7 @@ import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 
 @Composable
-fun AUthButton(
+fun AuthButton(
     text : String,
     isLoading : Boolean,
     onClick : () -> Unit

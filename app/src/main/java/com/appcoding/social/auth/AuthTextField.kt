@@ -21,7 +21,7 @@ fun AuthTextField(
         modifier = Modifier
             .fillMaxWidth(),
         value = value,
-        onValueChange = { viewModel.onPhoneChange(it) },
+        onValueChange = onValueChanged ,
         shape = RoundedCornerShape(Dimens.textfield_corner),
         placeholder = { Text(text = placeHolder) },
         singleLine = true,

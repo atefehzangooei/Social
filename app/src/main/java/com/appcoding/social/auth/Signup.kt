@@ -132,7 +132,7 @@ fun SignUp(navController: NavHostController){
                         Spacer(modifier = Modifier.size(Dimens.login_spacer))
                         Row(modifier = Modifier.fillMaxWidth())
                         {
-                            AUthButton(text = "ایجاد حساب کاربری",
+                            AuthButton(text = "ایجاد حساب کاربری",
                                 isLoading = isLoading,
                                 onClick = { keyboardController?.hide()
                                 viewModel.signup()}
