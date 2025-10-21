@@ -130,38 +130,13 @@ fun SignUp(navController: NavHostController){
                         Spacer(modifier = Modifier.size(Dimens.login_spacer))
                         AuthTextField(password, viewModel::onPasswordChange,"رمز عبور")
                         Spacer(modifier = Modifier.size(Dimens.login_spacer))
-
                         Row(modifier = Modifier.fillMaxWidth())
                         {
-                            Button(
-                                modifier = Modifier
-                                    .height(Dimens.signup_button_height)
-                                    .fillMaxWidth(),
-                                onClick = {
-                                    keyboardController?.hide()
-                                    viewModel.signup()
-                                },
-                                shape = RoundedCornerShape(Dimens.textfield_corner),
-                                colors = ButtonDefaults.buttonColors(
-                                    contentColor = Color.White,
-                                    containerColor = Colors.appcolor
-
-                                )
-                            ) {
-                                if (isLoading) {
-                                    CircularProgressIndicator(
-                                        color = Color.White,
-                                        modifier = Modifier.size(20.dp),
-                                        strokeWidth = 2.dp
-                                    )
-                                } else {
-                                    Text(
-                                        text = "ایجاد حساب کاربری",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
-                            }
-
+                            AUthButton(text = "ایجاد حساب کاربری",
+                                isLoading = isLoading,
+                                onClick = { keyboardController?.hide()
+                                viewModel.signup()}
+                            )
                         }
                     }
                 }
