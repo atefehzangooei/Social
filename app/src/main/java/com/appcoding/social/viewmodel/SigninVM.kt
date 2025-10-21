@@ -2,7 +2,7 @@ package com.appcoding.social.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.appcoding.social.RetrofitInstance
+import com.appcoding.social.data.api.RetrofitInstance
 import com.appcoding.social.UserPreferences
 import com.appcoding.social.models.SigninRequest
 import dagger.hilt.android.lifecycle.HiltViewModel

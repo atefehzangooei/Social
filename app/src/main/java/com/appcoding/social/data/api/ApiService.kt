@@ -4,6 +4,7 @@ import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse
 import com.appcoding.social.models.ForgetRequest
 import com.appcoding.social.models.LikeRequest
+import com.appcoding.social.models.PostRequest
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.SavePostRequest
 import com.appcoding.social.models.SigninRequest
@@ -28,8 +29,8 @@ interface ApiService
 {
     @Multipart
     @POST("posts/upload")
-     fun addPost(@Part("neveshtak") neveshtak:RequestBody,
-                        @Part image : MultipartBody.Part) : Call<String>
+     fun addPost(@Part image : MultipartBody.Part,
+                 @Part("post") post : PostRequest) : Call<String>
 
      @GET("posts/follower/{userId}/{lastSeenId}/{size}")
      suspend fun getPostsByFollower(@Path("userId") userId : Long,

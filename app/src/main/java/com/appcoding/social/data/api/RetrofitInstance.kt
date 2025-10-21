@@ -1,6 +1,5 @@
-package com.appcoding.social
+package com.appcoding.social.data.api
 
-import com.appcoding.social.data.api.ApiService
 //import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 

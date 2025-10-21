@@ -1,4 +1,4 @@
-package com.appcoding.social
+package com.appcoding.social.hilt
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

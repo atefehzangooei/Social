@@ -2,7 +2,7 @@ package com.appcoding.social.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.appcoding.social.RetrofitInstance
+import com.appcoding.social.data.api.RetrofitInstance
 import com.appcoding.social.models.SignupRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -108,12 +108,14 @@ import com.appcoding.social.Functions.RightToLeftLayout
 import com.appcoding.social.Functions.screenWidth
 import com.appcoding.social.Functions.uriToFile
 import com.appcoding.social.data.api.ApiService
+import com.appcoding.social.data.api.RetrofitInstance
 import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse
 import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.SavePostRequest
 import com.appcoding.social.models.StoryResponse
+import com.appcoding.social.screen.components.PullToRefreshLazyList
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.ui.theme.SocialTheme
@@ -421,6 +423,7 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
     }
 }
 
+/*
 private fun uploadPost(neveshtak : String, imageFile : File,
                        apiService : ApiService, callback : (Boolean, String) -> Unit){
     val textPart = neveshtak.toRequestBody("text/plain".toMediaTypeOrNull())
@@ -430,7 +433,7 @@ private fun uploadPost(neveshtak : String, imageFile : File,
         imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
     )
 
-    apiService.addPost(textPart, imagePart).enqueue(object : retrofit2.Callback<String> {
+    apiService.addPost(imagePart,textPart).enqueue(object : retrofit2.Callback<String> {
         override fun onResponse(call: Call<String>, response: Response<String>) {
             if(response.isSuccessful){
                 callback(true, "upload successfully")
@@ -449,6 +452,7 @@ private fun uploadPost(neveshtak : String, imageFile : File,
     })
 }
 
+*/
 
 @Composable
 fun  AddPostScreen(onBack: () -> Unit) {

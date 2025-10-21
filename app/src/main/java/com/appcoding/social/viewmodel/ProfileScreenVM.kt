@@ -3,7 +3,7 @@ package com.appcoding.social.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.appcoding.social.RetrofitInstance
+import com.appcoding.social.data.api.RetrofitInstance
 import com.appcoding.social.UserPreferences
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.UserInfo
