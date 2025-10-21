@@ -26,7 +26,7 @@ fun AuthButton(
         modifier = Modifier
             .height(Dimens.signup_button_height)
             .fillMaxWidth(),
-        onClick = { onClick },
+        onClick = onClick ,
         shape = RoundedCornerShape(Dimens.textfield_corner),
         colors = ButtonDefaults.buttonColors(
             contentColor = Color.White,

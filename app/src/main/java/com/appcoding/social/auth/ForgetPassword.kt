@@ -24,7 +24,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,41 +37,38 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.appcoding.social.Functions.RightToLeftLayout
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
-import com.appcoding.social.viewmodel.SigninVM
+import com.appcoding.social.viewmodel.ForgetPasswordVM
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun SignIn(navController: NavHostController) {
+fun ForgetPassword(navController: NavHostController) {
 
-    val viewModel : SigninVM = hiltViewModel()
+    val viewModel : ForgetPasswordVM = viewModel()
 
-    val password by viewModel.password.collectAsState()
+    val phone by viewModel.phone.collectAsState()
     val username by viewModel.username.collectAsState()
     val message by viewModel.message.collectAsState()
     val success by viewModel.success.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val userid by viewModel.userid.collectAsState()
-
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val snackScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-
-    LaunchedEffect(success,message) {
-        if(success) {
-            navController.navigate("main/$userid") {
-                popUpTo("signin") { inclusive = true }
+    LaunchedEffect(success) {
+        if(success){
+            navController.navigate("signin"){
+                popUpTo("forgetpassword"){ inclusive = true }
             }
         }
-        else{
-            if(message.isNotBlank()){
+        else {
+            if (message.isNotBlank()) {
                 snackScope.launch {
                     snackbarHostState.showSnackbar(message)
                 }
@@ -114,42 +110,25 @@ fun SignIn(navController: NavHostController) {
                         verticalArrangement = Arrangement.Center
                     )
                     {
-                        AuthTextField(username, viewModel::onUsernameChanged,"نام کاربری")
+                        AuthTextField(username,viewModel::onUsernameChanged,"نام کاربری")
                         Spacer(modifier = Modifier.size(Dimens.login_spacer))
-                        AuthTextField(password, viewModel::onPasswordChanged,"رمز عبور")
+                        AuthTextField(phone, viewModel::onPhoneChanged, "شماره موبایل")
                         Spacer(modifier = Modifier.size(Dimens.login_spacer))
 
                         Row(modifier = Modifier.fillMaxWidth())
                         {
-                            AuthButton(text = "ورود", isLoading = isLoading, onClick = {
-                                keyboardController?.hide()
-                                        viewModel.signin()}
-                            )
-
+                            AuthButton(text = "بازیابی رمز عبور",
+                                isLoading = isLoading,
+                                onClick = {
+                                    keyboardController?.hide()
+                                    viewModel.forgetPassword()
+                                })
                         }
-
-                        Spacer(modifier = Modifier.size(Dimens.login_spacer))
-
-                        TextButton(onClick = {
-                            navController.navigate("forgetpassword")
-                        }) {
-                            Text(text = "رمز عبور خود را فراموش کرده ام",
-                                style = MaterialTheme.typography.bodyMedium
-
-                            )
-                        }
-
                     }
                 }
 
-                    TextButton(modifier = Modifier.align(Alignment.BottomCenter),
-                        onClick = { navController.navigate("signup") },
-                    ) {
-                        Text(text = "حساب کاربری ندارید؟ اینجا کلیک کنید",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Colors.signup_signuptext)
-                    }
             }
+
         }
     }
 }
