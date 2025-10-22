@@ -7,9 +7,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.appcoding.social.DisplayStory
-import com.appcoding.social.splash.ForgetPassword
 import com.appcoding.social.MyApp
 import com.appcoding.social.ProfileScreen
+import com.appcoding.social.auth.ForgetPassword
 import com.appcoding.social.auth.SignIn
 import com.appcoding.social.auth.SignUp
 import com.appcoding.social.splash.Splash

@@ -1,5 +1,6 @@
 package com.appcoding.social.auth
 
+import android.provider.SyncStateContract.Columns
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -59,7 +61,6 @@ fun SignIn(navController: NavHostController) {
     val isLoading by viewModel.isLoading.collectAsState()
     val userid by viewModel.userid.collectAsState()
 
-
     val keyboardController = LocalSoftwareKeyboardController.current
     val snackScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -82,8 +83,8 @@ fun SignIn(navController: NavHostController) {
 
     RightToLeftLayout {
 
-        Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) })
-        {contentPadding ->
+        Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        ) {contentPadding ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -97,58 +98,60 @@ fun SignIn(navController: NavHostController) {
                         )
                     )
                     .padding(Dimens.login_padding),
-                contentAlignment = Alignment.Center
-            )
+                contentAlignment = Alignment.Center)
             {
                 Card(
-                    modifier = Modifier
-                        .wrapContentSize(),
-                    shape = RoundedCornerShape(Dimens.login_card_corner),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
-                ) {
-                    Column(
                         modifier = Modifier
-                            .wrapContentSize()
-                            .padding(30.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    )
-                    {
-                        AuthTextField(username, viewModel::onUsernameChanged,"نام کاربری")
-                        Spacer(modifier = Modifier.size(Dimens.login_spacer))
-                        AuthTextField(password, viewModel::onPasswordChanged,"رمز عبور")
-                        Spacer(modifier = Modifier.size(Dimens.login_spacer))
-
-                        Row(modifier = Modifier.fillMaxWidth())
-                        {
-                            AuthButton(text = "ورود", isLoading = isLoading, onClick = {
-                                keyboardController?.hide()
-                                        viewModel.signin()}
-                            )
-
-                        }
-
-                        Spacer(modifier = Modifier.size(Dimens.login_spacer))
-
-                        TextButton(onClick = {
-                            navController.navigate("forgetpassword")
-                        }) {
-                            Text(text = "رمز عبور خود را فراموش کرده ام",
-                                style = MaterialTheme.typography.bodyMedium
-
-                            )
-                        }
-
-                    }
-                }
-
-                    TextButton(modifier = Modifier.align(Alignment.BottomCenter),
-                        onClick = { navController.navigate("signup") },
+                            .wrapContentSize(),
+                        shape = RoundedCornerShape(Dimens.login_card_corner),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
                     ) {
-                        Text(text = "حساب کاربری ندارید؟ اینجا کلیک کنید",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Colors.signup_signuptext)
+                        Column(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .padding(30.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        )
+                        {
+                            AuthTextField(username, viewModel::onUsernameChanged, "نام کاربری")
+                            Spacer(modifier = Modifier.size(Dimens.login_spacer))
+                            AuthTextField(password, viewModel::onPasswordChanged, "رمز عبور")
+                            Spacer(modifier = Modifier.size(Dimens.login_spacer))
+
+                            Row(modifier = Modifier.fillMaxWidth())
+                            {
+                                AuthButton(text = "ورود", isLoading = isLoading, onClick = {
+                                    keyboardController?.hide()
+                                    viewModel.signin()
+                                }
+                                )
+
+                            }
+
+                            Spacer(modifier = Modifier.size(Dimens.login_spacer))
+
+                            TextButton(onClick = {
+                                navController.navigate("forgetpassword")
+                            }) {
+                                Text(
+                                    text = "رمز عبور خود را فراموش کرده ام",
+                                    style = MaterialTheme.typography.bodyMedium
+
+                                )
+                            }
+                        }
                     }
+
+                TextButton(modifier = Modifier.align(Alignment.BottomCenter),
+                    onClick = { navController.navigate("signup") },
+                ) {
+                    Text(
+                        text = "حساب کاربری ندارید؟ اینجا کلیک کنید",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Colors.signup_signuptext
+                    )
+                }
             }
         }
     }
