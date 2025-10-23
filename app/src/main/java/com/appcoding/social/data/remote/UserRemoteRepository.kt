@@ -8,10 +8,6 @@ import com.appcoding.social.models.SignupRequest
 import com.appcoding.social.models.StringMessage
 import com.appcoding.social.models.UserInfo
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
 
 class UserRemoteRepository(private val api : UserApi) {
 

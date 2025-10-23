@@ -3,11 +3,6 @@ package com.appcoding.social.data.remote
 import com.appcoding.social.data.api.StoryApi
 import com.appcoding.social.models.StoryResponse
 import okhttp3.MultipartBody
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Part
-import retrofit2.http.Path
 
 class StoryRemoteRepository(private val api : StoryApi) {
 
