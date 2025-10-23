@@ -107,7 +107,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.appcoding.social.Functions.RightToLeftLayout
 import com.appcoding.social.Functions.screenWidth
 import com.appcoding.social.Functions.uriToFile
-import com.appcoding.social.data.api.ApiService
 import com.appcoding.social.data.api.RetrofitInstance
 import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse

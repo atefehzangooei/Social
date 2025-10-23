@@ -2,8 +2,8 @@ package com.appcoding.social.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.appcoding.social.data.api.RetrofitInstance
 import com.appcoding.social.UserPreferences
+import com.appcoding.social.data.repository.PostRepository
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.StoryResponse
 import com.appcoding.social.models.pageSizeHome
@@ -15,8 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainDataVM @Inject constructor(
-    private val userPreferences: UserPreferences
-
+    private val userPreferences: UserPreferences,
+    private val postRepository: PostRepository
 ) : ViewModel() {
 
     private val _posts = MutableStateFlow<List<PostResponse>>(emptyList())
@@ -60,7 +60,7 @@ class MainDataVM @Inject constructor(
         viewModelScope.launch {
             _isLoadingStory.value = true
             try{
-                val storyRes = RetrofitInstance.api.getStoryOfFollowers(_userid.value)
+                val storyRes = postRepository.getStoryOfFollowers(_userid.value)
                 _stories.value = storyRes
             }
             catch(ex : Exception){
@@ -77,7 +77,7 @@ class MainDataVM @Inject constructor(
             try {
                 _isLoading.value = true
 
-                val postRes = RetrofitInstance.api.getPostsByFollower(
+                val postRes = postRepository.getPostsByFollowers(
                     userId = _userid.value,
                     lastSeenId = _lastSeenId.value,
                     size = pageSizeHome

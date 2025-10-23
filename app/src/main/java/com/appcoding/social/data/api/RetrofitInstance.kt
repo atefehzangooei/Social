@@ -26,13 +26,39 @@ object RetrofitInstance {
         .addInterceptor(logging)
         .build()
 */
-    val api: ApiService by lazy {
+    private val retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
            // .client(client)
             .build()
-            .create(ApiService::class.java)
+            //.create(ApiService::class.java)
     }
+
+    val postApi : PostApi by lazy{
+        retrofit.create(PostApi::class.java)
+    }
+
+    val commentApi : CommentApi by lazy {
+        retrofit.create(CommentApi::class.java)
+    }
+
+    val userApi : UserApi by lazy {
+        retrofit.create(UserApi::class.java)
+    }
+
+    val likeApi : LikeApi by lazy {
+        retrofit.create(LikeApi::class.java)
+    }
+
+    val savePostApi : SavePostApi by lazy {
+        retrofit.create(SavePostApi::class.java)
+    }
+
+    val storyApi : StoryApi by lazy {
+        retrofit.create(StoryApi::class.java)
+    }
+
+
 }
