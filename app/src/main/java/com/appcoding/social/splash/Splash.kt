@@ -93,7 +93,6 @@ fun Splash(navController: NavHostController){
             .background(Colors.appcolor)
     )
 
-    //val userid = 1
     LaunchedEffect(Unit) {
         delay(3000)
         if(userid > 0){
@@ -106,14 +105,5 @@ fun Splash(navController: NavHostController){
                 popUpTo("splash") { inclusive = true }
             }
         }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun SignupInPreview() {
-    SocialTheme {
-        //SignIn()
     }
 }
