@@ -2,8 +2,9 @@ package com.appcoding.social.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.appcoding.social.UserPreferences
+import com.appcoding.social.screen.components.UserPreferences
 import com.appcoding.social.data.repository.PostRepository
+import com.appcoding.social.data.repository.StoryRepository
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.StoryResponse
 import com.appcoding.social.models.pageSizeHome
@@ -16,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainDataVM @Inject constructor(
     private val userPreferences: UserPreferences,
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    private val storyRepository: StoryRepository
 ) : ViewModel() {
 
     private val _posts = MutableStateFlow<List<PostResponse>>(emptyList())
@@ -60,7 +62,7 @@ class MainDataVM @Inject constructor(
         viewModelScope.launch {
             _isLoadingStory.value = true
             try{
-                val storyRes = postRepository.getStoryOfFollowers(_userid.value)
+                val storyRes = storyRepository.getStoryOfFollowers(_userid.value)
                 _stories.value = storyRes
             }
             catch(ex : Exception){

@@ -1,4 +1,4 @@
-package com.appcoding.social
+package com.appcoding.social.screen.components
 
 import android.content.Context
 import androidx.datastore.core.DataStore

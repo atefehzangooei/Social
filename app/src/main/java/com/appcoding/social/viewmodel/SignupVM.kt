@@ -3,13 +3,18 @@ package com.appcoding.social.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appcoding.social.data.api.RetrofitInstance
+import com.appcoding.social.data.repository.UserRepository
 import com.appcoding.social.models.SignupRequest
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
-class SignupVM : ViewModel()
+@HiltViewModel
+class SignupVM @Inject constructor(
+    private val userRepository: UserRepository
+) : ViewModel()
 {
     private val _phone = MutableStateFlow("")
     val phone :StateFlow<String> = _phone
@@ -46,7 +51,7 @@ class SignupVM : ViewModel()
 
 
             try {
-                val response = RetrofitInstance.api.signUp(
+                val response = userRepository.signUp(
                     SignupRequest(
                         phone = _phone.value,
                         username = _usernanme.value,

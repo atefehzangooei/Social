@@ -57,9 +57,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
-import com.appcoding.social.Functions.RightToLeftLayout
-import com.appcoding.social.Functions.screenWidth
 import com.appcoding.social.R
+import com.appcoding.social.screen.components.RightToLeftLayout
+import com.appcoding.social.screen.components.screenWidth
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 

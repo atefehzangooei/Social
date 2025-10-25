@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appcoding.social.data.api.RetrofitInstance
-import com.appcoding.social.UserPreferences
+import com.appcoding.social.data.repository.PostRepository
+import com.appcoding.social.data.repository.UserRepository
+import com.appcoding.social.screen.components.UserPreferences
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.UserInfo
 import com.appcoding.social.models.pageSizeProfile
@@ -17,7 +19,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileScreenVM @Inject constructor(
-    private val userPreferences: UserPreferences) : ViewModel()
+    private val userPreferences: UserPreferences,
+    private val userRepository: UserRepository,
+    private val postRepository: PostRepository
+) : ViewModel()
 {
     private val _userInfo = MutableStateFlow<UserInfo?>(null)
     val userInfo : StateFlow<UserInfo?> = _userInfo
@@ -67,7 +72,7 @@ class ProfileScreenVM @Inject constructor(
            _isLoading.value = true
             _success.value = false
             try{
-                _userInfo.value = RetrofitInstance.api.getUserInfo(_myUserid.value)
+                _userInfo.value = userRepository.getUserInfo(_myUserid.value)
                 _success.value = true
             }
             catch (ex : Exception){
@@ -86,7 +91,7 @@ class ProfileScreenVM @Inject constructor(
             _postSuccess.value = false
 
             try{
-                val response = RetrofitInstance.api.getPostsByUserid(
+                val response = postRepository.getPostsByUserid(
                     userId = userid,
                     lastSeenId = _lastSeenId.value,
                     size = pageSizeProfile)

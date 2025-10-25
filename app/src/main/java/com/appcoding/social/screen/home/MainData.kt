@@ -63,8 +63,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.appcoding.social.Functions.RightToLeftLayout
-import com.appcoding.social.Functions.screenWidth
 import com.appcoding.social.R
 import com.appcoding.social.data.api.RetrofitInstance
 import com.appcoding.social.models.CommentRequest

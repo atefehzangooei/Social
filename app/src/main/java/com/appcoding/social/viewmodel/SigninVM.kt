@@ -3,7 +3,8 @@ package com.appcoding.social.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appcoding.social.data.api.RetrofitInstance
-import com.appcoding.social.UserPreferences
+import com.appcoding.social.data.repository.UserRepository
+import com.appcoding.social.screen.components.UserPreferences
 import com.appcoding.social.models.SigninRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +14,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SigninVM @Inject constructor(
-    private val userPreferences: UserPreferences) : ViewModel()
+    private val userPreferences: UserPreferences,
+    private val userRepository: UserRepository
+) : ViewModel()
 {
 
     private val _username = MutableStateFlow("")
@@ -48,7 +51,7 @@ class SigninVM @Inject constructor(
 
             try {
                 val response =
-                    RetrofitInstance.api.signIn(
+                   userRepository.signIn(
                         SigninRequest(
                             username = _username.value,
                             password = _password.value

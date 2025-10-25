@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun <T,U> PullToRefreshLazyList(
     posts : List<T>,
-    extraList : List<U>,
-    extraContent : @Composable (U) -> Unit,
+    profileList : List<U>,
+    profileContent : @Composable (U) -> Unit,
     content : @Composable (T) -> Unit,
     isRefreshing : Boolean,
     onRefresh : () -> Unit,
@@ -56,8 +56,8 @@ fun <T,U> PullToRefreshLazyList(
                                 .fillMaxWidth()
                                 .padding(20.dp)
                         ) {
-                            items(extraList) {
-                                extraContent(it)
+                            items(profileList) {
+                                profileContent(it)
                             }
                         }
                     }
@@ -76,7 +76,7 @@ fun <T,U> PullToRefreshLazyList(
                     contentPadding = PaddingValues(1.dp)
                 ) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
-                        extraContent(extraList[0])
+                        profileContent(profileList[0])
                     }
 
                     items(posts) {

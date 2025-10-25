@@ -53,7 +53,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.appcoding.social.Functions.RightToLeftLayout
 import com.appcoding.social.R
 import com.appcoding.social.screen.AppNavHost
 import com.appcoding.social.ui.theme.Colors

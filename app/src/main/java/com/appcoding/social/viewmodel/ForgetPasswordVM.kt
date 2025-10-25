@@ -3,13 +3,19 @@ package com.appcoding.social.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appcoding.social.data.api.RetrofitInstance
+import com.appcoding.social.data.repository.UserRepository
 import com.appcoding.social.models.ForgetRequest
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.lang.Exception
+import javax.inject.Inject
 
-class ForgetPasswordVM : ViewModel() {
+@HiltViewModel
+class ForgetPasswordVM @Inject constructor(
+    private val userRepository: UserRepository
+) : ViewModel() {
 
     private val _phone = MutableStateFlow("")
     val phone : StateFlow<String> = _phone
@@ -39,7 +45,7 @@ class ForgetPasswordVM : ViewModel() {
             _isLoading.value = true
                     try {
                         val response =
-                            RetrofitInstance.api.forgetPassword(
+                            userRepository.forgetPassword(
                                 ForgetRequest(
                                     _username.value,
                                     _phone.value

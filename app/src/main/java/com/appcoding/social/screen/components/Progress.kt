@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.dp
 import com.appcoding.social.ui.theme.Colors
 
 @Composable
-fun MyProgress(){
+fun LoadingDataProgress(){
     CircularProgressIndicator(
         modifier = Modifier.size(30.dp),
         color = Colors.progress_color)

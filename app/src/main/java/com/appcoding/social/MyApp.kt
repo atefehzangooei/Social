@@ -29,11 +29,12 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.appcoding.social.Functions.RightToLeftLayout
 import com.appcoding.social.screen.addpost.AddPostScreen
-import com.appcoding.social.screen.components.MyProgress
+import com.appcoding.social.screen.components.LoadingDataProgress
 import com.appcoding.social.screen.components.OpenAnimated
+import com.appcoding.social.screen.components.RightToLeftLayout
 import com.appcoding.social.screen.home.HomeScreen
+import com.appcoding.social.screen.profile.ProfileScreen
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 
@@ -99,7 +100,7 @@ fun MyApp(userid : Long, navController : NavHostController) {
                 contentAlignment = Alignment.Center)
             {
                 if(userid <= 0L){
-                    MyProgress()
+                    LoadingDataProgress()
                 }
                 else {
                     when (selectedIndex) {
