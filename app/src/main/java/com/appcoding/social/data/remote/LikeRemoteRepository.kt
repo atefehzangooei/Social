@@ -7,8 +7,9 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.POST
 import retrofit2.http.Path
+import javax.inject.Inject
 
-class LikeRemoteRepository(private val api : LikeApi) {
+class LikeRemoteRepository @Inject constructor(private val api : LikeApi) {
 
     suspend fun likePost(likeRequest : LikeRequest) : StringMessage{
         return api.likePost(likeRequest)

@@ -3,8 +3,9 @@ package com.appcoding.social.data.repository
 import com.appcoding.social.data.remote.SavePostRemoteRepository
 import com.appcoding.social.models.SavePostRequest
 import com.appcoding.social.models.StringMessage
+import javax.inject.Inject
 
-class SavePostRepository(private val remoteRepository: SavePostRemoteRepository) {
+class SavePostRepository @Inject constructor(private val remoteRepository: SavePostRemoteRepository) {
 
     suspend fun savePost(savePostRequest : SavePostRequest) : StringMessage {
         return remoteRepository.savePost(savePostRequest)

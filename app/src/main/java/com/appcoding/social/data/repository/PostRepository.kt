@@ -3,8 +3,9 @@ package com.appcoding.social.data.repository
 import com.appcoding.social.data.remote.PostRemoteRepository
 import com.appcoding.social.models.PostResponse
 import retrofit2.http.Path
+import javax.inject.Inject
 
-class PostRepository(private val remoteRepository: PostRemoteRepository) {
+class PostRepository @Inject constructor(private val remoteRepository: PostRemoteRepository) {
 
     suspend fun getPostsByFollowers(userId : Long,
                                    lastSeenId : Long? = -1,

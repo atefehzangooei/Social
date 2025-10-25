@@ -3,8 +3,9 @@ package com.appcoding.social.data.repository
 import com.appcoding.social.data.remote.StoryRemoteRepository
 import com.appcoding.social.models.StoryResponse
 import okhttp3.MultipartBody
+import javax.inject.Inject
 
-class StoryRepository(private val remoteRepository: StoryRemoteRepository) {
+class StoryRepository @Inject constructor(private val remoteRepository: StoryRemoteRepository) {
 
     suspend fun getStoryOfFollowers(userId : Long) : List<StoryResponse>{
         return remoteRepository.getStoryOfFollowers(userId)

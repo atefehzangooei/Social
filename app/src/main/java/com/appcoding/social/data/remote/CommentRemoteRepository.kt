@@ -7,8 +7,9 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import javax.inject.Inject
 
-class CommentRemoteRepository(private val api : CommentApi) {
+class CommentRemoteRepository @Inject constructor(private val api : CommentApi) {
 
     suspend fun getComments(postId : Long) : List<CommentResponse>{
         return api.getComments(postId)

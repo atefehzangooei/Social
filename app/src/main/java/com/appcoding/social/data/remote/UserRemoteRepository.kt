@@ -8,8 +8,9 @@ import com.appcoding.social.models.SignupRequest
 import com.appcoding.social.models.StringMessage
 import com.appcoding.social.models.UserInfo
 import retrofit2.Response
+import javax.inject.Inject
 
-class UserRemoteRepository(private val api : UserApi) {
+class UserRemoteRepository @Inject constructor(private val api : UserApi) {
 
     suspend fun signUp(signupRequest: SignupRequest) : StringMessage{
         return api.signUp(signupRequest)

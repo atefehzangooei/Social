@@ -3,8 +3,9 @@ package com.appcoding.social.data.remote
 import com.appcoding.social.data.api.StoryApi
 import com.appcoding.social.models.StoryResponse
 import okhttp3.MultipartBody
+import javax.inject.Inject
 
-class StoryRemoteRepository(private val api : StoryApi) {
+class StoryRemoteRepository @Inject constructor(private val api : StoryApi) {
 
     suspend fun getStoryOfFollowers(userId : Long) : List<StoryResponse>{
         return api.getStoryOfFollowers(userId)
