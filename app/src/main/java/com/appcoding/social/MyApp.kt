@@ -33,6 +33,7 @@ import com.appcoding.social.screen.addpost.AddPostScreen
 import com.appcoding.social.screen.components.LoadingDataProgress
 import com.appcoding.social.screen.components.OpenAnimated
 import com.appcoding.social.screen.components.RightToLeftLayout
+import com.appcoding.social.screen.explore.SearchPost
 import com.appcoding.social.screen.home.HomeScreen
 import com.appcoding.social.screen.profile.ProfileScreen
 import com.appcoding.social.ui.theme.Colors
@@ -105,8 +106,8 @@ fun MyApp(userid : Long, navController : NavHostController) {
                 else {
                     when (selectedIndex) {
                         0 -> HomeScreen(userid, navController)
-                        1 -> SearchScreen(userid)
-                        3 -> SearchScreen(userid)
+                        1 -> SearchPost()
+                        3 -> SearchPost()
                         4 -> ProfileScreen(userid)
                     }
                 }

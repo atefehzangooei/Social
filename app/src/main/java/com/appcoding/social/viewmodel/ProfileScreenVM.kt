@@ -3,13 +3,12 @@ package com.appcoding.social.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.appcoding.social.data.api.RetrofitInstance
 import com.appcoding.social.data.repository.PostRepository
 import com.appcoding.social.data.repository.UserRepository
 import com.appcoding.social.screen.components.UserPreferences
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.UserInfo
-import com.appcoding.social.models.pageSizeProfile
+import com.appcoding.social.screen.components.pageSizeProfile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -7,7 +7,7 @@ import com.appcoding.social.data.repository.PostRepository
 import com.appcoding.social.data.repository.StoryRepository
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.StoryResponse
-import com.appcoding.social.models.pageSizeHome
+import com.appcoding.social.screen.components.pageSizeHome
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -53,7 +53,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.appcoding.social.data.api.RetrofitInstance
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.screen.components.RightToLeftLayout
 import com.appcoding.social.ui.theme.Colors
@@ -74,52 +73,6 @@ class SearchActivity : ComponentActivity() {
 }
 
 
-@Composable
-fun DisplayStaggeredList(posts : List<PostResponse>){
-
-      LazyVerticalStaggeredGrid (modifier = Modifier
-        .fillMaxSize(),
-        columns = StaggeredGridCells.Fixed(3),
-    ) {
-        itemsIndexed(items = posts
-      /*  ,
-            span = { index, _ ->
-                //index % 10 in listOf(0, 7)
-                if (index % 11 == 0) {
-                    StaggeredGridItemSpan.FullLine
-                }
-                else{
-                    StaggeredGridItemSpan.SingleLane
-                }
-            }*/
-        ){ index  ,post ->
-           /* AsyncImage(
-                model = ColorPainter(Color(android.graphics.Color.parseColor(post.image))),
-                contentDescription = "post cover",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(width = 1.dp, color = Color.White)
-                    .aspectRatio(
-                        if(index % 10 in listOf(0,7)) 0.5f else 1f
-                    ),
-                contentScale = ContentScale.Crop
-            )*/
-
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(android.graphics.Color.parseColor(post.image)))
-                .border(width = 1.dp, color = Color.White)
-                .aspectRatio(
-                    if(index % 10 in listOf(0,7)) 0.5f else 1f
-                )
-                .clickable {  }
-
-            )
-
-        }
-    }
-
-}
 
 @Composable
 fun DisplaySearchPosts(index : Int, searchText : String){

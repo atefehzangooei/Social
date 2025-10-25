@@ -2,7 +2,6 @@ package com.appcoding.social.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.appcoding.social.data.api.RetrofitInstance
 import com.appcoding.social.data.repository.UserRepository
 import com.appcoding.social.screen.components.UserPreferences
 import com.appcoding.social.models.SigninRequest

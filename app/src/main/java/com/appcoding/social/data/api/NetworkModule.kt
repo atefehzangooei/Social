@@ -1,5 +1,6 @@
 package com.appcoding.social.data.api
 
+import com.appcoding.social.screen.components.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,7 +10,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Singleton
 
-private const val BASE_URL = "http://192.168.100.4:8080/"
 
 @Module
 @InstallIn(SingletonComponent::class)

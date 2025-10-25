@@ -64,14 +64,12 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.appcoding.social.R
-import com.appcoding.social.data.api.RetrofitInstance
 import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse
 import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.SavePostRequest
 import com.appcoding.social.models.StoryResponse
-import com.appcoding.social.screen.components.MyProgress
 import com.appcoding.social.screen.components.PullToRefreshLazyList
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
