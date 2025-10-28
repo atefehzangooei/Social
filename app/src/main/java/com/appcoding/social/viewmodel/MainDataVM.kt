@@ -2,9 +2,12 @@ package com.appcoding.social.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.appcoding.social.data.api.LikeApi
+import com.appcoding.social.data.repository.LikeRepository
 import com.appcoding.social.screen.components.UserPreferences
 import com.appcoding.social.data.repository.PostRepository
 import com.appcoding.social.data.repository.StoryRepository
+import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.StoryResponse
 import com.appcoding.social.screen.components.pageSizeHome
@@ -18,7 +21,8 @@ import javax.inject.Inject
 class MainDataVM @Inject constructor(
     private val userPreferences: UserPreferences,
     private val postRepository: PostRepository,
-    private val storyRepository: StoryRepository
+    private val storyRepository: StoryRepository,
+    private val likeRepository: LikeRepository
 ) : ViewModel() {
 
     private val _posts = MutableStateFlow<List<PostResponse>>(emptyList())
@@ -122,9 +126,27 @@ class MainDataVM @Inject constructor(
         return _userid.value
     }
 
-    fun likePost(){
+    fun likePost(post : PostResponse) {
         viewModelScope.launch {
+            _isLiked.value = !(_isLiked.value)
 
+            if (_isLiked.value) {
+                _likeCount.value++
+                val response = likeRepository.likePost(
+                    LikeRequest(
+                        postId = post.id,
+                        userId = _userid.value,
+                        date = "",
+                        time = ""
+                    )
+                )
+            } else {
+                _likeCount.value--
+                val response = likeRepository.disLikePost(
+                    postId = post.id,
+                    userId = _userid.value
+                )
+            }
         }
     }
 

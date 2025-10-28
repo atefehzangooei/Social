@@ -66,19 +66,23 @@ fun PostCard(post : PostResponse,
              navController: NavHostController,
              viewModel : MainDataVM) {
 
-    var commentSheetState = remember { mutableStateOf(false) }
-
-    var liked by remember { mutableStateOf(post.isLike) }
-    var saved by remember { mutableStateOf(post.isSave) }
+    val isLiked by viewModel.isLiked.collectAsState()
+    val isSaved by viewModel.isSaved.collectAsState()
+    val likeCount by viewModel.likeCount.collectAsState()
+    val commentCount by viewModel.commentCount.collectAsState()
 
     val likeScope = rememberCoroutineScope()
     val saveScope = rememberCoroutineScope()
-    var likeCount by remember { mutableStateOf(post.likeCount) }
-    val commentCount by remember { mutableStateOf(post.commentCount) }
+
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var commentSheetState = remember { mutableStateOf(false) }
 
 
     RightToLeftLayout {
+
+        LaunchedEffect(Unit) {
+            viewModel.setPost(post)
+        }
 
         Column(modifier = Modifier.wrapContentSize()) {
 
@@ -99,60 +103,6 @@ fun PostCard(post : PostResponse,
                         .padding(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
-                    val scale = remember { Animatable(1f) }
-
-                    LaunchedEffect(liked) {
-                        if (liked) {
-
-                            scale.animateTo(1.5f, animationSpec = tween(150))
-                            scale.animateTo(
-                                1f,
-                                animationSpec = tween(300, easing = FastOutSlowInEasing)
-                            )
-                        } else {
-
-                            scale.snapTo(1f)
-                        }
-                    }
-
-                    Image(painter = if (liked)
-                        painterResource(R.drawable.red_heart)
-                    else
-                        painterResource(R.drawable.like),
-                        contentDescription = "like",
-                        modifier = Modifier
-                            .size(Dimens.post_icons)
-                            .indication(interactionSource = remember { MutableInteractionSource() },
-                                indication = null)
-                            .graphicsLayer(
-                                scaleX = scale.value,
-                                scaleY = scale.value
-                            )
-                            .clickable {
-                                liked = !liked
-                                likeScope.launch {
-                                    if (liked) {
-                                        likeCount++
-                                        val response = RetrofitInstance.api.likePost(
-                                            LikeRequest(
-                                                postId = post.id,
-                                                userId = userid,
-                                                date = "",
-                                                time = ""
-                                            )
-                                        )
-                                    } else {
-                                        likeCount--
-                                        val response = RetrofitInstance.api.disLikePost(
-                                            postId = post.id,
-                                            userId = userid
-                                        )
-                                    }
-                                }
-                            }
-                    )
-
 
                     Spacer(modifier = Modifier.size(10.dp))
 
@@ -254,6 +204,47 @@ fun PostCard(post : PostResponse,
     }
 }
 
+@Composable
+fun LikeButton(isLiked : Boolean,
+               viewModel: MainDataVM){
+
+    val scale = remember { Animatable(1f) }
+
+    LaunchedEffect(isLiked) {
+        if (isLiked) {
+
+            scale.animateTo(1.5f, animationSpec = tween(150))
+            scale.animateTo(
+                1f,
+                animationSpec = tween(300, easing = FastOutSlowInEasing)
+            )
+        } else {
+
+            scale.snapTo(1f)
+        }
+    }
+
+    Image(painter = if (isLiked)
+        painterResource(R.drawable.red_heart)
+    else
+        painterResource(R.drawable.like),
+        contentDescription = "like",
+        modifier = Modifier
+            .size(Dimens.post_icons)
+            .indication(interactionSource = remember { MutableInteractionSource() },
+                indication = null)
+            .graphicsLayer(
+                scaleX = scale.value,
+                scaleY = scale.value
+            )
+            .clickable {
+
+            }
+    )
+
+
+
+}
 
 
 @Composable
