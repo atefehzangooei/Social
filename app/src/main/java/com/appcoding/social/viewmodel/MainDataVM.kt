@@ -44,6 +44,19 @@ class MainDataVM @Inject constructor(
     private val _isLoadingStory = MutableStateFlow(false)
     val isLoadingStory : StateFlow<Boolean> = _isLoadingStory
 
+    //posts
+    private val _isSaved = MutableStateFlow(false)
+    val isSaved : StateFlow<Boolean> = _isSaved
+
+    private val _isLiked = MutableStateFlow(false)
+    val isLiked : StateFlow<Boolean> = _isLiked
+
+    private val _commentCount = MutableStateFlow(0)
+    val commentCount : StateFlow<Int> = _commentCount
+
+    private val _likeCount = MutableStateFlow(0)
+    val likeCount : StateFlow<Int> = _likeCount
+
 
     fun getFirst(){
         _userid.value = getUserid()
@@ -109,4 +122,17 @@ class MainDataVM @Inject constructor(
         return _userid.value
     }
 
+    fun likePost(){
+        viewModelScope.launch {
+
+        }
+    }
+
+
+    fun setPost(post : PostResponse){
+        _isLiked.value = post.isLike
+        _isSaved.value = post.isSave
+        _likeCount.value = post.likeCount
+        _commentCount.value = post.commentCount
+    }
 }

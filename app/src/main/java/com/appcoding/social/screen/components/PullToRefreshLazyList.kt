@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
+import com.appcoding.social.viewmodel.MainDataVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
