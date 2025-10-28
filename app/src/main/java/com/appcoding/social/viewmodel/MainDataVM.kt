@@ -25,19 +25,11 @@ class MainDataVM @Inject constructor(
     private val likeRepository: LikeRepository
 ) : ViewModel() {
 
+
     private val _posts = MutableStateFlow<List<PostResponse>>(emptyList())
     val posts : StateFlow<List<PostResponse>> = _posts
 
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing : StateFlow<Boolean> = _isRefreshing
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading : StateFlow<Boolean> = _isLoading
-
     private val _lastSeenId = MutableStateFlow<Long?>(-1L)
-
-    private val _message = MutableStateFlow("")
-    //val message : StateFlow<String> = _message
 
     private val _userid = MutableStateFlow(-1L)
     val userid :StateFlow<Long> = _userid
@@ -45,8 +37,20 @@ class MainDataVM @Inject constructor(
     private val _stories = MutableStateFlow<List<StoryResponse>>(emptyList())
     val stories : StateFlow<List<StoryResponse>> = _stories
 
-    private val _isLoadingStory = MutableStateFlow(false)
-    val isLoadingStory : StateFlow<Boolean> = _isLoadingStory
+    private val _postState = MutableStateFlow(UiState())
+    val postState : StateFlow<UiState> = _postState
+
+    private val _storyState = MutableStateFlow(UiState())
+    val storyState : StateFlow<UiState> = _storyState
+
+    private val _likeState = MutableStateFlow(UiState())
+    val likeState : StateFlow<UiState> = _likeState
+
+    private val _commentState = MutableStateFlow(UiState())
+    val commentState : StateFlow<UiState> = _commentState
+
+    private val _saveState = MutableStateFlow(UiState())
+    val saveState : StateFlow<UiState> = _saveState
 
     //posts
     private val _isSaved = MutableStateFlow(false)
@@ -60,6 +64,8 @@ class MainDataVM @Inject constructor(
 
     private val _likeCount = MutableStateFlow(0)
     val likeCount : StateFlow<Int> = _likeCount
+
+
 
 
     fun getFirst(){
