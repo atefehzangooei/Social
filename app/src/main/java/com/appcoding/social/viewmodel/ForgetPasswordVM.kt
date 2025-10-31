@@ -22,14 +22,8 @@ class ForgetPasswordVM @Inject constructor(
     private val _username = MutableStateFlow("")
     val username : StateFlow<String> = _username
 
-    private val _message = MutableStateFlow("")
-    val message : StateFlow<String> = _message
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading : StateFlow<Boolean> = _isLoading
-
-    private val _success = MutableStateFlow(false)
-    val success : StateFlow<Boolean> = _success
+    private val _state = MutableStateFlow(UiState())
+    val state : StateFlow<UiState> = _state
 
 
     fun onPhoneChanged(value: String) { _phone.value = value }
@@ -38,10 +32,10 @@ class ForgetPasswordVM @Inject constructor(
     fun forgetPassword(){
         viewModelScope.launch {
             if (_username.value.isBlank() || _phone.value.isBlank()) {
-                _message.value = "لطفا تمام اطلاعات را وارد کنید"
+                _state.value =UiState(message =  "لطفا تمام اطلاعات را وارد کنید")
                 return@launch
             }
-            _isLoading.value = true
+            _state.value = UiState(isLoading = true)
                     try {
                         val response =
                             userRepository.forgetPassword(
@@ -52,19 +46,19 @@ class ForgetPasswordVM @Inject constructor(
                             )
                         when(response.message) {
                             "no user" -> {
-                                _message.value = "کاربری با این نام کاربری و شماره تلفن همراه وجود ندارد"
+                                _state.value = UiState(message = "کاربری با این نام کاربری و شماره تلفن همراه وجود ندارد")
                             }
                             "sms" -> {
-                                _message.value = "اطلاعات کاربری شما تا دقایقی دیگر برایتان ارسال می شود"
-                                _success.value = true
+                                _state.value = UiState(message = "اطلاعات کاربری شما تا دقایقی دیگر برایتان ارسال می شود")
+                                _state.value = UiState(success = true)
                             }
                         }
                     }
                     catch(e: Exception){
-                        _message.value = e.toString()
+                        _state.value = UiState(message = e.toString())
                     }
                     finally {
-                        _isLoading.value = false
+                        _state.value = UiState(isLoading = false)
                     }
 
         }

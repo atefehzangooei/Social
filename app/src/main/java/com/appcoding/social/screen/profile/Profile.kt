@@ -29,14 +29,10 @@ fun ProfileScreen(userid : Long) {
         val viewModel : ProfileScreenVM = hiltViewModel()
 
         val userInfo by viewModel.userInfo.collectAsState()
-        val isLoading by viewModel.isLoading.collectAsState()
-        val message by viewModel.message.collectAsState()
-        val myProfile by viewModel.myProfile.collectAsState()
-        val success by viewModel.success.collectAsState()
         val posts by viewModel.userPosts.collectAsState()
-        val postLoading by viewModel.postLoading.collectAsState()
-        val postSuccess by viewModel.postSuccess.collectAsState()
-        val isRefreshing by viewModel.isRefreshing.collectAsState()
+        val myProfile by viewModel.myProfile.collectAsState()
+        val state by viewModel.state.collectAsState()
+        val postState by viewModel.postState.collectAsState()
 
         val snackbarHostState = remember { SnackbarHostState() }
         val snackScope = rememberCoroutineScope()
@@ -46,10 +42,15 @@ fun ProfileScreen(userid : Long) {
             viewModel.getProfile(userid)
         }
 
-        LaunchedEffect(message) {
-            if(message.isNotEmpty()){
+        LaunchedEffect(state.message, postState.message) {
+            if(state.message.isNotEmpty()){
                 snackScope.launch {
-                    snackbarHostState.showSnackbar(message)
+                    snackbarHostState.showSnackbar(state.message)
+                }
+            }
+            if(postState.message.isNotEmpty()){
+                snackScope.launch {
+                    snackbarHostState.showSnackbar(postState.message)
                 }
             }
         }
@@ -69,20 +70,20 @@ fun ProfileScreen(userid : Long) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            if ((isLoading && postLoading) || isRefreshing)
+            if ((state.isLoading && postState.isLoading) || state.isRefreshing)
                 Box(modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center) {
                     LoadingDataProgress()
                 }
 
-            if (success && postSuccess) {
+            if (state.success && postState.success) {
 
                 PullToRefreshLazyList(
                     posts = posts,
-                    profileList = listOf(userInfo),
-                    profileContent = {userinfo -> DisplayUserInfo(userInfo,myProfile) },
+                    extraList = listOf(userInfo),
+                    extraContent = {userinfo -> DisplayUserInfo(userInfo,myProfile) },
                     content = {post -> ProfilePostCard(post) },
-                    isRefreshing = isRefreshing,
+                    isRefreshing = state.isRefreshing,
                     onRefresh = {
                         viewModel.onRefresh(userid)
                     },

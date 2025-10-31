@@ -28,6 +28,9 @@ class SearchPostVM @Inject constructor(
     private val _isFocused = MutableStateFlow(false)
     val isFocused : StateFlow<Boolean> = _isFocused
 
+    private val _state = MutableStateFlow(UiState())
+    val state : StateFlow<UiState> = _state
+
     private val _isTyping = MutableStateFlow(false)
     val isTyping : StateFlow<Boolean> = _isTyping
 
@@ -38,16 +41,6 @@ class SearchPostVM @Inject constructor(
     val posts : StateFlow<List<PostResponse>> = _posts
 
     private val _lastSeenId = MutableStateFlow<Long?>(-1L)
-
-    private val _success = MutableStateFlow(false)
-    val success : StateFlow<Boolean> = _success
-
-    private val _message = MutableStateFlow("")
-    val message : StateFlow<String> = _message
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading : StateFlow<Boolean> = _isLoading
-
 
     fun onSearchTextChanged(newText : String){
         _searchText.value = newText
@@ -71,8 +64,8 @@ class SearchPostVM @Inject constructor(
     fun getPosts(){
         viewModelScope.launch {
             val myUserid = userPreferences.getUserIdFlow().first() ?: 0L
-            _success.value = false
-            _isLoading.value = true
+            _state.value = UiState(success = false)
+            _state.value = UiState(isLoading = true)
             try {
                 val response = postRepository.searchPost(
                     text = _searchText.value,
@@ -86,15 +79,14 @@ class SearchPostVM @Inject constructor(
                     _posts.value = response
 
                 _lastSeenId.value = response.lastOrNull()?.id
-                _success.value = true
+                _state.value = UiState(success = true)
 
             } catch (e: Exception) {
-               _message.value = e.toString()
-                _success.value = false
+                _state.value = UiState(message = e.toString())
+                _state.value = UiState(success = false)
             } finally {
                 _searchAction.value = false
-
-                _isLoading.value = false
+                _state.value = UiState(isLoading = false)
             }
         }
     }

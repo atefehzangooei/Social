@@ -64,9 +64,7 @@ fun SearchPost() {
     val isTyping by viewModel.isTyping.collectAsState()
     val searchAction by viewModel.searchAction.collectAsState()
     val posts by viewModel.posts.collectAsState()
-    val success by viewModel.success.collectAsState()
-    val message by viewModel.message.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -83,10 +81,10 @@ fun SearchPost() {
         }
     }
 
-    LaunchedEffect(message) {
-            if(message.isNotEmpty()){
+    LaunchedEffect(state.message) {
+            if(state.message.isNotEmpty()){
                 snackScope.launch {
-                    snackbarHostState.showSnackbar(message)
+                    snackbarHostState.showSnackbar(state.message)
                 }
             }
         }
@@ -164,11 +162,11 @@ fun SearchPost() {
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        if(isLoading) {
+                        if(state.isLoading) {
                             LoadingDataProgress()
                         }
 
-                        if(success){
+                        if(state.success){
                             DisplayStaggeredList(posts)
                         }
                     }

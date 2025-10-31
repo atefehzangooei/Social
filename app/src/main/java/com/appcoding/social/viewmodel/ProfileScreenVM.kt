@@ -26,11 +26,11 @@ class ProfileScreenVM @Inject constructor(
     private val _userInfo = MutableStateFlow<UserInfo?>(null)
     val userInfo : StateFlow<UserInfo?> = _userInfo
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading : StateFlow<Boolean> = _isLoading
+    private val _state = MutableStateFlow(UiState())
+    val state : StateFlow<UiState> = _state
 
-    private val _message = MutableStateFlow("")
-    val message : StateFlow<String> = _message
+    private val _postState = MutableStateFlow(UiState())
+    val postState : StateFlow<UiState> = _postState
 
     private val _myUserid = MutableStateFlow(0L)
 
@@ -40,24 +40,11 @@ class ProfileScreenVM @Inject constructor(
     private val _userPosts = MutableStateFlow<List<PostResponse>>(emptyList())
     val userPosts : StateFlow<List<PostResponse>> = _userPosts
 
-    private val _postLoading = MutableStateFlow(false)
-    val postLoading : StateFlow<Boolean> = _postLoading
-
-    private val _success = MutableStateFlow(false)
-    val success : StateFlow<Boolean> = _success
-
-    private val _postSuccess = MutableStateFlow(false)
-    val postSuccess : StateFlow<Boolean> = _postSuccess
-
     private val _lastSeenId = MutableStateFlow<Long?>(-1L)
-
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing : StateFlow<Boolean> = _isRefreshing
-
 
     fun onRefresh(userid : Long){
         _lastSeenId.value = -1
-        _isRefreshing.value = true
+        _state.value = UiState(isRefreshing = true)
         getProfile(userid)
     }
 
@@ -68,17 +55,17 @@ class ProfileScreenVM @Inject constructor(
 
             getUserPosts(userid)
 
-           _isLoading.value = true
-            _success.value = false
+           _state.value = UiState(isLoading = true)
+            _state.value = UiState(success = false)
             try{
                 _userInfo.value = userRepository.getUserInfo(_myUserid.value)
-                _success.value = true
+                _state.value = UiState(success = true)
             }
             catch (ex : Exception){
-                _message.value = ex.toString()
+                _state.value = UiState(message = ex.toString())
             }
             finally {
-                _isLoading.value = false
+                _state.value = UiState(isLoading = false)
             }
         }
     }
@@ -86,8 +73,8 @@ class ProfileScreenVM @Inject constructor(
 
     fun getUserPosts(userid : Long){
         viewModelScope.launch {
-            _postLoading.value = true
-            _postSuccess.value = false
+            _postState.value = UiState(isLoading = true)
+            _postState.value = UiState(success = false)
 
             try{
                 val response = postRepository.getPostsByUserid(
@@ -102,14 +89,14 @@ class ProfileScreenVM @Inject constructor(
                     _userPosts.value = response
 
                 _lastSeenId.value = response.lastOrNull()?.id
-                _postSuccess.value = true
+                _postState.value = UiState(success = true)
             }
             catch (ex : Exception){
-                _message.value = ex.toString()
+                _postState.value = UiState(message = ex.toString())
             }
             finally {
-                _postLoading.value = false
-                _isRefreshing.value = false
+                _postState.value = UiState(isLoading = false)
+                _postState.value = UiState(isRefreshing = false)
             }
         }
     }
