@@ -25,14 +25,8 @@ class SignupVM @Inject constructor(
     private val _usernanme = MutableStateFlow("")
     val username : StateFlow<String> = _usernanme
 
-    private val _message = MutableStateFlow("")
-    val message : StateFlow<String> = _message
-
-    private val _success = MutableStateFlow(false)
-    val success : StateFlow<Boolean> = _success
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading : StateFlow<Boolean> = _isLoading
+    private val _state = MutableStateFlow(UiState())
+    val state : StateFlow<UiState> = _state
 
 
     //Functions to update Inputs
@@ -44,10 +38,10 @@ class SignupVM @Inject constructor(
     fun signup(){
         viewModelScope.launch {
             if (_phone.value.isBlank() || _usernanme.value.isBlank() || _password.value.isBlank()) {
-                _message.value ="لطفا اطلاعات را به درستی وارد نمایید"
+                _state.value = UiState(message = "لطفا اطلاعات را به درستی وارد نمایید")
                 return@launch
             }
-            _isLoading.value = true
+            _state.value = UiState(isLoading = true)
 
 
             try {
@@ -60,20 +54,20 @@ class SignupVM @Inject constructor(
                 )
                 when (response.message) {
                     "repeated username" -> {
-                        _message.value = "نام کاربری وارد شده تکراری است"
+                        _state.value = UiState(message = "نام کاربری وارد شده تکراری است")
                     }
                     "success" -> {
-                        _success.value = true
-                        _message.value = "حساب شما با موفقیت ایجاد شد"
+                        _state.value = UiState(success = true)
+                        _state.value = UiState(message = "حساب شما با موفقیت ایجاد شد")
                     }
                     else -> {
-                        _message.value = "نام کاربری دیگری انتخاب کنید"
+                        _state.value = UiState(message = "نام کاربری دیگری انتخاب کنید")
                     }
                 }
             } catch (e: Exception) {
-                _message.value = e.toString()
+                _state.value = UiState(message = e.toString())
             } finally {
-                _isLoading.value = false
+                _state.value = UiState(isLoading = false)
             }
 
         }

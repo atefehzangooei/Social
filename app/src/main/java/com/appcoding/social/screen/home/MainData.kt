@@ -35,6 +35,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -84,56 +87,74 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainData(userid : Long, navController: NavHostController) {
 
-    val viewModel : MainDataVM = hiltViewModel()
+    val viewModel: MainDataVM = hiltViewModel()
 
     val posts by viewModel.posts.collectAsState()
     val stories by viewModel.stories.collectAsState()
-    val isRefreshing by viewModel.isRefreshing.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val postState by viewModel.postState.collectAsState()
+    val storyState by viewModel.storyState.collectAsState()
 
     val listState = rememberLazyListState()
+    val snackScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.getFirst()
     }
 
+    LaunchedEffect(postState.message) {
+        if (postState.message.isNotEmpty()) {
+            snackScope.launch {
+                snackbarHostState.showSnackbar(postState.message)
+            }
+        }
+    }
+
     LaunchedEffect(listState) {
-        snapshotFlow {listState.layoutInfo}
-            .collect{ layoutInfo ->
+        snapshotFlow { listState.layoutInfo }
+            .collect { layoutInfo ->
                 val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index
                 val totalItems = layoutInfo.totalItemsCount
 
-                if (!isLoading && lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
+                if (!postState.isLoading && lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
                     viewModel.getData()
                 }
             }
     }
 
+    if (postState.success && storyState.success) {
+        PullToRefreshLazyList(
+            posts = posts,
+            extraList = stories,
+            extraContent = { story -> StoryCard(story, userid, navController) },
+            content = { post -> PostCard(post, userid, navController, viewModel) },
+            isRefreshing = postState.isRefreshing,
+            onRefresh = {
+                viewModel.onRefresh()
+            },
+            lazyListState = listState,
+            tag = "main"
+        )
+    }
 
-    PullToRefreshLazyList(
-        posts = posts,
-        extraList = stories,
-        extraContent = { story -> StoryCard(story, userid, navController) },
-        content = { post -> PostCard(post, userid, navController, viewModel) },
-        isRefreshing = isRefreshing,
-        onRefresh = {
-            viewModel.onRefresh()
-        },
-        lazyListState = listState,
-        tag = "main"
-    )
 
+    RightToLeftLayout {
 
-    if(isLoading){
-        Box(modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center)
-        {
-            LoadingDataProgress()
+        Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        ) { contentPadding ->
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(contentPadding),
+                contentAlignment = Alignment.Center
+            )
+            {
+                if (postState.isLoading) LoadingDataProgress()
+            }
         }
     }
 }
-
-
 
 
 @Composable

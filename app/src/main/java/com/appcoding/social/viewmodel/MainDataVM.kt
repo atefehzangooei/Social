@@ -37,6 +37,7 @@ class MainDataVM @Inject constructor(
     private val _stories = MutableStateFlow<List<StoryResponse>>(emptyList())
     val stories : StateFlow<List<StoryResponse>> = _stories
 
+    //States
     private val _postState = MutableStateFlow(UiState())
     val postState : StateFlow<UiState> = _postState
 
@@ -52,7 +53,7 @@ class MainDataVM @Inject constructor(
     private val _saveState = MutableStateFlow(UiState())
     val saveState : StateFlow<UiState> = _saveState
 
-    //posts
+    //post
     private val _isSaved = MutableStateFlow(false)
     val isSaved : StateFlow<Boolean> = _isSaved
 
@@ -66,8 +67,6 @@ class MainDataVM @Inject constructor(
     val likeCount : StateFlow<Int> = _likeCount
 
 
-
-
     fun getFirst(){
         _userid.value = getUserid()
         getData()
@@ -75,7 +74,7 @@ class MainDataVM @Inject constructor(
     }
 
     fun onRefresh(){
-        _isRefreshing.value = true
+        _postState.value = UiState(isRefreshing = true)
         _lastSeenId.value = -1
         getData()
         getStory()
@@ -83,16 +82,24 @@ class MainDataVM @Inject constructor(
 
     private fun getStory(){
         viewModelScope.launch {
-            _isLoadingStory.value = true
+            _storyState.value = UiState(isLoading = true)
+            _storyState.value = UiState(success = false)
             try{
                 val storyRes = storyRepository.getStoryOfFollowers(_userid.value)
                 _stories.value = storyRes
+
+                _storyState.value = UiState(success = true)
+
             }
             catch(ex : Exception){
-               _isLoadingStory.value = false
+               _storyState.value = UiState(isLoading = false)
+                _storyState.value = UiState(success = false)
+
             }
             finally {
-                _isLoadingStory.value = false
+                _storyState.value = UiState(isLoading = false)
+                _storyState.value = UiState(success = false)
+
             }
         }
     }
@@ -100,7 +107,8 @@ class MainDataVM @Inject constructor(
     fun getData() {
         viewModelScope.launch {
             try {
-                _isLoading.value = true
+                _postState.value = UiState(isLoading = true)
+                _postState.value = UiState(success = false)
 
                 val postRes = postRepository.getPostsByFollowers(
                     userId = _userid.value,
@@ -113,11 +121,14 @@ class MainDataVM @Inject constructor(
                     _posts.value = postRes
 
                 _lastSeenId.value = postRes.lastOrNull()?.id
+
+                _postState.value = UiState(success = true)
+
             } catch (e: Exception) {
-                _message.value = "خطایی رخ داده است"
+                _postState.value = UiState(message = "خطایی رخ داده است")
             } finally {
-                _isLoading.value = false
-                _isRefreshing.value = false
+                _postState.value = UiState(isLoading = false)
+                _postState.value = UiState(isRefreshing = false)
             }
         }
 

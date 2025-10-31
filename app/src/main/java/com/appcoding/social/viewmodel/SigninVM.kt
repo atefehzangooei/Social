@@ -24,14 +24,8 @@ class SigninVM @Inject constructor(
     private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading : StateFlow<Boolean> = _isLoading
-
-    private val _message = MutableStateFlow("")
-    val message : StateFlow<String> = _message
-
-    private val _success = MutableStateFlow(false)
-    val success : StateFlow<Boolean> = _success
+    private val _state = MutableStateFlow(UiState())
+    val state : StateFlow<UiState> = _state
 
     private val _userid = MutableStateFlow(-1L)
     val userid : StateFlow<Long> = _userid
@@ -43,10 +37,10 @@ class SigninVM @Inject constructor(
         viewModelScope.launch {
 
             if (_username.value.isBlank() || _password.value.isBlank()) {
-                _message.value = "لطفا تمام اطلاعات را وارد کنید"
+                _state.value = UiState(message = "لطفا تمام اطلاعات را وارد کنید")
                 return@launch
             }
-            _isLoading.value = true
+            _state.value = UiState(isLoading = true)
 
             try {
                 val response =
@@ -57,18 +51,18 @@ class SigninVM @Inject constructor(
                         )
                     )
                 if (response.isSuccessful) {
-                    _success.value = true
+                    _state.value = UiState(success = true)
                     val userInfo = response.body()
                     _userid.value =  userInfo!!.id
                     userPreferences.saveUserId(_userid.value)
 
                 } else if (response.code() == 401) {
-                    _message.value = "نام کاربری یا کلمه عبور اشتباه است!"
+                    _state.value = UiState(message = "نام کاربری یا کلمه عبور اشتباه است!")
                 }
             } catch (e: Exception) {
-                _message.value = e.toString()
+                _state.value = UiState(message = e.toString())
             } finally {
-                _isLoading.value = false
+                _state.value = UiState(isLoading = false)
             }
 
         }
