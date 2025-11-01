@@ -2,6 +2,7 @@ package com.appcoding.social.data.remote
 
 import com.appcoding.social.data.api.StoryApi
 import com.appcoding.social.models.StoryResponse
+import com.appcoding.social.models.StringMessage
 import okhttp3.MultipartBody
 import javax.inject.Inject
 
@@ -18,7 +19,7 @@ class StoryRemoteRepository @Inject constructor(private val api : StoryApi) {
         return api.addStory(imageFile, userId, date, time)
     }
 
-    suspend fun deleteStory(storyId : Long){
+    suspend fun deleteStory(storyId : Long) : StringMessage {
         return api.deleteStory(storyId)
     }
 

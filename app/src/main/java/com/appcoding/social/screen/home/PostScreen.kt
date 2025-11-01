@@ -103,7 +103,7 @@ fun PostCard(post : PostResponse,
                         .padding(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    LikeButton(isLiked, post, viewModel)
+                    LikeButton(isLiked, post.id, viewModel)
 
                     Spacer(modifier = Modifier.size(10.dp))
 
@@ -150,8 +150,7 @@ fun PostCard(post : PostResponse,
                         scrimColor = Color.Black.copy(alpha = 0.5f),
                         //dragHandle = {BottomSheetDefaults.DragHandle()}
                     ) {
-                        CommentBottomSheet(post.i
-                                d, viewModel)
+                        CommentBottomSheet(post.id, viewModel)
                     }
                 }
 
@@ -183,8 +182,10 @@ fun PostCard(post : PostResponse,
 
 @Composable
 fun LikeButton(isLiked : Boolean,
-               post : PostResponse,
+               postId : Long,
                viewModel: MainDataVM){
+
+    val likeState by viewModel.likeState.collectAsState()
 
     val scale = remember { Animatable(1f) }
 
@@ -200,6 +201,7 @@ fun LikeButton(isLiked : Boolean,
         }
     }
 
+
     Image(painter = if (isLiked)
         painterResource(R.drawable.red_heart)
     else
@@ -213,7 +215,8 @@ fun LikeButton(isLiked : Boolean,
                 scaleX = scale.value,
                 scaleY = scale.value
             )
-            .clickable { viewModel.likePost(post.id)
+            .clickable {
+                viewModel.likePost(postId)
             }
     )
 

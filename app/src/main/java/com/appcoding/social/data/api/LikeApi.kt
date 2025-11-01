@@ -14,6 +14,6 @@ interface LikeApi {
 
     @DELETE("likes/dislike/{postId}/{userId}")
     suspend fun disLikePost(@Path("postId") postId: Long,
-                            @Path("userId") userId : Long)
+                            @Path("userId") userId : Long) : StringMessage
 
 }

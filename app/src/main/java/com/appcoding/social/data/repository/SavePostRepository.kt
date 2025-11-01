@@ -11,7 +11,7 @@ class SavePostRepository @Inject constructor(private val remoteRepository: SaveP
         return remoteRepository.savePost(savePostRequest)
     }
 
-    suspend fun unSavePost(postId: Long, userId : Long){
+    suspend fun unSavePost(postId: Long, userId : Long) : StringMessage {
         return remoteRepository.unSavePost(postId, userId)
     }
 }

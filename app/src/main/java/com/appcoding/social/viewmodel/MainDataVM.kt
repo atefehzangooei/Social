@@ -159,7 +159,6 @@ class MainDataVM @Inject constructor(
 
     fun likePost(postId : Long) {
         viewModelScope.launch {
-            _isLiked.value = !(_isLiked.value)
 
             if (_isLiked.value) {
                 _likeCount.value++
@@ -171,19 +170,30 @@ class MainDataVM @Inject constructor(
                         time = ""
                     )
                 )
+                if(response.success){
+                    _isLiked.value = !_isLiked.value
+                }
+                else{
+                    _likeState.value = UiState(success = false, message = response.message)
+                }
             } else {
                 _likeCount.value--
                 val response = likeRepository.disLikePost(
                     postId = postId,
                     userId = _userid.value
                 )
+                if(response.success){
+                    _isLiked.value = !_isLiked.value
+                }
+                else{
+                    _likeState.value = UiState(success = false, message = response.message)
+                }
             }
         }
     }
 
     fun savePost(postId : Long){
         viewModelScope.launch {
-            _isSaved.value = !_isSaved.value
                 if(_isSaved.value){
                     try {
                         val response = savePostRepository.savePost(
@@ -194,12 +204,17 @@ class MainDataVM @Inject constructor(
                                 time = "14"
                             )
                         )
-
-                        _saveState.value = UiState(success = true)
-                        _saveState.value = UiState(message = "با موفقیت ذخیره شد")
+                        if(response.success) {
+                            _isSaved.value = !_isSaved.value
+                            _saveState.value = UiState(success = true)
+                            _saveState.value = UiState(message = "با موفقیت ذخیره شد")
+                        }
+                        else{
+                            _saveState.value = UiState(success = false, message = response.message)
+                        }
                     }
                     catch (ex : Exception){
-                        _saveState.value = UiState(message = ex.toString())
+                        _saveState.value = UiState(success = false, message = ex.toString())
                     }
                 }
                 else{
@@ -208,11 +223,17 @@ class MainDataVM @Inject constructor(
                             userId = _userid.value,
                             postId = postId
                         )
-                        _saveState.value = UiState(success = true)
-                        _saveState.value = UiState(message = "unsaved")
+                        if(response.success) {
+                            _isSaved.value = !_isSaved.value
+                            _saveState.value = UiState(success = true)
+                            _saveState.value = UiState(message = "unsaved")
+                        }
+                        else{
+                            _saveState.value = UiState(success = false, message = response.message)
+                        }
                     }
                     catch (ex : Exception){
-                        _saveState.value = UiState(message = ex.toString())
+                        _saveState.value = UiState(success = false, message = ex.toString())
                     }
                 }
         }

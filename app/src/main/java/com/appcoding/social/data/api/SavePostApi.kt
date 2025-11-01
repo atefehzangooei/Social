@@ -14,6 +14,6 @@ interface SavePostApi {
 
     @DELETE("save_post/{postId}/{userId}")
     suspend fun unSavePost(@Path("postId") postId: Long,
-                           @Path("userId") userId : Long)
+                           @Path("userId") userId : Long) : StringMessage
 
 }

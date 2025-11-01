@@ -12,7 +12,8 @@ class LikeRepository @Inject constructor(private val remoteRepository: LikeRemot
     }
 
     suspend fun disLikePost(postId: Long,
-                            userId : Long){
+                            userId : Long) : StringMessage
+    {
         return remoteRepository.disLikePost(postId, userId)
     }
 
