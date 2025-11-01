@@ -1,17 +1,24 @@
 package com.appcoding.social.viewmodel
 
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appcoding.social.data.api.LikeApi
+import com.appcoding.social.data.repository.CommentRepository
 import com.appcoding.social.data.repository.LikeRepository
 import com.appcoding.social.screen.components.UserPreferences
 import com.appcoding.social.data.repository.PostRepository
+import com.appcoding.social.data.repository.SavePostRepository
 import com.appcoding.social.data.repository.StoryRepository
+import com.appcoding.social.models.CommentRequest
+import com.appcoding.social.models.CommentResponse
 import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.PostResponse
+import com.appcoding.social.models.SavePostRequest
 import com.appcoding.social.models.StoryResponse
 import com.appcoding.social.screen.components.pageSizeHome
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,7 +29,9 @@ class MainDataVM @Inject constructor(
     private val userPreferences: UserPreferences,
     private val postRepository: PostRepository,
     private val storyRepository: StoryRepository,
-    private val likeRepository: LikeRepository
+    private val likeRepository: LikeRepository,
+    private val savePostRepository: SavePostRepository,
+    private val commentRepository: CommentRepository
 ) : ViewModel() {
 
 
@@ -66,6 +75,13 @@ class MainDataVM @Inject constructor(
     private val _likeCount = MutableStateFlow(0)
     val likeCount : StateFlow<Int> = _likeCount
 
+    //comments
+    private val _comments = MutableStateFlow<List<CommentResponse>>(emptyList())
+    val comments : StateFlow<List<CommentResponse>> = _comments
+
+    private val _newComment = MutableStateFlow("")
+    val newComment : StateFlow<String> = _newComment
+
 
     fun getFirst(){
         _userid.value = getUserid()
@@ -98,8 +114,6 @@ class MainDataVM @Inject constructor(
             }
             finally {
                 _storyState.value = UiState(isLoading = false)
-                _storyState.value = UiState(success = false)
-
             }
         }
     }
@@ -143,7 +157,7 @@ class MainDataVM @Inject constructor(
         return _userid.value
     }
 
-    fun likePost(post : PostResponse) {
+    fun likePost(postId : Long) {
         viewModelScope.launch {
             _isLiked.value = !(_isLiked.value)
 
@@ -151,7 +165,7 @@ class MainDataVM @Inject constructor(
                 _likeCount.value++
                 val response = likeRepository.likePost(
                     LikeRequest(
-                        postId = post.id,
+                        postId = postId,
                         userId = _userid.value,
                         date = "",
                         time = ""
@@ -160,9 +174,93 @@ class MainDataVM @Inject constructor(
             } else {
                 _likeCount.value--
                 val response = likeRepository.disLikePost(
-                    postId = post.id,
+                    postId = postId,
                     userId = _userid.value
                 )
+            }
+        }
+    }
+
+    fun savePost(postId : Long){
+        viewModelScope.launch {
+            _isSaved.value = !_isSaved.value
+                if(_isSaved.value){
+                    try {
+                        val response = savePostRepository.savePost(
+                            SavePostRequest(
+                                userId = _userid.value,
+                                postId = postId,
+                                date = "14",
+                                time = "14"
+                            )
+                        )
+
+                        _saveState.value = UiState(success = true)
+                        _saveState.value = UiState(message = "با موفقیت ذخیره شد")
+                    }
+                    catch (ex : Exception){
+                        _saveState.value = UiState(message = ex.toString())
+                    }
+                }
+                else{
+                    try {
+                        val response = savePostRepository.unSavePost(
+                            userId = _userid.value,
+                            postId = postId
+                        )
+                        _saveState.value = UiState(success = true)
+                        _saveState.value = UiState(message = "unsaved")
+                    }
+                    catch (ex : Exception){
+                        _saveState.value = UiState(message = ex.toString())
+                    }
+                }
+        }
+    }
+
+    fun getComments(postId: Long){
+        viewModelScope.launch {
+            _commentState.value = UiState(isLoading = true)
+
+            try{
+                _comments.value = commentRepository.getComments(postId)
+                _commentState.value = UiState(success = true)
+               // post.commentCount++
+            }
+            catch (ex : Exception){
+                _commentState.value = UiState(message = ex.toString())
+            }
+            finally {
+                _commentState.value = UiState(isLoading = false)
+            }
+        }
+    }
+
+    fun onCommentChanged(value: String) { _newComment.value = value}
+
+    fun sendComment(postId : Long){
+        viewModelScope.launch {
+            _commentState.value = UiState(isLoading = true)
+            try {
+                val commentRequest = CommentRequest(
+                    postId = postId,
+                    userId = _userid.value,
+                    comment = _newComment.value,
+                    date = "1404",
+                    time = "18:00"
+                )
+                val addedComment = commentRepository.addComment(commentRequest)
+                _comments.value +=  addedComment
+                _newComment.value = ""
+
+                _commentState.value = UiState(success = true)
+
+            }
+            catch (ex : Exception){
+                _commentState.value = UiState(message = ex.toString())
+            }
+            finally {
+                _commentState.value = UiState(isLoading = false)
             }
         }
     }

@@ -56,9 +56,7 @@ fun SignIn(navController: NavHostController) {
 
     val password by viewModel.password.collectAsState()
     val username by viewModel.username.collectAsState()
-    val message by viewModel.message.collectAsState()
-    val success by viewModel.success.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val state by viewModel.state.collectAsState()
     val userid by viewModel.userid.collectAsState()
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -66,16 +64,16 @@ fun SignIn(navController: NavHostController) {
     val snackbarHostState = remember { SnackbarHostState() }
 
 
-    LaunchedEffect(success,message) {
-        if(success) {
+    LaunchedEffect(state.success,state.message) {
+        if(state.success) {
             navController.navigate("main/$userid") {
                 popUpTo("signin") { inclusive = true }
             }
         }
         else{
-            if(message.isNotBlank()){
+            if(state.message.isNotBlank()){
                 snackScope.launch {
-                    snackbarHostState.showSnackbar(message)
+                    snackbarHostState.showSnackbar(state.message)
                 }
             }
         }
@@ -121,7 +119,7 @@ fun SignIn(navController: NavHostController) {
 
                             Row(modifier = Modifier.fillMaxWidth())
                             {
-                                AuthButton(text = "ورود", isLoading = isLoading, onClick = {
+                                AuthButton(text = "ورود", isLoading = state.isLoading, onClick = {
                                     keyboardController?.hide()
                                     viewModel.signin()
                                 }

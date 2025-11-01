@@ -75,7 +75,7 @@ fun PostCard(post : PostResponse,
     val saveScope = rememberCoroutineScope()
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var commentSheetState = remember { mutableStateOf(false) }
+    var commentSheetState by remember { mutableStateOf(false) }
 
 
     RightToLeftLayout {
@@ -103,6 +103,7 @@ fun PostCard(post : PostResponse,
                         .padding(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    LikeButton(isLiked, post, viewModel)
 
                     Spacer(modifier = Modifier.size(10.dp))
 
@@ -149,11 +150,11 @@ fun PostCard(post : PostResponse,
                         scrimColor = Color.Black.copy(alpha = 0.5f),
                         //dragHandle = {BottomSheetDefaults.DragHandle()}
                     ) {
-                        CommentBottomSheet(post, userid)
+                        CommentBottomSheet(post.id, viewModel)
                     }
                 }
 
-                Image(painter = if (saved)
+                Image(painter = if (isSaved)
                     painterResource(R.drawable.save_filled)
                 else
                     painterResource(R.drawable.save),
@@ -161,32 +162,9 @@ fun PostCard(post : PostResponse,
                     contentDescription = "save",
                     modifier = Modifier
                         .size(Dimens.post_icons)
-                        .clickable {
-                            saved = !saved
-                            saveScope.launch {
-                                if(saved){
-                                    val response = RetrofitInstance.api.savePost(
-                                        SavePostRequest(
-                                            userId = userid,
-                                            postId = post.id,
-                                            date = "14",
-                                            time = "14"
-                                        )
-                                    )
-                                }
-                                else{
-                                    val response = RetrofitInstance.api.unSavePost(
-                                        userId = userid,
-                                        postId = post.id
-                                    )
-                                }
-                            }
-                        }
-
+                        .clickable { viewModel.savePost(post.id) }
                 )
-
             }
-
 
             Spacer(modifier = Modifier.size(Dimens.normal_spacer))
 
@@ -198,28 +176,25 @@ fun PostCard(post : PostResponse,
                     .wrapContentHeight()
                     .padding(Dimens.normal_padding)
             )
-
-
         }
     }
 }
 
 @Composable
 fun LikeButton(isLiked : Boolean,
+               post : PostResponse,
                viewModel: MainDataVM){
 
     val scale = remember { Animatable(1f) }
 
     LaunchedEffect(isLiked) {
         if (isLiked) {
-
             scale.animateTo(1.5f, animationSpec = tween(150))
             scale.animateTo(
                 1f,
                 animationSpec = tween(300, easing = FastOutSlowInEasing)
             )
         } else {
-
             scale.snapTo(1f)
         }
     }
@@ -237,8 +212,7 @@ fun LikeButton(isLiked : Boolean,
                 scaleX = scale.value,
                 scaleY = scale.value
             )
-            .clickable {
-
+            .clickable { viewModel.likePost(post.id)
             }
     )
 

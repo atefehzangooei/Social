@@ -61,25 +61,23 @@ fun SignUp(navController: NavHostController){
     val phone by viewModel.phone.collectAsState()
     val password by viewModel.password.collectAsState()
     val username by viewModel.username.collectAsState()
-    val message by viewModel.message.collectAsState()
-    val success by viewModel.success.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val snackScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
 
 
-    LaunchedEffect(message)
+    LaunchedEffect(state.message)
     {
-        if (success) {
+        if (state.success) {
             navController.navigate("signin") {
                 popUpTo("signup") { inclusive = true }
             }
         } else {
-            if (message.isNotBlank()) {
+            if (state.message.isNotBlank()) {
                 snackScope.launch {
-                    snackbarHostState.showSnackbar(message)
+                    snackbarHostState.showSnackbar(state.message)
                 }
             }
         }
@@ -133,7 +131,7 @@ fun SignUp(navController: NavHostController){
                         Row(modifier = Modifier.fillMaxWidth())
                         {
                             AuthButton(text = "ایجاد حساب کاربری",
-                                isLoading = isLoading,
+                                isLoading = state.isLoading,
                                 onClick = { keyboardController?.hide()
                                 viewModel.signup()}
                             )

@@ -64,6 +64,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.appcoding.social.R
@@ -80,6 +81,7 @@ import com.appcoding.social.screen.components.screenWidth
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.viewmodel.MainDataVM
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -158,117 +160,116 @@ fun MainData(userid : Long, navController: NavHostController) {
 
 
 @Composable
-fun CommentBottomSheet(post : PostResponse, userid : Long){
+fun CommentBottomSheet(postId : Long,
+                       viewModel: MainDataVM){
 
-    val context = LocalContext.current
-    var comments by remember { mutableStateOf<List<CommentResponse>>(emptyList()) }
-    var newComment by remember { mutableStateOf("") }
-    val coroutineScope = rememberCoroutineScope()
-    // val focusRequester = remember { FocusRequester() }
+    val comments by viewModel.comments.collectAsState()
+    val commentState by viewModel.commentState.collectAsState()
+    val newComment by viewModel.newComment.collectAsState()
 
     LaunchedEffect(Unit){
-        //focusRequester.requestFocus()
-        try{
-            comments = RetrofitInstance.api.getComments(post.id)
-            post.commentCount++
-        }
-        catch (ex : Exception){
-            Toast.makeText(context,ex.message, Toast.LENGTH_LONG).show()
-        }
+       viewModel.getComments(postId)
     }
 
     RightToLeftLayout {
 
-        Column(modifier = Modifier.fillMaxSize()) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                items(comments) { comment ->
-                    CommentCard(comment)
-                }
+        if(commentState.isLoading){
+            Box(modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center)
+            {
+                LoadingDataProgress()
             }
+        }
+        else {
+            Column(modifier = Modifier.fillMaxSize()) {
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .imePadding()
-                    .wrapContentHeight()
-                    .padding(Dimens.normal_padding)
-                    .drawBehind {
-                        val strokeWidth = 1.dp.toPx()
-                        drawLine(
-                            color = Color.LightGray,
-                            start = Offset(0f, 0f),
-                            end = Offset(size.width, 0f),
-                            strokeWidth = strokeWidth
-                        )
-                    },
-                verticalAlignment = Alignment.Bottom
-            ) {
-                val userProfile =
-                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu8Qi_EGuDWDLusHz6fyxhgaQWa6q0YsOiBH3adnqLx-6_JbLy_-ch2P3xcDxtTh-g9qY&usqp=CAU"
-
-                AsyncImage(
-                    model = userProfile,
-                    contentDescription = "my profile",
+                LazyColumn(
                     modifier = Modifier
-                        //.weight(1f)
-                        .size(Dimens.comment_user_profile)
-                        .clip(CircleShape)
-                        .align(Alignment.CenterVertically)
-
-                )
-
-                TextField(
-                    value = newComment,
-                    onValueChange = { newComment = it },
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                    placeholder = { Text("نظرت رو بگو") },
-                    singleLine = true,
-                    modifier = Modifier
-                        .weight(5f),
-                    // .focusRequester(focusRequester),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedPlaceholderColor = Colors.placeholder,
-                        unfocusedPlaceholderColor = Colors.placeholder
-
-                    )
-                )
-
-                Icon(imageVector = Icons.Filled.Check,
-                    contentDescription = "send comment",
-                    tint = Colors.appcolor,
-                    modifier = Modifier
+                        .fillMaxWidth()
                         .weight(1f)
-                        .size(Dimens.comment_user_profile)
-                        .clip(CircleShape)
-                        .align(Alignment.CenterVertically)
-                        .clickable {
-                            if (newComment.isNotEmpty()) {
-                                coroutineScope.launch(Dispatchers.IO) {
-                                    val commentRequest = CommentRequest(
-                                        postId = post.id,
-                                        userId = userid,
-                                        comment = newComment,
-                                        date = "1404",
-                                        time = "18:00"
-                                    )
-                                    val addedComment =
-                                        RetrofitInstance.api.addComment(commentRequest)
-                                    comments = comments + addedComment
-                                    newComment = ""
-                                }
-                            }
+                ) {
+                    items(comments) { comment ->
+                        CommentCard(comment)
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .imePadding()
+                        .wrapContentHeight()
+                        .padding(Dimens.normal_padding)
+                        .drawBehind {
+                            val strokeWidth = 1.dp.toPx()
+                            drawLine(
+                                color = Color.LightGray,
+                                start = Offset(0f, 0f),
+                                end = Offset(size.width, 0f),
+                                strokeWidth = strokeWidth
+                            )
+                        },
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    val userProfile =
+                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu8Qi_EGuDWDLusHz6fyxhgaQWa6q0YsOiBH3adnqLx-6_JbLy_-ch2P3xcDxtTh-g9qY&usqp=CAU"
+
+                    AsyncImage(
+                        model = userProfile,
+                        contentDescription = "my profile",
+                        modifier = Modifier
+                            //.weight(1f)
+                            .size(Dimens.comment_user_profile)
+                            .clip(CircleShape)
+                            .align(Alignment.CenterVertically)
+                    )
+
+                    TextField(
+                        value = newComment,
+                        onValueChange = viewModel::onCommentChanged ,
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        placeholder = { Text("نظرت رو بگو") },
+                        singleLine = true,
+                        modifier = Modifier
+                            .weight(5f),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedPlaceholderColor = Colors.placeholder,
+                            unfocusedPlaceholderColor = Colors.placeholder
+
+                        )
+                    )
+
+                    if(commentState.isLoading){
+                        Box(modifier = Modifier
+                            .weight(1f)
+                            .size(Dimens.comment_user_profile),
+                            contentAlignment = Alignment.Center)
+                        {
+                            LoadingDataProgress()
                         }
-                )
+                    }
+                    else {
+                        Icon(imageVector = Icons.Filled.Check,
+                            contentDescription = "send comment",
+                            tint = Colors.appcolor,
+                            modifier = Modifier
+                                .weight(1f)
+                                .size(Dimens.comment_user_profile)
+                                .clip(CircleShape)
+                                .align(Alignment.CenterVertically)
+                                .clickable {
+                                    if (newComment.isNotEmpty()) {
+                                        viewModel.sendComment(postId)
+                                    }
+                                }
+                        )
+                    }
+                }
             }
         }
     }
