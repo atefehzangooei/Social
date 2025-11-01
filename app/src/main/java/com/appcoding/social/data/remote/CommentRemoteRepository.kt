@@ -3,6 +3,7 @@ package com.appcoding.social.data.remote
 import com.appcoding.social.data.api.CommentApi
 import com.appcoding.social.models.CommentRequest
 import com.appcoding.social.models.CommentResponse
+import com.appcoding.social.models.StringMessage
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -17,6 +18,10 @@ class CommentRemoteRepository @Inject constructor(private val api : CommentApi) 
 
     suspend fun addComment(commentRequest : CommentRequest) : CommentResponse{
         return api.addComment(commentRequest)
+    }
+
+    suspend fun deleteComment(commentId : Long) : StringMessage{
+        return api.deleteComment(commentId)
     }
 
 }

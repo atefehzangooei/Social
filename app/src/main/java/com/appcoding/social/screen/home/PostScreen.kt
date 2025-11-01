@@ -150,7 +150,8 @@ fun PostCard(post : PostResponse,
                         scrimColor = Color.Black.copy(alpha = 0.5f),
                         //dragHandle = {BottomSheetDefaults.DragHandle()}
                     ) {
-                        CommentBottomSheet(post.id, viewModel)
+                        CommentBottomSheet(post.i
+                                d, viewModel)
                     }
                 }
 
