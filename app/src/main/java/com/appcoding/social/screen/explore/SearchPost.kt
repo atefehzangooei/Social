@@ -71,8 +71,6 @@ fun SearchPost() {
     val snackScope = rememberCoroutineScope()
     val gridState = rememberLazyStaggeredGridState()
 
-    DisplayStaggeredList(posts)
-
     RightToLeftLayout {
 
     LaunchedEffect(searchAction) {

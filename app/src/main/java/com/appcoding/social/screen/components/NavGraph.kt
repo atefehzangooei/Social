@@ -1,4 +1,4 @@
-package com.appcoding.social.screen
+package com.appcoding.social.screen.components
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -10,6 +10,7 @@ import com.appcoding.social.MyApp
 import com.appcoding.social.auth.ForgetPassword
 import com.appcoding.social.auth.SignIn
 import com.appcoding.social.auth.SignUp
+import com.appcoding.social.screen.home.MainData
 import com.appcoding.social.screen.profile.ProfileScreen
 import com.appcoding.social.splash.Splash
 
@@ -23,7 +24,7 @@ fun AppNavHost(navController: NavHostController, startDestination : String = "sp
         composable("signup"){ SignUp(navController) }
        // composable("main"){ MyApp(navController) }
         composable("forgetpassword"){ ForgetPassword(navController) }
-        //composable("story"){ DisplayStory(navController) }
+        composable("post_screen"){ MainData(navController) }
 
         composable(
             route = "main/{userid}",

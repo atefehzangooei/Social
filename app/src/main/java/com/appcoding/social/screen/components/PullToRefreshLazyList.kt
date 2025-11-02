@@ -13,12 +13,19 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -31,7 +38,7 @@ fun <T,U> PullToRefreshLazyList(
     posts : List<T>,
     extraList : List<U>,
     extraContent : @Composable (U) -> Unit,
-    content : @Composable (T) -> Unit,
+    content : @Composable (T, Int) -> Unit,
     isRefreshing : Boolean,
     onRefresh : () -> Unit,
     lazyListState : LazyListState? = null,
@@ -39,7 +46,6 @@ fun <T,U> PullToRefreshLazyList(
     tag : String
 ){
     val pullToRefreshState = rememberPullToRefreshState()
-
 
     Box(
         modifier = Modifier
@@ -63,9 +69,8 @@ fun <T,U> PullToRefreshLazyList(
                         }
                     }
 
-
                     items(posts) {
-                        content(it)
+                        content(it, 0)
                     }
                 }
             }
@@ -80,9 +85,9 @@ fun <T,U> PullToRefreshLazyList(
                         extraContent(extraList[0])
                     }
 
-                    items(posts) {
-                        content(it)
-                    }
+                    itemsIndexed(posts) {index, item ->
+                        content(item, index)
+                        }
                 }
             }
             "search" -> {

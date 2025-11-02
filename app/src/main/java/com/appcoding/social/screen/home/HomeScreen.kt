@@ -18,7 +18,7 @@ fun HomeScreen(userid : Long, navController: NavHostController) {
             .background(Colors.background))
         {
             AppNameBar()
-            MainData(userid, navController)
+            MainData(navController)
         }
     }
 
