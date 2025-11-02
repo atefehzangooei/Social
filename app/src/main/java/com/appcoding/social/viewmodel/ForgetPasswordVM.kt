@@ -49,18 +49,13 @@ class ForgetPasswordVM @Inject constructor(
                                 _state.value = UiState(message = "کاربری با این نام کاربری و شماره تلفن همراه وجود ندارد")
                             }
                             "sms" -> {
-                                _state.value = UiState(message = "اطلاعات کاربری شما تا دقایقی دیگر برایتان ارسال می شود")
-                                _state.value = UiState(success = true)
+                                _state.value = UiState(success = true, message = "اطلاعات کاربری شما تا دقایقی دیگر برایتان ارسال می شود")
                             }
                         }
                     }
                     catch(e: Exception){
                         _state.value = UiState(message = e.toString())
                     }
-                    finally {
-                        _state.value = UiState(isLoading = false)
-                    }
-
         }
     }
 

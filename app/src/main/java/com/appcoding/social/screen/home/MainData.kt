@@ -1,6 +1,7 @@
 package com.appcoding.social.screen.home
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -124,6 +125,8 @@ fun MainData(userid : Long, navController: NavHostController) {
             }
     }
 
+    Log.d("before if" , "post success + ${postState.success}")
+    Log.d("before if" , "story success + ${storyState.success}")
     if (postState.success && storyState.success) {
         PullToRefreshLazyList(
             posts = posts,

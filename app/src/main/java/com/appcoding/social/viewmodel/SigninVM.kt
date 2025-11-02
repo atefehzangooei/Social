@@ -61,10 +61,7 @@ class SigninVM @Inject constructor(
                 }
             } catch (e: Exception) {
                 _state.value = UiState(message = e.toString())
-            } finally {
-                _state.value = UiState(isLoading = false)
             }
-
         }
     }
 }

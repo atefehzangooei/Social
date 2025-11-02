@@ -55,8 +55,7 @@ class ProfileScreenVM @Inject constructor(
 
             getUserPosts(userid)
 
-           _state.value = UiState(isLoading = true)
-            _state.value = UiState(success = false)
+          // _state.value = UiState(isLoading = true)
             try{
                 _userInfo.value = userRepository.getUserInfo(_myUserid.value)
                 _state.value = UiState(success = true)
@@ -64,18 +63,13 @@ class ProfileScreenVM @Inject constructor(
             catch (ex : Exception){
                 _state.value = UiState(message = ex.toString())
             }
-            finally {
-                _state.value = UiState(isLoading = false)
-            }
         }
     }
 
 
     fun getUserPosts(userid : Long){
         viewModelScope.launch {
-            _postState.value = UiState(isLoading = true)
-            _postState.value = UiState(success = false)
-
+           // _postState.value = UiState(isLoading = true)
             try{
                 val response = postRepository.getPostsByUserid(
                     userId = userid,
@@ -93,10 +87,6 @@ class ProfileScreenVM @Inject constructor(
             }
             catch (ex : Exception){
                 _postState.value = UiState(message = ex.toString())
-            }
-            finally {
-                _postState.value = UiState(isLoading = false)
-                _postState.value = UiState(isRefreshing = false)
             }
         }
     }

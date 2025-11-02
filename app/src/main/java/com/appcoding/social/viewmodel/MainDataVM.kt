@@ -1,5 +1,6 @@
 package com.appcoding.social.viewmodel
 
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -99,7 +100,6 @@ class MainDataVM @Inject constructor(
     private fun getStory(){
         viewModelScope.launch {
             _storyState.value = UiState(isLoading = true)
-            _storyState.value = UiState(success = false)
             try{
                 val storyRes = storyRepository.getStoryOfFollowers(_userid.value)
                 _stories.value = storyRes
@@ -109,12 +109,9 @@ class MainDataVM @Inject constructor(
             }
             catch(ex : Exception){
                _storyState.value = UiState(isLoading = false)
-                _storyState.value = UiState(success = false)
+                Log.d("before if", "_story state : ${_storyState.value.success}")
+            }
 
-            }
-            finally {
-                _storyState.value = UiState(isLoading = false)
-            }
         }
     }
 
@@ -122,7 +119,6 @@ class MainDataVM @Inject constructor(
         viewModelScope.launch {
             try {
                 _postState.value = UiState(isLoading = true)
-                _postState.value = UiState(success = false)
 
                 val postRes = postRepository.getPostsByFollowers(
                     userId = _userid.value,
@@ -138,11 +134,10 @@ class MainDataVM @Inject constructor(
 
                 _postState.value = UiState(success = true)
 
+
             } catch (e: Exception) {
                 _postState.value = UiState(message = "خطایی رخ داده است")
-            } finally {
-                _postState.value = UiState(isLoading = false)
-                _postState.value = UiState(isRefreshing = false)
+                Log.d("before if", "_post state : ${_postState.value.success}")
             }
         }
 
@@ -206,8 +201,7 @@ class MainDataVM @Inject constructor(
                         )
                         if(response.success) {
                             _isSaved.value = !_isSaved.value
-                            _saveState.value = UiState(success = true)
-                            _saveState.value = UiState(message = "با موفقیت ذخیره شد")
+                            _saveState.value = UiState(success = true, message = "با موفقیت ذخیره شد")
                         }
                         else{
                             _saveState.value = UiState(success = false, message = response.message)
@@ -225,8 +219,7 @@ class MainDataVM @Inject constructor(
                         )
                         if(response.success) {
                             _isSaved.value = !_isSaved.value
-                            _saveState.value = UiState(success = true)
-                            _saveState.value = UiState(message = "unsaved")
+                            _saveState.value = UiState(success = true, message = "unsaved")
                         }
                         else{
                             _saveState.value = UiState(success = false, message = response.message)
@@ -250,9 +243,6 @@ class MainDataVM @Inject constructor(
             }
             catch (ex : Exception){
                 _commentState.value = UiState(message = ex.toString())
-            }
-            finally {
-                _commentState.value = UiState(isLoading = false)
             }
         }
     }
@@ -279,9 +269,6 @@ class MainDataVM @Inject constructor(
             }
             catch (ex : Exception){
                 _commentState.value = UiState(message = ex.toString())
-            }
-            finally {
-                _commentState.value = UiState(isLoading = false)
             }
         }
     }

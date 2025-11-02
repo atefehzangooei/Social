@@ -64,7 +64,6 @@ class SearchPostVM @Inject constructor(
     fun getPosts(){
         viewModelScope.launch {
             val myUserid = userPreferences.getUserIdFlow().first() ?: 0L
-            _state.value = UiState(success = false)
             _state.value = UiState(isLoading = true)
             try {
                 val response = postRepository.searchPost(
@@ -83,10 +82,8 @@ class SearchPostVM @Inject constructor(
 
             } catch (e: Exception) {
                 _state.value = UiState(message = e.toString())
-                _state.value = UiState(success = false)
             } finally {
                 _searchAction.value = false
-                _state.value = UiState(isLoading = false)
             }
         }
     }

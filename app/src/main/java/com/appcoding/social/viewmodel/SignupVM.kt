@@ -42,8 +42,6 @@ class SignupVM @Inject constructor(
                 return@launch
             }
             _state.value = UiState(isLoading = true)
-
-
             try {
                 val response = userRepository.signUp(
                     SignupRequest(
@@ -57,8 +55,7 @@ class SignupVM @Inject constructor(
                         _state.value = UiState(message = "نام کاربری وارد شده تکراری است")
                     }
                     "success" -> {
-                        _state.value = UiState(success = true)
-                        _state.value = UiState(message = "حساب شما با موفقیت ایجاد شد")
+                        _state.value = UiState(success = true, message = "حساب شما با موفقیت ایجاد شد")
                     }
                     else -> {
                         _state.value = UiState(message = "نام کاربری دیگری انتخاب کنید")
@@ -66,10 +63,7 @@ class SignupVM @Inject constructor(
                 }
             } catch (e: Exception) {
                 _state.value = UiState(message = e.toString())
-            } finally {
-                _state.value = UiState(isLoading = false)
             }
-
         }
     }
 }
