@@ -77,13 +77,15 @@ class ProfileScreenVM @Inject constructor(
                     size = pageSizeProfile)
                 Log.d("myresponse", "size is ${response.size}")
 
-                if(_lastSeenId.value !!> -1)
-                    _userPosts.value += response
-                else
-                    _userPosts.value = response
+                if(response.size > 0) {
+                    if (_lastSeenId.value!! > -1)
+                        _userPosts.value += response
+                    else
+                        _userPosts.value = response
 
-                _lastSeenId.value = response.lastOrNull()?.id
-                _postState.value = UiState(success = true)
+                    _lastSeenId.value = response.lastOrNull()?.id
+                    _postState.value = UiState(success = true)
+                }
             }
             catch (ex : Exception){
                 _postState.value = UiState(message = ex.toString())
