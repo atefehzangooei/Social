@@ -2,6 +2,7 @@ package com.appcoding.social.screen.home
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -118,7 +119,8 @@ fun MainData(navController: NavHostController) {
 
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
+                    .background(Colors.background)
                     .padding(contentPadding),
                 contentAlignment = Alignment.Center
             )
@@ -129,153 +131,4 @@ fun MainData(navController: NavHostController) {
     }
 }
 
-
-@Composable
-fun CommentBottomSheet(postId : Long,
-                       viewModel: MainDataVM){
-
-    val comments by viewModel.comments.collectAsState()
-    val commentState by viewModel.commentState.collectAsState()
-    val newComment by viewModel.newComment.collectAsState()
-
-    LaunchedEffect(Unit){
-       viewModel.getComments(postId)
-    }
-
-    RightToLeftLayout {
-
-        if(commentState.isLoading){
-            Box(modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center)
-            {
-                LoadingDataProgress()
-            }
-        }
-        else {
-            Column(modifier = Modifier.fillMaxSize()) {
-
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                ) {
-                    items(comments) { comment ->
-                        CommentCard(comment)
-                    }
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .imePadding()
-                        .wrapContentHeight()
-                        .padding(Dimens.normal_padding)
-                        .drawBehind {
-                            val strokeWidth = 1.dp.toPx()
-                            drawLine(
-                                color = Color.LightGray,
-                                start = Offset(0f, 0f),
-                                end = Offset(size.width, 0f),
-                                strokeWidth = strokeWidth
-                            )
-                        },
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    val userProfile =
-                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu8Qi_EGuDWDLusHz6fyxhgaQWa6q0YsOiBH3adnqLx-6_JbLy_-ch2P3xcDxtTh-g9qY&usqp=CAU"
-
-                    AsyncImage(
-                        model = userProfile,
-                        contentDescription = "my profile",
-                        modifier = Modifier
-                            //.weight(1f)
-                            .size(Dimens.comment_user_profile)
-                            .clip(CircleShape)
-                            .align(Alignment.CenterVertically)
-                    )
-
-                    TextField(
-                        value = newComment,
-                        onValueChange = viewModel::onCommentChanged ,
-                        textStyle = MaterialTheme.typography.bodyMedium,
-                        placeholder = { Text("نظرت رو بگو") },
-                        singleLine = true,
-                        modifier = Modifier
-                            .weight(5f),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedPlaceholderColor = Colors.placeholder,
-                            unfocusedPlaceholderColor = Colors.placeholder
-
-                        )
-                    )
-
-                    if(commentState.isLoading){
-                        Box(modifier = Modifier
-                            .weight(1f)
-                            .size(Dimens.comment_user_profile),
-                            contentAlignment = Alignment.Center)
-                        {
-                            LoadingDataProgress()
-                        }
-                    }
-                    else {
-                        Icon(imageVector = Icons.Filled.Check,
-                            contentDescription = "send comment",
-                            tint = Colors.appcolor,
-                            modifier = Modifier
-                                .weight(1f)
-                                .size(Dimens.comment_user_profile)
-                                .clip(CircleShape)
-                                .align(Alignment.CenterVertically)
-                                .clickable {
-                                    if (newComment.isNotEmpty()) {
-                                        viewModel.sendComment(postId)
-                                    }
-                                }
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun CommentCard(comment: CommentResponse) {
-
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight()
-        .padding(Dimens.normal_padding)
-    ) {
-        AsyncImage(model = comment.userProfile,
-            contentDescription = "user profile",
-            modifier = Modifier
-                .size(Dimens.comment_user_profile)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(modifier = Modifier.size(10.dp))
-
-        Column(modifier = Modifier
-            .wrapContentSize()
-        ) {
-            Text(text = comment.username,
-                style = MaterialTheme.typography.titleSmall,
-                color = Color.Black)
-
-            Text(text = comment.comment,
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Black)
-        }
-    }
-
-}
 
