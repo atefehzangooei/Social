@@ -86,6 +86,7 @@ class ProfileScreenVM @Inject constructor(
                     _lastSeenId.value = response.lastOrNull()?.id
                     _postState.value = UiState(success = true)
                 }
+
             }
             catch (ex : Exception){
                 _postState.value = UiState(message = ex.toString())
