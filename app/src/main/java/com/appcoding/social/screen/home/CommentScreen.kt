@@ -94,8 +94,7 @@ fun CommentBottomSheet(postId : Long,
                         },
                     verticalAlignment = Alignment.Bottom
                 ) {
-                    val userProfile =
-                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu8Qi_EGuDWDLusHz6fyxhgaQWa6q0YsOiBH3adnqLx-6_JbLy_-ch2P3xcDxtTh-g9qY&usqp=CAU"
+                    val userProfile = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu8Qi_EGuDWDLusHz6fyxhgaQWa6q0YsOiBH3adnqLx-6_JbLy_-ch2P3xcDxtTh-g9qY&usqp=CAU"
 
                     AsyncImage(
                         model = userProfile,
@@ -128,30 +127,29 @@ fun CommentBottomSheet(postId : Long,
                         )
                     )
 
-                    if(commentState.isLoading){
-                        Box(modifier = Modifier
-                            .weight(1f)
-                            .size(Dimens.comment_user_profile),
-                            contentAlignment = Alignment.Center)
-                        {
+                    Box(modifier = Modifier
+                        .weight(1f)
+                        .size(Dimens.comment_user_profile),
+                        contentAlignment = Alignment.Center)
+                    {
+                        if (commentState.isLoading) {
                             LoadingDataProgress()
-                        }
-                    }
-                    else {
-                        Icon(imageVector = Icons.Filled.Check,
-                            contentDescription = "send comment",
-                            tint = Colors.appcolor,
-                            modifier = Modifier
-                                .weight(1f)
-                                .size(Dimens.comment_user_profile)
-                                .clip(CircleShape)
-                                .align(Alignment.CenterVertically)
-                                .clickable {
-                                    if (newComment.isNotEmpty()) {
-                                        viewModel.sendComment(postId)
+                        } else {
+                            Icon(imageVector = Icons.Filled.Check,
+                                contentDescription = "send comment",
+                                tint = Colors.appcolor,
+                                modifier = Modifier
+                                    //.weight(1f)
+                                   // .size(Dimens.comment_user_profile)
+                                    .clip(CircleShape)
+                                   // .align(Alignment.CenterVertically)
+                                    .clickable {
+                                        if (newComment.isNotEmpty()) {
+                                            viewModel.sendComment(postId)
+                                        }
                                     }
-                                }
-                        )
+                            )
+                        }
                     }
                 }
             }
