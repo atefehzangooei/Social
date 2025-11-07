@@ -17,6 +17,7 @@ import com.appcoding.social.models.LikeRequest
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.SavePostRequest
 import com.appcoding.social.models.StoryResponse
+import com.appcoding.social.models.UserStory
 import com.appcoding.social.screen.components.pageSizeHome
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +47,9 @@ class MainDataVM @Inject constructor(
 
     private val _stories = MutableStateFlow<List<StoryResponse>>(emptyList())
     val stories : StateFlow<List<StoryResponse>> = _stories
+
+    private val _userStory = MutableStateFlow<List<UserStory>>(emptyList())
+    val userStory : StateFlow<List<UserStory>> = _userStory
 
     //States
     private val _postState = MutableStateFlow(UiState())
@@ -87,17 +91,17 @@ class MainDataVM @Inject constructor(
     fun getFirst(){
         _userid.value = getUserid()
         getData()
-        getStory()
+        getStoryList()
     }
 
     fun onRefresh(){
         _postState.value = UiState(isRefreshing = true)
         _lastSeenId.value = -1
         getData()
-        getStory()
+        getStoryList()
     }
 
-    private fun getStory(){
+    private fun getStoryList(){
         viewModelScope.launch {
             _storyState.value = UiState(isLoading = true)
             try{
@@ -110,6 +114,21 @@ class MainDataVM @Inject constructor(
             catch(ex : Exception){
                _storyState.value = UiState(isLoading = false)
                 Log.d("before if", "_story state : ${_storyState.value.success}")
+            }
+
+        }
+    }
+
+    fun getUserStory(userid : Long){
+        viewModelScope.launch {
+            _storyState.value = UiState(isLoading = true)
+            try {
+                _userStory.value = storyRepository.getStoryByUserid(userid)
+
+                _storyState.value = UiState(success = true)
+            }
+            catch(ex : Exception){
+                _storyState.value = UiState(message = ex.toString())
             }
 
         }

@@ -3,6 +3,7 @@ package com.appcoding.social.data.repository
 import com.appcoding.social.data.remote.StoryRemoteRepository
 import com.appcoding.social.models.StoryResponse
 import com.appcoding.social.models.StringMessage
+import com.appcoding.social.models.UserStory
 import okhttp3.MultipartBody
 import javax.inject.Inject
 
@@ -23,7 +24,7 @@ class StoryRepository @Inject constructor(private val remoteRepository: StoryRem
         return remoteRepository.deleteStory(storyId)
     }
 
-    suspend fun getStoryByUserid(userId : Long){
+    suspend fun getStoryByUserid(userId : Long) : List<UserStory> {
         return remoteRepository.getStoryByUserid(userId)
     }
 

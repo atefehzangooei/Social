@@ -2,6 +2,7 @@ package com.appcoding.social.data.api
 
 import com.appcoding.social.models.StoryResponse
 import com.appcoding.social.models.StringMessage
+import com.appcoding.social.models.UserStory
 import okhttp3.MultipartBody
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -24,6 +25,6 @@ interface StoryApi {
     suspend fun deleteStory(@Path("storyId") storyId : Long) : StringMessage
 
     @GET("story/user/{userId}")
-    suspend fun getStoryByUserid(@Path("userId") userId : Long)
+    suspend fun getStoryByUserid(@Path("userId") userId : Long) : List<UserStory>
 
 }

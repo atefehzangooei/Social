@@ -1,9 +1,9 @@
 package com.appcoding.social.models
 
-data class StoryResponse (
-    val userId : Long,
-    val profileImage : String,
+data class UserStory(
     val username : String,
+    val profileImage : String,
+    val image : String,
     val date : String,
     val time : String,
     val duration : Int
