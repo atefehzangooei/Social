@@ -1,5 +1,6 @@
 package com.appcoding.social.screen.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -57,8 +58,8 @@ fun StoryCard(story : StoryResponse, userid : Long, navController: NavHostContro
             modifier = Modifier
                 .size(Dimens.story_home_display)
                 .clip(CircleShape)
-                .padding(1.dp)
                 .border(width = 2.dp, color = Color.Magenta, CircleShape)
+                //.padding(2.dp)
                 .clickable {
                     navController.navigate("story/${story.userId}")
                 })
