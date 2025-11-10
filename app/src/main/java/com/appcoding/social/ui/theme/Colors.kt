@@ -10,7 +10,7 @@ object Colors{
     val placeholder = Color(0x40000000)
     val add_post_button = Color(0xFF4a5df9)
     val line = Color(0x40000000)
-    val story_background = Color(0x40000000)
+    val story_background = Color(0xFF181818)
     val post_bottom = Color(0xCC000000)
     val profile_bio = Color(0xFF6c7a9c)
     //val appcolor = Color(0xFFD086C3)
