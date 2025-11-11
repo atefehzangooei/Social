@@ -11,6 +11,7 @@ import com.appcoding.social.auth.ForgetPassword
 import com.appcoding.social.auth.SignIn
 import com.appcoding.social.auth.SignUp
 import com.appcoding.social.screen.home.MainData
+import com.appcoding.social.screen.home.StoryPager
 import com.appcoding.social.screen.home.StoryViewer
 import com.appcoding.social.screen.profile.ProfileScreen
 import com.appcoding.social.splash.Splash
@@ -19,7 +20,7 @@ import com.appcoding.social.splash.Splash
 @Composable
 fun AppNavHost(navController: NavHostController, startDestination : String = "splash")
 {
-    NavHost(navController = navController, startDestination = startDestination){
+    NavHost(navController = navController, startDestination = startDestination, route = "nav_graph"){
         composable("splash"){ Splash(navController) }
         composable("signin"){ SignIn(navController) }
         composable("signup"){ SignUp(navController) }
@@ -32,7 +33,7 @@ fun AppNavHost(navController: NavHostController, startDestination : String = "sp
             arguments = listOf(navArgument("userid") { type = NavType.LongType })
         ) { backStackEntry ->
             val userid = backStackEntry.arguments!!.getLong("userid")
-            StoryViewer(userid)
+            StoryPager(userid, backStackEntry)
         }
 
         composable(

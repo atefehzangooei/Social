@@ -49,6 +49,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
@@ -96,7 +98,9 @@ fun StoryCard(story : StoryResponse, userid : Long, navController: NavHostContro
 
 
 @Composable
-fun StoryPager(userid : Long, viewModel : MainDataVM){
+fun StoryPager(userid : Long){
+
+    val viewModel : MainDataVM = hiltViewModel()
 
     val stories by viewModel.stories.collectAsState()
     val pagerState = rememberPagerState(initialPage = 0, pageCount = {stories.size})
