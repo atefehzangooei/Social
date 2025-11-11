@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -97,7 +98,25 @@ fun StoryCard(story : StoryResponse, userid : Long, navController: NavHostContro
 @Composable
 fun StoryPager(userid : Long, viewModel : MainDataVM){
 
-    val storyList by viewmodel
+    val stories by viewModel.stories.collectAsState()
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = {stories.size})
+
+
+    LaunchedEffect(pagerState.currentPage) {
+            delay(stories[pagerState.currentPage].duration.toLong())
+            if (pagerState.currentPage < stories.lastIndex) {
+                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+            }
+        }
+
+
+    HorizontalPager(
+        state = pagerState,
+        modifier = Modifier.fillMaxSize()
+    ) { page ->
+        StoryViewer(stories[page].userId)
+    }
+
 }
 
 @Composable
@@ -109,20 +128,9 @@ fun StoryViewer(userid: Long){
 
     val snackbarHostState = remember { SnackbarHostState()}
     val snackeScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(initialPage = 0, pageCount = {userStory.size})
 
     LaunchedEffect(Unit){
         viewModel.getUserStory(userid)
-    }
-
-
-    LaunchedEffect(pagerState.currentPage) {
-        if(storyState.success) {
-            delay(userStory[pagerState.currentPage].duration.toLong())
-            if (pagerState.currentPage < userStory.lastIndex) {
-                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-            }
-        }
     }
 
     LaunchedEffect(storyState.message) {
@@ -133,7 +141,7 @@ fun StoryViewer(userid: Long){
         }
     }
 
-   // val activeIndex by remember { mutableStateOf(0) }
+    var activeIndex by remember { mutableStateOf(0) }
 
     Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState)})
     { contentpadding ->
@@ -149,15 +157,12 @@ fun StoryViewer(userid: Long){
             if (storyState.isLoading) {
                 LoadingDataProgress()
             } else if (storyState.success) {
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier.fillMaxSize()
-                ) { page ->
 
+                if(activeIndex< userStory.size){
                     Box(modifier = Modifier.fillMaxSize()
                     ) {
                         AsyncImage(
-                            model = userStory[page].image,
+                            model = userStory[activeIndex].image,
                             contentDescription = "story",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
@@ -169,17 +174,16 @@ fun StoryViewer(userid: Long){
                                 .padding(2.dp)
                         ) {
 
-                            RowDurationProgress(
-                                userStory.size,
-                                userStory[0].duration * 1000L,
-                                page
+                            activeIndex = (RowDurationProgress(
+                                    userStory.size,
+                                    userStory[0].duration * 1000L,
+                                    activeIndex
+                                )
                             )
                             RowUserInfo(userStory[0].profileImage, userStory[0].username)
                         }
                     }
                 }
-
-
             }
         }
     }
@@ -222,11 +226,10 @@ fun RowUserInfo(profileImage : String, username : String) {
 @Composable
 fun RowDurationProgress(storyCount : Int,
                         duration : Long,
-                        activeIndex : Int) {  //duration = milliseconds
-    //val progressSize = screenWidth() / storyCount
+                        activeIndex : Int) : Int{  //duration = milliseconds
 
-   // var activeIndex by remember { mutableStateOf(0) }
-    var progress by remember { mutableStateOf(0f) }  //float
+    var progress by remember { mutableFloatStateOf(0f) }  //float
+    var activeIndexB = activeIndex
 
     LaunchedEffect(activeIndex) {
         if (activeIndex < storyCount) {
@@ -239,7 +242,9 @@ fun RowDurationProgress(storyCount : Int,
                 delay(delayPerStep)
             }
             progress = 1f
-           // activeIndex++
+            activeIndexB++
+
+
         }
     }
 
@@ -268,6 +273,7 @@ fun RowDurationProgress(storyCount : Int,
             )
         }
     }
+    return activeIndex
 }
 
 
