@@ -33,7 +33,7 @@ fun AppNavHost(navController: NavHostController, startDestination : String = "sp
             arguments = listOf(navArgument("userid") { type = NavType.LongType })
         ) { backStackEntry ->
             val userid = backStackEntry.arguments!!.getLong("userid")
-            StoryPager(userid, backStackEntry)
+            StoryPager(userid, navController)
         }
 
         composable(

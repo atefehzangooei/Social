@@ -60,7 +60,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainData(navController: NavHostController) {
 
-    val viewModel: MainDataVM = hiltViewModel()
+    val parentEntry = remember(navController.currentBackStackEntry){
+        navController.getBackStackEntry("nav_graph")
+    }
+
+    val viewModel: MainDataVM = hiltViewModel(parentEntry)
 
     val posts by viewModel.posts.collectAsState()
     val stories by viewModel.stories.collectAsState()

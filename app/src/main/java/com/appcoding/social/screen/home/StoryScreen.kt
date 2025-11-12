@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -98,11 +99,23 @@ fun StoryCard(story : StoryResponse, userid : Long, navController: NavHostContro
 
 
 @Composable
-fun StoryPager(userid : Long){
+fun StoryPager(userid: Long, navController: NavHostController){
 
-    val viewModel : MainDataVM = hiltViewModel()
+    val parentEntry = remember(navController.currentBackStackEntry) {
+        navController.getBackStackEntry("nav_graph")
+    }
+
+    val viewModel : MainDataVM = hiltViewModel(parentEntry)
 
     val stories by viewModel.stories.collectAsState()
+    val userStory by viewModel.userStory.collectAsState()
+    val storyState by viewModel.storyState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState()}
+    val snackeScope = rememberCoroutineScope()
+    var pagerIndex by remember{ mutableStateOf(0) }
+
+
+
     val pagerState = rememberPagerState(initialPage = 0, pageCount = {stories.size})
 
 
@@ -110,31 +123,10 @@ fun StoryPager(userid : Long){
             delay(stories[pagerState.currentPage].duration.toLong())
             if (pagerState.currentPage < stories.lastIndex) {
                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                pagerIndex = pagerState.currentPage + 1
             }
-        }
+        viewModel.getUserStory(stories[pagerIndex].userId)
 
-
-    HorizontalPager(
-        state = pagerState,
-        modifier = Modifier.fillMaxSize()
-    ) { page ->
-        StoryViewer(stories[page].userId)
-    }
-
-}
-
-@Composable
-fun StoryViewer(userid: Long){
-
-    val viewModel : MainDataVM = hiltViewModel()
-    val storyState by viewModel.storyState.collectAsState()
-    val userStory by viewModel.userStory.collectAsState()
-
-    val snackbarHostState = remember { SnackbarHostState()}
-    val snackeScope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit){
-        viewModel.getUserStory(userid)
     }
 
     LaunchedEffect(storyState.message) {
@@ -145,23 +137,41 @@ fun StoryViewer(userid: Long){
         }
     }
 
-    var activeIndex by remember { mutableStateOf(0) }
+
+    Log.d("story size", "story size = ${stories.size}")
+
 
     Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState)})
     { contentpadding ->
 
-        Box(
+        HorizontalPager(
+            state = pagerState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentpadding)
+        ) { page ->
+            Log.d("page", "page = $page")
+            if (storyState.isLoading) {
+                LoadingDataProgress()
+            } else if (storyState.success) {
+                StoryViewer(stories[page].userId, userStory)
+            }
+        }
+    }
+}
+
+@Composable
+fun StoryViewer(userid: Long, userStory : List<UserStory>){
+
+    var activeIndex by remember { mutableStateOf(0) }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
                 .background(Colors.story_background),
             contentAlignment = Alignment.Center
         )
         {
-            if (storyState.isLoading) {
-                LoadingDataProgress()
-            } else if (storyState.success) {
-
                 if(activeIndex< userStory.size){
                     Box(modifier = Modifier.fillMaxSize()
                     ) {
@@ -188,8 +198,6 @@ fun StoryViewer(userid: Long){
                         }
                     }
                 }
-            }
-        }
     }
 }
 
@@ -198,7 +206,7 @@ fun RowUserInfo(profileImage : String, username : String) {
 
     Row(modifier = Modifier
         .fillMaxWidth()
-        .padding(vertical = 15.dp)
+        .padding(15.dp)
     ){
         AsyncImage(model = profileImage,
             contentDescription = "profile",
@@ -207,6 +215,8 @@ fun RowUserInfo(profileImage : String, username : String) {
                 .size(Dimens.home_profile_image_size)
                 .clip(CircleShape)
         )
+
+        Spacer(modifier = Modifier.size(10.dp))
 
         Text(text = username,
             style = TextStyle(
