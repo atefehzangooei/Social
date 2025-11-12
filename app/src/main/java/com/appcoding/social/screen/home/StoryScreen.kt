@@ -123,9 +123,9 @@ fun StoryPager(userid: Long, navController: NavHostController){
             delay(stories[pagerState.currentPage].duration.toLong())
             if (pagerState.currentPage < stories.lastIndex) {
                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                pagerIndex = pagerState.currentPage + 1
             }
-        viewModel.getUserStory(stories[pagerIndex].userId)
+        Log.d("page", "page index = ${pagerState.currentPage}")
+        viewModel.getUserStory(stories[pagerState.currentPage].userId)
 
     }
 
