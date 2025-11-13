@@ -40,6 +40,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -50,6 +51,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -282,95 +284,113 @@ fun  AddPostScreen(onBack: () -> Unit) {
 
         Box(modifier = Modifier.fillMaxSize()) {
 
-            Row(modifier = Modifier
-                .width(screenWidth() / 2)
-                .wrapContentHeight()
-                .background(Color.Black)
-                .padding(10.dp)
-                .align(Alignment.BottomStart)
-            ){
-
-            }
-            Column(
+            Row(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .width(screenWidth() / 2)
+                    .wrapContentHeight()
+                    .padding(20.dp)
                     .background(Color.Black)
-            )
-            {
-                Row(
+                    .padding(10.dp)
+                    .align(Alignment.BottomStart)
+                    .clip(RoundedCornerShape(Dimens.add_post_corner)),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(onClick = {}) {
+
+                    Text(text = "Post",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White)
+                }
+
+                TextButton(onClick = {}) {
+                    Text(text = "Story",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White)
+                }
+            }
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(Dimens.normal_padding),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .fillMaxSize()
+                        .background(Color.Black)
                 )
                 {
                     Row(
                         modifier = Modifier
-                            .wrapContentSize()
+                            .fillMaxWidth()
                             .padding(Dimens.normal_padding),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     )
                     {
-                        Icon(painter = painterResource(R.drawable.close),
-                            contentDescription = "close",
-                            tint = Color.White,
+                        Row(
                             modifier = Modifier
-                                .size(20.dp)
-                                .clickable { onBack() })
+                                .wrapContentSize()
+                                .padding(Dimens.normal_padding),
+                            verticalAlignment = Alignment.CenterVertically
+                        )
+                        {
+                            Icon(painter = painterResource(R.drawable.close),
+                                contentDescription = "close",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .clickable { onBack() })
 
-                        Spacer(modifier = Modifier.size(10.dp))
+                            Spacer(modifier = Modifier.size(10.dp))
+
+                            Text(
+                                text = "پست جدید",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
 
                         Text(
-                            text = "پست جدید",
+                            text = "بعدی",
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = Colors.next_color,
+                            modifier = Modifier.clickable { next = true }
                         )
+
                     }
 
-                    Text(
-                        text = "بعدی",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Colors.next_color,
-                        modifier = Modifier.clickable { next = true }
-                    )
-
-                }
-
-                selectedImageUri?.let { uri ->
-                    Image(
-                        painter = rememberAsyncImagePainter(uri),
-                        contentDescription = "main image",
-                        modifier = Modifier.size(screenWidth()),
-                        contentScale = ContentScale.Crop
-                    )
-
-
-                }
-
-
-
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(4),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(images) { imageUri ->
-
+                    selectedImageUri?.let { uri ->
                         Image(
-                            modifier = Modifier
-                                .padding(1.dp)
-                                .aspectRatio(1f)
-                                .clickable {
-                                    selectedImageUri = imageUri
-                                },
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            painter = rememberAsyncImagePainter(model = imageUri)
+                            painter = rememberAsyncImagePainter(uri),
+                            contentDescription = "main image",
+                            modifier = Modifier.size(screenWidth()),
+                            contentScale = ContentScale.Crop
                         )
+
+
+                    }
+
+
+
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(4),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(images) { imageUri ->
+
+                            Image(
+                                modifier = Modifier
+                                    .padding(1.dp)
+                                    .aspectRatio(1f)
+                                    .clickable {
+                                        selectedImageUri = imageUri
+                                    },
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                painter = rememberAsyncImagePainter(model = imageUri)
+                            )
+                        }
                     }
                 }
-            }
         }
         if(next){
             AddPostScreenNext(onBack = {next = false}, selectedImageUri = selectedImageUri)
