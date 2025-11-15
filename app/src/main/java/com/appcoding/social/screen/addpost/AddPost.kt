@@ -45,6 +45,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,25 +60,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.appcoding.social.R
 import com.appcoding.social.screen.components.RightToLeftLayout
 import com.appcoding.social.screen.components.screenWidth
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
+import com.appcoding.social.viewmodel.AddPostVM
 
 
 @Composable
 fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
 
-    val context = LocalContext.current
-    val imageSize = screenWidth() / 2 +20.dp
-    var neveshtak by remember { mutableStateOf("") }
+    val viewModel : AddPostVM = viewModel()
 
-    var isUploading by remember { mutableStateOf(false) }
-    var toastMessage by remember { mutableStateOf("") }
-    var uploadComplete by remember { mutableStateOf(false) }
-
+    val neveshtak by viewModel.neveshtak.collectAsState()
 
     BackHandler(enabled = true) {
         onBack()
@@ -97,100 +96,15 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
                 verticalArrangement = Arrangement.Top
             )
             {
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(Dimens.normal_padding),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                )
-                {
-                    Text(
-                        text = "پست جدید",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-
-                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = "BackToAddPostScreen",
-                        modifier = Modifier
-                            .size(30.dp)
-                            .clickable { onBack() })
-                }
-
+                NextTopBar(onBack)
                 Spacer(modifier = Modifier.size(20.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(selectedImageUri),
-                        contentDescription = "ImagePost",
-                        modifier = Modifier
-                            .size(imageSize),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-
-                TextField(
-                    value = neveshtak,
-                    onValueChange = { neveshtak = it },
-                    placeholder = { Text("یه نوشتک قشنگ بذار") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedPlaceholderColor = Colors.placeholder,
-                        unfocusedPlaceholderColor = Colors.placeholder
-                    )
-
-                )
+                NextDisplaySelectedImage(selectedImageUri)
+                NeveshtakTextField(neveshtak, viewModel)
             }
 
-
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White),
-                verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.CenterHorizontally)
-            {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .height((0.5).dp)
-                    .background(Colors.line))
-
-                Button(onClick = {
-                    /*  if(neveshtak.isNotEmpty() && selectedImageUri != null) {
-                          isUploading = true
-                          selectedImageUri.let {safeUri ->
-                              val imageFile = uriToFile(safeUri, context)
-                              uploadPost(neveshtak, imageFile, apiService) { success, message ->
-                                  isUploading = false
-                                  uploadComplete = true
-                                  toastMessage = message
-                              }
-                          }
-
-                      }*/
-
-                },
-                    modifier = Modifier.width(imageSize),
-                    shape = RoundedCornerShape(Dimens.button_corner),
-                    colors = ButtonDefaults.buttonColors(
-                        contentColor = Color.White,
-                        containerColor = Colors.add_post_button
-                    )) {
-                    Text("اشتراک گذاری")
-                }
+            if(selectedImageUri != null) {
+                SharePost(neveshtak, viewModel)
             }
-
 
         }
     }
@@ -201,6 +115,101 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
             Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show()
             uploadComplete = false
         }
+    }
+}
+
+@Composable
+fun NeveshtakTextField(neveshtak : String, viewModel:AddPostVM) {
+
+    TextField(
+        value = neveshtak,
+        onValueChange = viewModel::onNeveshtakChanged,
+        placeholder = { Text("یه نوشتک قشنگ بذار") },
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedPlaceholderColor = Colors.placeholder,
+            unfocusedPlaceholderColor = Colors.placeholder
+        )
+
+    )
+}
+
+@Composable
+fun SharePost(neveshtak: String, viewModel: AddPostVM) {
+
+    val state by viewModel.state.collectAsState()
+
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(Color.White),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally)
+    {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height((0.5).dp)
+            .background(Colors.line))
+
+        Button(onClick = { viewModel.sharePost()},
+            modifier = Modifier.width(imageSize),
+            shape = RoundedCornerShape(Dimens.button_corner),
+            colors = ButtonDefaults.buttonColors(
+                contentColor = Color.White,
+                containerColor = Colors.add_post_button
+            )) {
+            Text("اشتراک گذاری")
+        }
+    }
+}
+
+@Composable
+fun NextDisplaySelectedImage(selectedImageUri: Uri?) {
+
+    val imageSize = screenWidth() / 2 +20.dp
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(selectedImageUri),
+            contentDescription = "ImagePost",
+            modifier = Modifier
+                .size(imageSize),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+
+@Composable
+fun NextTopBar(onBack: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(Dimens.normal_padding),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    )
+    {
+        Text(
+            text = "پست جدید",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+
+        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+            contentDescription = "BackToAddPostScreen",
+            modifier = Modifier
+                .size(30.dp)
+                .clickable { onBack() })
     }
 }
 
@@ -416,8 +425,6 @@ fun getGalleryImages(context: Context): List<Uri> {
         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
         projection,
         null,
-
-
         null,
         sortOrder
     )?.use { cursor ->
