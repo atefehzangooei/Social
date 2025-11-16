@@ -65,10 +65,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.appcoding.social.R
 import com.appcoding.social.screen.components.RightToLeftLayout
+import com.appcoding.social.screen.components.checkReadPermission
 import com.appcoding.social.screen.components.screenWidth
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.viewmodel.AddPostVM
+import com.appcoding.social.viewmodel.UiState
 
 
 @Composable
@@ -101,21 +103,18 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
                 NextDisplaySelectedImage(selectedImageUri)
                 NeveshtakTextField(neveshtak, viewModel)
             }
-
-            if(selectedImageUri != null) {
-                SharePost(neveshtak, viewModel)
-            }
+            sharePost(neveshtak, selectedImageUri, viewModel)
 
         }
     }
 
-    LaunchedEffect(toastMessage){
+   /* LaunchedEffect(toastMessage){
         if(uploadComplete) {
             neveshtak = toastMessage
             Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show()
             uploadComplete = false
         }
-    }
+    }*/
 }
 
 @Composable
@@ -141,9 +140,14 @@ fun NeveshtakTextField(neveshtak : String, viewModel:AddPostVM) {
 }
 
 @Composable
-fun SharePost(neveshtak: String, viewModel: AddPostVM) {
+fun sharePost(
+    neveshtak: String,
+    selectedImageUri : Uri?,
+    viewModel: AddPostVM) : UiState {
 
+    val imageSize = screenWidth() / 2 +20.dp
     val state by viewModel.state.collectAsState()
+
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -156,7 +160,7 @@ fun SharePost(neveshtak: String, viewModel: AddPostVM) {
             .height((0.5).dp)
             .background(Colors.line))
 
-        Button(onClick = { viewModel.sharePost()},
+        Button(onClick = { viewModel.sharePost(neveshtak, selectedImageUri) },
             modifier = Modifier.width(imageSize),
             shape = RoundedCornerShape(Dimens.button_corner),
             colors = ButtonDefaults.buttonColors(
@@ -166,6 +170,8 @@ fun SharePost(neveshtak: String, viewModel: AddPostVM) {
             Text("اشتراک گذاری")
         }
     }
+
+    return state
 }
 
 @Composable
@@ -213,36 +219,6 @@ fun NextTopBar(onBack: () -> Unit) {
     }
 }
 
-/*
-private fun uploadPost(neveshtak : String, imageFile : File,
-                       apiService : ApiService, callback : (Boolean, String) -> Unit){
-    val textPart = neveshtak.toRequestBody("text/plain".toMediaTypeOrNull())
-    val imagePart = MultipartBody.Part.createFormData(
-        "image",
-        imageFile.name,
-        imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
-    )
-
-    apiService.addPost(imagePart,textPart).enqueue(object : retrofit2.Callback<String> {
-        override fun onResponse(call: Call<String>, response: Response<String>) {
-            if(response.isSuccessful){
-                callback(true, "upload successfully")
-            }
-            else {
-                if(response.body()!=null) {
-                        callback(false, response.body()!!)
-                }
-            }
-        }
-
-        override fun onFailure(call: Call<String>, t: Throwable) {
-            callback(false, "message is : ${t.message}")
-
-        }
-    })
-}
-
-*/
 
 @Composable
 fun  AddPostScreen(onBack: () -> Unit) {
@@ -262,13 +238,7 @@ fun  AddPostScreen(onBack: () -> Unit) {
         }
     }
 
-
-    val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        android.Manifest.permission.READ_MEDIA_IMAGES
-    } else {
-        android.Manifest.permission.READ_EXTERNAL_STORAGE
-    }
-
+    val permission = checkReadPermission()
 
     LaunchedEffect(Unit) {
         if (ContextCompat.checkSelfPermission(context, permission)
@@ -287,7 +257,6 @@ fun  AddPostScreen(onBack: () -> Unit) {
     BackHandler(enabled = true) {
         onBack()
     }
-
 
     RightToLeftLayout {
 
@@ -311,6 +280,7 @@ fun  AddPostScreen(onBack: () -> Unit) {
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White)
+
                 }
 
                 TextButton(onClick = {}) {
