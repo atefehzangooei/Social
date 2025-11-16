@@ -14,7 +14,7 @@ interface PostApi {
 
     @Multipart
     @POST("posts/upload")
-    fun addPost(@Part image : MultipartBody.Part,
+    fun uploadPost(@Part image : MultipartBody.Part,
                 @Part("post") post : PostRequest
     ) : Call<String>
 

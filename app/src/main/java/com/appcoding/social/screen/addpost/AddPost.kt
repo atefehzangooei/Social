@@ -160,7 +160,7 @@ fun sharePost(
             .height((0.5).dp)
             .background(Colors.line))
 
-        Button(onClick = { viewModel.sharePost(neveshtak, selectedImageUri) },
+        Button(onClick = { sharePost(neveshtak, selectedImageUri) },
             modifier = Modifier.width(imageSize),
             shape = RoundedCornerShape(Dimens.button_corner),
             colors = ButtonDefaults.buttonColors(
@@ -173,6 +173,8 @@ fun sharePost(
 
     return state
 }
+
+
 
 @Composable
 fun NextDisplaySelectedImage(selectedImageUri: Uri?) {

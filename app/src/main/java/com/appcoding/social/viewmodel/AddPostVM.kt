@@ -4,13 +4,17 @@ import android.content.Context
 import android.net.Uri
 import android.os.FileUtils
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.appcoding.social.data.api.PostApi
 import com.appcoding.social.data.repository.PostRepository
+import com.appcoding.social.screen.addpost.UploadProgressRequestBody
 import com.appcoding.social.screen.components.MyFileUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,7 +41,6 @@ class AddPostVM @Inject constructor(
                 _state.value = UiState(message = "برای پست خود یک نوشتک زیبا بنویس")
             }
             else {
-                _state.value = UiState(isLoading = true)
                     selectedImageUri.let { safeUri ->
                         val imageFile = myFileUtils.uriToFile(safeUri)
                         uploadPost(neveshtak, imageFile) { success, message ->
@@ -50,9 +53,27 @@ class AddPostVM @Inject constructor(
         }
     }
 
+    private fun uploadPost(neveshtak : String, imageFile : File){
+        viewModelScope.launch {
+            try{
+                _state.value = UiState(isUploading = true, progress = 0)
+                val requestBody = UploadProgressRequestBody(
+                    file = imageFile,
+                    contentType = "image/jpeg",
+                    onProgress = {
 
- fun uploadPost(neveshtak : String, imageFile : File,
-                       apiService : ApiService, callback : (Boolean, String) -> Unit){
+                    }
+                )
+
+            }
+            catch(ex : Exception){
+                _state.value = UiState(progress = 0, message = ex.toString())
+            }
+        }
+    }
+
+ fun uploadPost1(neveshtak : String, imageFile : File,
+                apiService : ApiService, callback : (Boolean, String) -> Unit){
     val textPart = neveshtak.toRequestBody("text/plain".toMediaTypeOrNull())
     val imagePart = MultipartBody.Part.createFormData(
         "image",

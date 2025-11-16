@@ -5,6 +5,6 @@ data class UiState(
     val success : Boolean = false,
     val message : String = "",
     val isRefreshing : Boolean = false,
-){
-    fun setLoading(value : Boolean) = this.copy(isLoading = value, success = false, isRefreshing = false)
-}
+    val progress : Int = 0,
+    val isUploading : Boolean = false
+)
