@@ -61,6 +61,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
@@ -77,7 +78,7 @@ import com.appcoding.social.viewmodel.UiState
 @Composable
 fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
 
-    val viewModel : AddPostVM = viewModel()
+    val viewModel : AddPostVM = hiltViewModel()
 
     val neveshtak by viewModel.neveshtak.collectAsState()
     val state by viewModel.state.collectAsState()

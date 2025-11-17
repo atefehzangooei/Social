@@ -65,7 +65,7 @@ class AddPostVM @Inject constructor(
         viewModelScope.launch {
             val post = PostRequest(
                 userId = userPreferences.getUserIdFlow().first() ?: 0L,
-                neveshtak = neveshtak,
+                caption = neveshtak,
                 date = "",
                 time = ""
                 )
@@ -100,7 +100,6 @@ class AddPostVM @Inject constructor(
                     isUploading = false,
                     progress = 100,
                     success = true,
-                    message = response.message
                 )
 
             } catch (e: Exception) {
