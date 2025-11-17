@@ -2,7 +2,9 @@ package com.appcoding.social.data.api
 
 import com.appcoding.social.models.PostRequest
 import com.appcoding.social.models.PostResponse
+import com.appcoding.social.models.StringMessage
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Multipart
@@ -14,9 +16,9 @@ interface PostApi {
 
     @Multipart
     @POST("posts/upload")
-    fun uploadPost(@Part image : MultipartBody.Part,
-                @Part("post") post : PostRequest
-    ) : Call<String>
+    suspend fun uploadPost(@Part image : MultipartBody.Part,
+                @Part("post") post : RequestBody
+    ) : PostResponse
 
     @GET("posts/follower/{userId}/{lastSeenId}/{size}")
     suspend fun getPostsByFollowers(@Path("userId") userId : Long,

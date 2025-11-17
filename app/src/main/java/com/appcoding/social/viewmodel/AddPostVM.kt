@@ -1,26 +1,33 @@
 package com.appcoding.social.viewmodel
 
-import android.content.Context
 import android.net.Uri
-import android.os.FileUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appcoding.social.data.api.PostApi
 import com.appcoding.social.data.repository.PostRepository
+import com.appcoding.social.models.PostRequest
 import com.appcoding.social.screen.addpost.UploadProgressRequestBody
 import com.appcoding.social.screen.components.MyFileUtils
+import com.appcoding.social.screen.components.UserPreferences
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class AddPostVM @Inject constructor(
     private val myFileUtils: MyFileUtils,
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    private val userPreferences: UserPreferences
 ): ViewModel() {
 
     private val _neveshtak = MutableStateFlow("")
@@ -43,35 +50,92 @@ class AddPostVM @Inject constructor(
             else {
                     selectedImageUri.let { safeUri ->
                         val imageFile = myFileUtils.uriToFile(safeUri)
-                        uploadPost(neveshtak, imageFile) { success, message ->
-                            isUploading = false
-                            uploadComplete = true
-                            toastMessage = message
-                        }
+                        uploadPost(neveshtak, imageFile)
                     }
             }
         }
     }
 
-    private fun uploadPost(neveshtak : String, imageFile : File){
+
+    private fun uploadPost(neveshtak: String, imageFile: File) {
+
+        // جلوگیری از آپلود دوباره وسط کار
+        if (_state.value.isUploading) return
+
         viewModelScope.launch {
-            try{
-                _state.value = UiState(isUploading = true, progress = 0)
+            val post = PostRequest(
+                userId = userPreferences.getUserIdFlow().first() ?: 0L,
+                neveshtak = neveshtak,
+                date = "",
+                time = ""
+                )
+
+            try {
+                _state.value = UiState(isUploading = true)
+
+                // PostRequest → JSON
+                val json = Gson().toJson(post)
+                val postPart = json.toRequestBody("application/json".toMediaType())
+
+                // Image با Progress
                 val requestBody = UploadProgressRequestBody(
                     file = imageFile,
-                    contentType = "image/jpeg",
-                    onProgress = {
-
+                    contentType = "image/jpeg".toMediaTypeOrNull(),
+                    onProgress = { percent ->
+                        _state.value = _state.value.copy(progress = percent)
                     }
                 )
 
-            }
-            catch(ex : Exception){
-                _state.value = UiState(progress = 0, message = ex.toString())
+                // image file → Multipart
+                val imagePart = MultipartBody.Part.createFormData(
+                    name = "image",
+                    filename = imageFile.name,
+                    body = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                )
+
+                // API call
+                val response = postRepository.uploadPost(imagePart, postPart)
+
+                _state.value = UiState(
+                    isUploading = false,
+                    progress = 100,
+                    success = true,
+                    message = response.message
+                )
+
+            } catch (e: Exception) {
+                _state.value = UiState(
+                    isUploading = false,
+                    success = false,
+                    progress = 0,
+                    message = e.toString()
+                )
             }
         }
     }
 
+
+    /*  private fun uploadPost(neveshtak : String, imageFile : File){
+          viewModelScope.launch {
+              try{
+                  _state.value = UiState(isUploading = true, progress = 0)
+                  val requestBody = UploadProgressRequestBody(
+                      file = imageFile,
+                      contentType = "image/jpeg",
+                      onProgress = {
+
+
+                      }
+                  )
+
+              }
+              catch(ex : Exception){
+                  _state.value = UiState(progress = 0, message = ex.toString())
+              }
+          }
+      }*/
+
+    /*
  fun uploadPost1(neveshtak : String, imageFile : File,
                 apiService : ApiService, callback : (Boolean, String) -> Unit){
     val textPart = neveshtak.toRequestBody("text/plain".toMediaTypeOrNull())
@@ -99,6 +163,6 @@ class AddPostVM @Inject constructor(
         }
     })
 }
-
+*/
 
 }

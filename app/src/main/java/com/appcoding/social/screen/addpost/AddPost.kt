@@ -38,6 +38,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -79,6 +80,7 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
     val viewModel : AddPostVM = viewModel()
 
     val neveshtak by viewModel.neveshtak.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     BackHandler(enabled = true) {
         onBack()
@@ -104,6 +106,15 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
                 NeveshtakTextField(neveshtak, viewModel)
             }
             sharePost(neveshtak, selectedImageUri, viewModel)
+
+            if(state.isUploading){
+                LinearProgressIndicator(
+                    progress = { state.progress / 100f },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Center)
+                )
+            }
 
         }
     }
@@ -145,7 +156,7 @@ fun sharePost(
     selectedImageUri : Uri?,
     viewModel: AddPostVM) : UiState {
 
-    val imageSize = screenWidth() / 2 +20.dp
+    val imageSize = screenWidth() / 2 + 20.dp
     val state by viewModel.state.collectAsState()
 
 
@@ -160,7 +171,7 @@ fun sharePost(
             .height((0.5).dp)
             .background(Colors.line))
 
-        Button(onClick = { sharePost(neveshtak, selectedImageUri) },
+        Button(onClick = { viewModel.sharePost(neveshtak, selectedImageUri) },
             modifier = Modifier.width(imageSize),
             shape = RoundedCornerShape(Dimens.button_corner),
             colors = ButtonDefaults.buttonColors(

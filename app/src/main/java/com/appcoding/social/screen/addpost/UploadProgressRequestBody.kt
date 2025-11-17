@@ -9,27 +9,27 @@ import java.io.FileInputStream
 
 class UploadProgressRequestBody(
     private val file: File,
-    private val contentType: String = "image/jpeg",
+    private val contentType: MediaType?,
     private val onProgress: (Int) -> Unit
 ) : RequestBody() {
 
-    override fun contentType(): MediaType? = contentType.toMediaTypeOrNull()
+    override fun contentType(): MediaType? = contentType
 
     override fun contentLength(): Long = file.length()
 
     override fun writeTo(sink: BufferedSink) {
+        val length = contentLength()
         val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-        val total = contentLength()
+        val input = file.inputStream()
         var uploaded = 0L
+        var read: Int
 
-        FileInputStream(file).use { input ->
-            var read: Int
+        input.use {
             while (input.read(buffer).also { read = it } != -1) {
-                // اگر coroutine/شبکه لغو شود، IOException یا InterruptedException ممکنه بیاد
-                sink.write(buffer, 0, read)
                 uploaded += read
-                val percent = ((uploaded * 100) / total).toInt()
-                onProgress(percent.coerceIn(0, 100))
+                sink.write(buffer, 0, read)
+                val progress = (uploaded * 100 / length).toInt()
+                onProgress(progress)
             }
         }
     }
