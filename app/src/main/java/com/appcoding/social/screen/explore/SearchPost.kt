@@ -183,7 +183,7 @@ fun DisplayStaggeredList(posts : List<PostResponse>){
     ) {
         itemsIndexed(items = posts
         ){ index  ,post ->
-            /* AsyncImage(
+             AsyncImage(
                  model = ColorPainter(Color(android.graphics.Color.parseColor(post.image))),
                  contentDescription = "post cover",
                  modifier = Modifier
@@ -193,8 +193,8 @@ fun DisplayStaggeredList(posts : List<PostResponse>){
                          if(index % 10 in listOf(0,7)) 0.5f else 1f
                      ),
                  contentScale = ContentScale.Crop
-             )*/
-
+             )
+/*
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(android.graphics.Color.parseColor(post.image)))
@@ -204,7 +204,7 @@ fun DisplayStaggeredList(posts : List<PostResponse>){
                 )
                 .clickable {  }
 
-            )
+            )*/
 
         }
     }

@@ -47,12 +47,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.screen.components.RightToLeftLayout
 import com.appcoding.social.ui.theme.Colors
@@ -121,7 +123,7 @@ fun DisplaySearchPosts(index : Int, searchText : String){
 
             Spacer(modifier = Modifier.size(20.dp))
 
-           /* AsyncImage(
+            AsyncImage(
                 model = post.image,
                 contentDescription = "post cover",
                 modifier = Modifier
@@ -131,15 +133,15 @@ fun DisplaySearchPosts(index : Int, searchText : String){
                         if (index % 10 in listOf(0, 7)) 0.5f else 1f
                     ),
                 contentScale = ContentScale.Crop
-            )*/
-            
+            )
+            /*
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Red)
                 .aspectRatio(1f)
                 //.background(Color(android.graphics.Color.parseColor(post.image))),
                 )
-
+*/
 
         }
     }
