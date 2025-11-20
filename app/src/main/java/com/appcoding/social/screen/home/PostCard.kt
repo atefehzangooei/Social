@@ -1,5 +1,6 @@
 package com.appcoding.social.screen.home
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -64,9 +65,6 @@ fun PostCard(post : PostResponse,
     val likeCount by viewModel.likeCount.collectAsState()
     val commentCount by viewModel.commentCount.collectAsState()
 
-    val likeScope = rememberCoroutineScope()
-    val saveScope = rememberCoroutineScope()
-
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var commentSheetState by remember { mutableStateOf(false) }
 
@@ -78,6 +76,8 @@ fun PostCard(post : PostResponse,
         }
 
         Column(modifier = Modifier.wrapContentSize()) {
+
+            Log.d("post","post image = ${post.image}")
 
             PostCard_ProfileInfo(post, navController)
             PostCard_LoadImage(post.image)
