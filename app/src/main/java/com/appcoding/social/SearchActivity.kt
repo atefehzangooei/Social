@@ -122,36 +122,36 @@ fun DisplaySearchPosts(index : Int, searchText : String){
             }
 
             Spacer(modifier = Modifier.size(20.dp))
-
-            AsyncImage(
-                model = post.image,
-                contentDescription = "post cover",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(width = 1.dp, color = Color.White)
-                    .aspectRatio(
-                        if (index % 10 in listOf(0, 7)) 0.5f else 1f
-                    ),
-                contentScale = ContentScale.Crop
-            )
-            /*
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Red)
-                .aspectRatio(1f)
-                //.background(Color(android.graphics.Color.parseColor(post.image))),
-                )
+/*
+           AsyncImage(
+               model = post.image,
+               contentDescription = "post cover",
+               modifier = Modifier
+                   .fillMaxWidth()
+                   .border(width = 1.dp, color = Color.White)
+                   .aspectRatio(
+                       if (index % 10 in listOf(0, 7)) 0.5f else 1f
+                   ),
+               contentScale = ContentScale.Crop
+           )*/
+           /*
+        Box(modifier = Modifier
+               .fillMaxWidth()
+               .background(Color.Red)
+               .aspectRatio(1f)
+               //.background(Color(android.graphics.Color.parseColor(post.image))),
+               )
 */
 
-        }
-    }
+       }
+   }
 }
 
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    SocialTheme {
-        DisplaySearchPosts(0, "برنامه نویسی")
-    }
+   SocialTheme {
+       DisplaySearchPosts(0, "برنامه نویسی")
+   }
 }

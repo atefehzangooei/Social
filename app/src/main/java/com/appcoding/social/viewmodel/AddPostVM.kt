@@ -90,7 +90,8 @@ class AddPostVM @Inject constructor(
                 val imagePart = MultipartBody.Part.createFormData(
                     name = "image",
                     filename = imageFile.name,
-                    body = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                    body = requestBody
+                   // body = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
                 )
 
                 // API call

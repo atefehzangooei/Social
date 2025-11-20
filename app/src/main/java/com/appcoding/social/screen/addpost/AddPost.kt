@@ -108,15 +108,26 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
             }
             sharePost(neveshtak, selectedImageUri, viewModel)
 
-            if(state.isUploading){
-                LinearProgressIndicator(
-                    progress = { state.progress / 100f },
+            if(state.isUploading) {
+                val boxWidth = screenWidth() - 40.dp
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .width(boxWidth)
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Colors.upload_progress_background)
                         .align(Alignment.Center)
-                )
-            }
+                ) {
+                    LinearProgressIndicator(
+                        progress = { state.progress / 100f },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp)
+                            .align(Alignment.Center)
 
+                    )
+                }
+            }
         }
     }
 

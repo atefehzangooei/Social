@@ -64,7 +64,7 @@ fun ProfilePostCard(post : PostResponse, index : Int){
 
     var selectedIndex by remember { mutableIntStateOf(-1) }
 
-    Image(painter = ColorPainter(Color(android.graphics.Color.parseColor(post.image))),
+    AsyncImage(model = post.image,
         modifier = Modifier
             .padding(1.dp)
             .aspectRatio(1f)

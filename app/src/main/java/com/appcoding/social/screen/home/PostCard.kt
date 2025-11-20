@@ -220,20 +220,20 @@ fun LikeButton(isLiked : Boolean,
 
 @Composable
 fun PostCard_LoadImage(image: String) {
-    /*AsyncImage(
-                    model = ColorPainter(Color(android.graphics.Color.parseColor(post.image))),
+    AsyncImage(
+                    model = image,
                     contentDescription = "postImage",
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(screenWidth()),
                     contentScale = ContentScale.Crop
-                )*/
+                )
 
-    Box( modifier = Modifier
+   /* Box( modifier = Modifier
         .fillMaxWidth()
         .background(Color(android.graphics.Color.parseColor(image)))
         .height(screenWidth()))
-
+*/
 
 }
 

@@ -27,4 +27,5 @@ object Colors{
     val signup_background_bottom = Color(0xFFec6db4)
     val signup_background_top = Color(0xFFaabed9)
     val search_view_post_background = Color(0xFF0c1013)
+    val upload_progress_background = Color(0xFFADADAD)
 }

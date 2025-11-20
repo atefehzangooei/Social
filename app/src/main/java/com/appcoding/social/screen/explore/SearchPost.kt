@@ -38,11 +38,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.appcoding.social.R
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.screen.components.LoadingDataProgress
@@ -184,7 +186,7 @@ fun DisplayStaggeredList(posts : List<PostResponse>){
         itemsIndexed(items = posts
         ){ index  ,post ->
              AsyncImage(
-                 model = ColorPainter(Color(android.graphics.Color.parseColor(post.image))),
+                 model = post.image,
                  contentDescription = "post cover",
                  modifier = Modifier
                      .fillMaxWidth()
