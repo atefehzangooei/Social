@@ -6,5 +6,7 @@ data class UiState(
     val message : String = "",
     val isRefreshing : Boolean = false,
     val progress : Int = 0,
-    val isUploading : Boolean = false
+    val isUploading : Boolean = false,
+    val isLoadMore : Boolean = false,
+    val loadMoreSuccess : Boolean = false
 )

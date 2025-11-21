@@ -33,8 +33,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,6 +56,7 @@ import com.appcoding.social.screen.components.RightToLeftLayout
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.viewmodel.MainDataVM
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 @SuppressLint("ShowToast", "FrequentlyChangedStateReadInComposition")
@@ -71,6 +74,7 @@ fun MainData(navController: NavHostController) {
     val postState by viewModel.postState.collectAsState()
     val storyState by viewModel.storyState.collectAsState()
     val userid by viewModel.userid.collectAsState()
+    val lastSeenId by viewModel.lastSeenId.collectAsState()
 
     val listState = rememberLazyListState()
     val snackScope = rememberCoroutineScope()
@@ -88,19 +92,34 @@ fun MainData(navController: NavHostController) {
         }
     }
 
-    LaunchedEffect(listState) {
+    LaunchedEffect(Unit) {
         snapshotFlow { listState.layoutInfo }
             .collect { layoutInfo ->
+
                 val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index
                 val totalItems = layoutInfo.totalItemsCount
 
-                if (!postState.isLoading && lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
-                    viewModel.getData()
+                if (!postState.isLoadMore && lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
+                    viewModel.getDataMore(lastSeenId)
                 }
             }
     }
 
-    if (postState.success && storyState.success) {
+   /* LaunchedEffect(Unit) {
+        snapshotFlow { listState.firstVisibleItemIndex }
+            .drop(1)
+            .collect {
+
+                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+                val totalItems = listState.layoutInfo.totalItemsCount
+
+                if (lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
+                    viewModel.getDataMore(lastSeenId)
+                }
+            }
+    }*/
+
+    if (postState.success || storyState.success) {
         PullToRefreshLazyList(
             posts = posts,
             extraList = stories,
@@ -114,7 +133,6 @@ fun MainData(navController: NavHostController) {
             tag = "main"
         )
     }
-
 
     RightToLeftLayout {
 

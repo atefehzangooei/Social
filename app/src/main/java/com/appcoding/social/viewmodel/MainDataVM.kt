@@ -40,7 +40,8 @@ class MainDataVM @Inject constructor(
     private val _posts = MutableStateFlow<List<PostResponse>>(emptyList())
     val posts : StateFlow<List<PostResponse>> = _posts
 
-    private val _lastSeenId = MutableStateFlow<Long?>(-1L)
+    private val _lastSeenId = MutableStateFlow<Long>(-1L)
+    val lastSeenId : StateFlow<Long> = _lastSeenId
 
     private val _userid = MutableStateFlow(-1L)
     val userid :StateFlow<Long> = _userid
@@ -90,6 +91,7 @@ class MainDataVM @Inject constructor(
 
     fun getFirst(){
         _userid.value = getUserid()
+        _lastSeenId.value = -1
         getData()
         getStoryList()
     }
@@ -137,6 +139,7 @@ class MainDataVM @Inject constructor(
     fun getData() {
         viewModelScope.launch {
             try {
+                Log.d("lastseenid","before get first data = ${_lastSeenId.value}")
                 _postState.value = UiState(isLoading = true)
 
                 val postRes = postRepository.getPostsByFollowers(
@@ -144,23 +147,61 @@ class MainDataVM @Inject constructor(
                     lastSeenId = _lastSeenId.value,
                     size = pageSizeHome
                 )
-                if(_lastSeenId.value !!> -1)
-                     _posts.value += postRes
-                else
-                    _posts.value = postRes
+                Log.d("lastseenid", "post response size = ${postRes.size}")
 
-                _lastSeenId.value = postRes.lastOrNull()?.id
+                if(postRes.size > 0) {
+                    if (_lastSeenId.value > -1)
+                        _posts.value += postRes
+                    else
+                        _posts.value = postRes
 
-                _postState.value = UiState(success = true)
+                    _lastSeenId.value = postRes.lastOrNull()!!.id
 
+                    Log.d("lastseenid", "after get first data = ${_lastSeenId.value}")
+
+                    _postState.value = UiState(success = true)
+                }
 
             } catch (e: Exception) {
-                _postState.value = UiState(message = "خطایی رخ داده است")
+                //_postState.value = UiState(message = "خطایی رخ داده است")
+                _postState.value = UiState(message = e.toString())
                 Log.d("before if", "_post state : ${_postState.value.success}")
             }
         }
 
     }
+
+    fun getDataMore(last_seen_id : Long){
+        viewModelScope.launch {
+            try {
+                _postState.value = UiState(isLoadMore = true)
+
+                val postRes = postRepository.getPostsByFollowers(
+                    userId = _userid.value,
+                    lastSeenId = last_seen_id,
+                    size = pageSizeHome
+                )
+
+                if(postRes.size > 0) {
+                    if (last_seen_id > -1)
+                        _posts.value += postRes
+                    else
+                        _posts.value = postRes
+
+                    _lastSeenId.value = postRes.lastOrNull()!!.id
+
+                    _postState.value = UiState(loadMoreSuccess = true)
+                }
+                else{
+                    _postState.value = UiState(isLoadMore = false)
+                }
+
+            } catch (e: Exception) {
+                _postState.value = UiState(message = e.toString())
+            }
+        }
+    }
+
 
     private fun getUserid() : Long {
         viewModelScope.launch {
