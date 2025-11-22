@@ -124,7 +124,7 @@ fun MainData(navController: NavHostController) {
             posts = posts,
             extraList = stories,
             extraContent = { story -> StoryCard(story, userid, navController) },
-            content = { post, index -> PostCard(post, userid, navController, viewModel) },
+            content = { post, index -> PostCard(post, navController, viewModel) },
             isRefreshing = postState.isRefreshing,
             onRefresh = {
                 viewModel.onRefresh()

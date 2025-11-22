@@ -36,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.appcoding.social.models.CommentResponse
+import com.appcoding.social.models.PostResponse
 import com.appcoding.social.screen.components.LoadingDataProgress
 import com.appcoding.social.screen.components.RightToLeftLayout
 import com.appcoding.social.ui.theme.Colors
@@ -43,7 +44,7 @@ import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.viewmodel.MainDataVM
 
 @Composable
-fun CommentBottomSheet(postId : Long,
+fun CommentBottomSheet(post : PostResponse,
                        viewModel: MainDataVM
 ){
 
@@ -52,7 +53,7 @@ fun CommentBottomSheet(postId : Long,
     val newComment by viewModel.newComment.collectAsState()
 
     LaunchedEffect(Unit){
-        viewModel.getComments(postId)
+        viewModel.getComments(post)
     }
 
     RightToLeftLayout {
@@ -145,7 +146,7 @@ fun CommentBottomSheet(postId : Long,
                                    // .align(Alignment.CenterVertically)
                                     .clickable {
                                         if (newComment.isNotEmpty()) {
-                                            viewModel.sendComment(postId)
+                                            viewModel.sendComment(post)
                                         }
                                     }
                             )

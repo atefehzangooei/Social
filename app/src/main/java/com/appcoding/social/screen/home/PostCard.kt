@@ -56,24 +56,19 @@ import com.appcoding.social.viewmodel.MainDataVM
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCard(post : PostResponse,
-             userid : Long,
              navController: NavHostController,
              viewModel : MainDataVM) {
 
-    val isLiked by viewModel.isLiked.collectAsState()
-    val isSaved by viewModel.isSaved.collectAsState()
-    val likeCount by viewModel.likeCount.collectAsState()
-    val commentCount by viewModel.commentCount.collectAsState()
+   // val isLiked by viewModel.isLiked.collectAsState()
+   // val isSaved by viewModel.isSaved.collectAsState()
+   // val likeCount by viewModel.likeCount.collectAsState()
+   // val commentCount by viewModel.commentCount.collectAsState()
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var commentSheetState by remember { mutableStateOf(false) }
 
 
     RightToLeftLayout {
-
-        LaunchedEffect(Unit) {
-            viewModel.setPost(post)
-        }
 
         Column(modifier = Modifier.wrapContentSize()) {
 
@@ -96,12 +91,12 @@ fun PostCard(post : PostResponse,
                         .padding(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    LikeButton(isLiked, post.id, viewModel)
+                    LikeButton(post, viewModel)
 
                     Spacer(modifier = Modifier.size(10.dp))
 
                     Text(
-                        text = likeCount.toString(),
+                        text = post.likeCount.toString(),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold
                     )
@@ -118,7 +113,7 @@ fun PostCard(post : PostResponse,
                     Spacer(modifier = Modifier.size(10.dp))
 
                     Text(
-                        text = commentCount.toString(),
+                        text = post.commentCount.toString(),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold
                     )
@@ -143,11 +138,11 @@ fun PostCard(post : PostResponse,
                         scrimColor = Color.Black.copy(alpha = 0.5f),
                         //dragHandle = {BottomSheetDefaults.DragHandle()}
                     ) {
-                        CommentBottomSheet(post.id, viewModel)
+                        CommentBottomSheet(post, viewModel)
                     }
                 }
 
-                Image(painter = if (isSaved)
+                Image(painter = if (post.isSave)
                     painterResource(R.drawable.save_filled)
                 else
                     painterResource(R.drawable.save),
@@ -155,7 +150,7 @@ fun PostCard(post : PostResponse,
                     contentDescription = "save",
                     modifier = Modifier
                         .size(Dimens.post_icons)
-                        .clickable { viewModel.savePost(post.id) }
+                        .clickable { viewModel.savePost(post) }
                 )
             }
 
@@ -174,16 +169,13 @@ fun PostCard(post : PostResponse,
 }
 
 @Composable
-fun LikeButton(isLiked : Boolean,
-               postId : Long,
+fun LikeButton(post : PostResponse,
                viewModel: MainDataVM){
-
-    val likeState by viewModel.likeState.collectAsState()
 
     val scale = remember { Animatable(1f) }
 
-    LaunchedEffect(isLiked) {
-        if (isLiked) {
+    LaunchedEffect(post.isLike) {
+        if (post.isLike) {
             scale.animateTo(1.5f, animationSpec = tween(150))
             scale.animateTo(
                 1f,
@@ -195,7 +187,7 @@ fun LikeButton(isLiked : Boolean,
     }
 
 
-    Image(painter = if (isLiked)
+    Image(painter = if (post.isLike)
         painterResource(R.drawable.red_heart)
     else
         painterResource(R.drawable.like),
@@ -209,7 +201,7 @@ fun LikeButton(isLiked : Boolean,
                 scaleY = scale.value
             )
             .clickable {
-                viewModel.likePost(postId)
+                viewModel.likePost(post)
             }
     )
 
