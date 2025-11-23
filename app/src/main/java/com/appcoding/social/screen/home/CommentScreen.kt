@@ -44,16 +44,18 @@ import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.viewmodel.MainDataVM
 
 @Composable
-fun CommentBottomSheet(post : PostResponse,
+fun CommentBottomSheet(postId : Long,
                        viewModel: MainDataVM
 ){
 
     val comments by viewModel.comments.collectAsState()
     val commentState by viewModel.commentState.collectAsState()
     val newComment by viewModel.newComment.collectAsState()
+    val profileImage by viewModel.profileImage.collectAsState()
+
 
     LaunchedEffect(Unit){
-        viewModel.getComments(post)
+        viewModel.getComments(postId)
     }
 
     RightToLeftLayout {
@@ -66,8 +68,9 @@ fun CommentBottomSheet(post : PostResponse,
             }
         }
         else {
-            Column(modifier = Modifier.fillMaxSize()) {
 
+            Column(modifier = Modifier.fillMaxSize()) {
+                if(comments.size > 0){
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -75,6 +78,18 @@ fun CommentBottomSheet(post : PostResponse,
                 ) {
                     items(comments) { comment ->
                         CommentCard(comment)
+                    }
+                }
+            }
+                else{
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                        contentAlignment = Alignment.Center)
+                    {
+                        Text(text = "نظری ثبت نشده است !",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.Black)
                     }
                 }
 
@@ -95,10 +110,10 @@ fun CommentBottomSheet(post : PostResponse,
                         },
                     verticalAlignment = Alignment.Bottom
                 ) {
-                    val userProfile = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu8Qi_EGuDWDLusHz6fyxhgaQWa6q0YsOiBH3adnqLx-6_JbLy_-ch2P3xcDxtTh-g9qY&usqp=CAU"
+                    //val userProfile = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu8Qi_EGuDWDLusHz6fyxhgaQWa6q0YsOiBH3adnqLx-6_JbLy_-ch2P3xcDxtTh-g9qY&usqp=CAU"
 
                     AsyncImage(
-                        model = userProfile,
+                        model = profileImage,
                         contentDescription = "my profile",
                         modifier = Modifier
                             //.weight(1f)
@@ -146,7 +161,7 @@ fun CommentBottomSheet(post : PostResponse,
                                    // .align(Alignment.CenterVertically)
                                     .clickable {
                                         if (newComment.isNotEmpty()) {
-                                            viewModel.sendComment(post)
+                                            viewModel.sendComment(postId)
                                         }
                                     }
                             )

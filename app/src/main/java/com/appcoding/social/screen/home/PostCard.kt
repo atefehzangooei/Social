@@ -59,11 +59,6 @@ fun PostCard(post : PostResponse,
              navController: NavHostController,
              viewModel : MainDataVM) {
 
-   // val isLiked by viewModel.isLiked.collectAsState()
-   // val isSaved by viewModel.isSaved.collectAsState()
-   // val likeCount by viewModel.likeCount.collectAsState()
-   // val commentCount by viewModel.commentCount.collectAsState()
-
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var commentSheetState by remember { mutableStateOf(false) }
 
@@ -138,7 +133,7 @@ fun PostCard(post : PostResponse,
                         scrimColor = Color.Black.copy(alpha = 0.5f),
                         //dragHandle = {BottomSheetDefaults.DragHandle()}
                     ) {
-                        CommentBottomSheet(post, viewModel)
+                        CommentBottomSheet(post.id, viewModel)
                     }
                 }
 
@@ -150,7 +145,7 @@ fun PostCard(post : PostResponse,
                     contentDescription = "save",
                     modifier = Modifier
                         .size(Dimens.post_icons)
-                        .clickable { viewModel.savePost(post) }
+                        .clickable { viewModel.savePost(post.id) }
                 )
             }
 
@@ -201,11 +196,9 @@ fun LikeButton(post : PostResponse,
                 scaleY = scale.value
             )
             .clickable {
-                viewModel.likePost(post)
+                viewModel.likePost(post.id)
             }
     )
-
-
 
 }
 

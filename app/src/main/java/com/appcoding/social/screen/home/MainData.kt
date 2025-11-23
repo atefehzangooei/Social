@@ -75,6 +75,7 @@ fun MainData(navController: NavHostController) {
     val storyState by viewModel.storyState.collectAsState()
     val userid by viewModel.userid.collectAsState()
     val lastSeenId by viewModel.lastSeenId.collectAsState()
+    val profileImage by viewModel.profileImage.collectAsState()
 
     val listState = rememberLazyListState()
     val snackScope = rememberCoroutineScope()
@@ -104,20 +105,6 @@ fun MainData(navController: NavHostController) {
                 }
             }
     }
-
-   /* LaunchedEffect(Unit) {
-        snapshotFlow { listState.firstVisibleItemIndex }
-            .drop(1)
-            .collect {
-
-                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
-                val totalItems = listState.layoutInfo.totalItemsCount
-
-                if (lastVisibleItem != null && lastVisibleItem >= totalItems - 1) {
-                    viewModel.getDataMore(lastSeenId)
-                }
-            }
-    }*/
 
     if (postState.success || storyState.success) {
         PullToRefreshLazyList(

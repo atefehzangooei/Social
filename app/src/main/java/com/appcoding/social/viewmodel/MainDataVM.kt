@@ -23,6 +23,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -75,6 +76,9 @@ class MainDataVM @Inject constructor(
 
     private val _newComment = MutableStateFlow("")
     val newComment : StateFlow<String> = _newComment
+
+    private val _profileImage = MutableStateFlow("")
+    val profileImage : StateFlow<String> = _profileImage
 
 
     fun getFirst(){
@@ -202,22 +206,22 @@ class MainDataVM @Inject constructor(
 
 
     fun likePost(postId: Long) {
+
         _posts.value = _posts.value.map { post ->
-            if(post.id == postId){
+            if (post.id == postId) {
                 val newLikeCount =
-                    if(post.isLike) post.likeCount++
-                else post.likeCount--
+                    if (post.isLike) post.likeCount - 1
+                    else post.likeCount + 1
                 post.copy(
                     isLike = !post.isLike,
                     likeCount = newLikeCount
                 )
-            }
-            else post
+            } else post
         }
         viewModelScope.launch {
             val post = _posts.value.find { it.id == postId } ?: return@launch
+
             if (post.isLike) {
-                post.likeCount++
                 val response = likeRepository.likePost(
                     LikeRequest(
                         postId = post.id,
@@ -226,83 +230,58 @@ class MainDataVM @Inject constructor(
                         time = ""
                     )
                 )
-                if(response.success){
-                    _isLiked.value = !_isLiked.value
-                }
-                else{
-                    _likeState.value = UiState(success = false, message = response.message)
-                }
             } else {
-                _likeCount.value--
                 val response = likeRepository.disLikePost(
-                    postId = _postId.value,
+                    postId = post.id,
                     userId = _userid.value
                 )
-                if(response.success){
-                    _isLiked.value = !_isLiked.value
-                }
-                else{
-                    _likeState.value = UiState(success = false, message = response.message)
-                }
             }
         }
     }
 
-    fun savePost(post: PostResponse){
-        setPost(post)
+    fun savePost(postId: Long) {
+        _posts.value = _posts.value.map { post ->
+            if (post.id == postId) {
+                post.copy(
+                    isSave = !post.isSave
+                )
+            } else post
+        }
         viewModelScope.launch {
-                if(_isSaved.value){
-                    try {
-                        val response = savePostRepository.savePost(
-                            SavePostRequest(
-                                userId = _userid.value,
-                                postId = _postId.value,
-                                date = "14",
-                                time = "14"
-                            )
-                        )
-                        if(response.success) {
-                            _isSaved.value = !_isSaved.value
-                            _saveState.value = UiState(success = true, message = "با موفقیت ذخیره شد")
-                        }
-                        else{
-                            _saveState.value = UiState(success = false, message = response.message)
-                        }
-                    }
-                    catch (ex : Exception){
-                        _saveState.value = UiState(success = false, message = ex.toString())
-                    }
-                }
-                else{
-                    try {
-                        val response = savePostRepository.unSavePost(
+            val post = _posts.value.find { it.id == postId } ?: return@launch
+
+            try {
+                if (post.isSave) {
+                    val response = savePostRepository.savePost(
+                        SavePostRequest(
                             userId = _userid.value,
-                            postId = _postId.value
+                            postId = postId,
+                            date = "14",
+                            time = "14"
                         )
-                        if(response.success) {
-                            _isSaved.value = !_isSaved.value
-                            _saveState.value = UiState(success = true, message = "unsaved")
-                        }
-                        else{
-                            _saveState.value = UiState(success = false, message = response.message)
-                        }
-                    }
-                    catch (ex : Exception){
-                        _saveState.value = UiState(success = false, message = ex.toString())
-                    }
+                    )
+                } else {
+                    val response = savePostRepository.unSavePost(
+                        userId = _userid.value,
+                        postId = postId
+                    )
                 }
+            } catch (ex: Exception) {
+                _saveState.value = UiState(success = false, message = ex.toString())
+            }
         }
     }
 
-    fun getComments(post: PostResponse){
-        setPost(post)
+    fun getComments(postId: Long){
+
         viewModelScope.launch {
+            _profileImage.value = userPreferences.getUserProfileFlow().first() ?: ""
+
             _commentState.value = UiState(isLoading = true)
 
             try{
-                _comments.value = commentRepository.getComments(_postId.value)
+                _comments.value = commentRepository.getComments(postId)
                 _commentState.value = UiState(success = true)
-               // post.commentCount++
             }
             catch (ex : Exception){
                 _commentState.value = UiState(message = ex.toString())
@@ -312,13 +291,19 @@ class MainDataVM @Inject constructor(
 
     fun onCommentChanged(value: String) { _newComment.value = value}
 
-    fun sendComment(post: PostResponse){
-        setPost(post)
+    fun sendComment(postId: Long){
+        _posts.value = _posts.value.map { post ->
+            if(post.id == postId){
+                val newCommentCount = post.commentCount +1
+                post.copy(commentCount = newCommentCount)
+            }
+            else post
+        }
         viewModelScope.launch {
             _commentState.value = UiState(isLoading = true)
             try {
                 val commentRequest = CommentRequest(
-                    postId = _postId.value,
+                    postId = postId,
                     userId = _userid.value,
                     comment = _newComment.value,
                     date = "1404",

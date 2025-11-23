@@ -30,6 +30,9 @@ class SigninVM @Inject constructor(
     private val _userid = MutableStateFlow(-1L)
     val userid : StateFlow<Long> = _userid
 
+    private val _profileImage = MutableStateFlow("")
+    val profileImage : StateFlow<String> = _profileImage
+
     fun onUsernameChanged(value: String){ _username.value = value }
     fun onPasswordChanged(value: String){ _password.value = value }
 
@@ -54,7 +57,8 @@ class SigninVM @Inject constructor(
                     _state.value = UiState(success = true)
                     val userInfo = response.body()
                     _userid.value =  userInfo!!.id
-                    userPreferences.saveUserId(_userid.value)
+                    _profileImage.value =  userInfo.profileImage
+                    userPreferences.saveUser(_userid.value, _profileImage.value)
 
                 } else if (response.code() == 401) {
                     _state.value = UiState(message = "نام کاربری یا کلمه عبور اشتباه است!")

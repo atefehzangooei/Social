@@ -55,9 +55,9 @@ class ProfileScreenVM @Inject constructor(
 
             getUserPosts(userid)
 
-          // _state.value = UiState(isLoading = true)
             try{
                 _userInfo.value = userRepository.getUserInfo(_myUserid.value)
+                userPreferences.updateProfileImage(_userInfo.value!!.profileImage)
                 _state.value = UiState(success = true)
             }
             catch (ex : Exception){
