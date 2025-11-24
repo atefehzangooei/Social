@@ -72,6 +72,7 @@ import com.appcoding.social.screen.components.screenWidth
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.viewmodel.AddPostVM
+import com.appcoding.social.viewmodel.MainDataVM
 import com.appcoding.social.viewmodel.UiState
 
 
@@ -130,14 +131,6 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
             }
         }
     }
-
-   /* LaunchedEffect(toastMessage){
-        if(uploadComplete) {
-            neveshtak = toastMessage
-            Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show()
-            uploadComplete = false
-        }
-    }*/
 }
 
 @Composable
@@ -170,6 +163,10 @@ fun sharePost(
 
     val imageSize = screenWidth() / 2 + 20.dp
     val state by viewModel.state.collectAsState()
+    val uploadedPost by viewModel.uploadedPost.collectAsState()
+
+    val dataViewModel : MainDataVM = hiltViewModel()
+
 
 
     Column(modifier = Modifier
@@ -191,6 +188,11 @@ fun sharePost(
                 containerColor = Colors.add_post_button
             )) {
             Text("اشتراک گذاری")
+        }
+
+        if(state.success){
+            if(uploadedPost != null)
+            dataViewModel.addPost(uploadedPost!!)
         }
     }
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.appcoding.social.data.api.PostApi
 import com.appcoding.social.data.repository.PostRepository
 import com.appcoding.social.models.PostRequest
+import com.appcoding.social.models.PostResponse
 import com.appcoding.social.screen.addpost.UploadProgressRequestBody
 import com.appcoding.social.screen.components.MyFileUtils
 import com.appcoding.social.screen.components.UserPreferences
@@ -36,6 +37,9 @@ class AddPostVM @Inject constructor(
     private val _state = MutableStateFlow(UiState())
     val state : StateFlow<UiState> = _state
 
+    private val _uploadedPost = MutableStateFlow<PostResponse?>(null)
+    val uploadedPost : StateFlow<PostResponse?> = _uploadedPost
+
 
     fun onNeveshtakChanged(value : String) { _neveshtak.value = value }
 
@@ -57,11 +61,10 @@ class AddPostVM @Inject constructor(
     }
 
 
-    private fun uploadPost(neveshtak: String, imageFile: File) {
+    private fun uploadPost(neveshtak: String, imageFile: File){
 
         // جلوگیری از آپلود دوباره وسط کار
         if (_state.value.isUploading) return
-
         viewModelScope.launch {
             val post = PostRequest(
                 userId = userPreferences.getUserIdFlow().first() ?: 0L,
@@ -95,7 +98,7 @@ class AddPostVM @Inject constructor(
                 )
 
                 // API call
-                val response = postRepository.uploadPost(imagePart, postPart)
+                _uploadedPost.value = postRepository.uploadPost(imagePart, postPart)
 
                 _state.value = UiState(
                     isUploading = false,

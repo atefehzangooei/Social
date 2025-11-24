@@ -122,11 +122,20 @@ fun SignUp(navController: NavHostController){
                         Spacer(modifier = Modifier.size(15.dp))
                         ProfileImage()
                         Spacer(modifier = Modifier.size(Dimens.normal_spacer))
-                        AuthTextField(phone, viewModel::onPhoneChange, "شماره موبایل")
+                        AuthTextField(phone,
+                            viewModel::onPhoneChange,
+                            "شماره موبایل",
+                            "phone")
                         Spacer(modifier = Modifier.size(Dimens.login_spacer))
-                        AuthTextField(username,  viewModel::onUsernameChange, "نام کاربری")
+                        AuthTextField(username,
+                            viewModel::onUsernameChange,
+                            "نام کاربری",
+                            "username")
                         Spacer(modifier = Modifier.size(Dimens.login_spacer))
-                        AuthTextField(password, viewModel::onPasswordChange,"رمز عبور")
+                        AuthTextField(password,
+                            viewModel::onPasswordChange,
+                            "رمز عبور",
+                            "password")
                         Spacer(modifier = Modifier.size(Dimens.login_spacer))
                         Row(modifier = Modifier.fillMaxWidth())
                         {

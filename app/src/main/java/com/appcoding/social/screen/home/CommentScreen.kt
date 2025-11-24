@@ -39,6 +39,7 @@ import com.appcoding.social.models.CommentResponse
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.screen.components.LoadingDataProgress
 import com.appcoding.social.screen.components.RightToLeftLayout
+import com.appcoding.social.screen.components.SendProgress
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 import com.appcoding.social.viewmodel.MainDataVM
@@ -148,12 +149,13 @@ fun CommentBottomSheet(postId : Long,
                         .size(Dimens.comment_user_profile),
                         contentAlignment = Alignment.Center)
                     {
-                        if (commentState.isLoading) {
-                            LoadingDataProgress()
+                        if (commentState.isUploading) {
+                            SendProgress()
                         } else {
                             Icon(imageVector = Icons.Filled.Check,
                                 contentDescription = "send comment",
                                 tint = Colors.appcolor,
+
                                 modifier = Modifier
                                     //.weight(1f)
                                    // .size(Dimens.comment_user_profile)

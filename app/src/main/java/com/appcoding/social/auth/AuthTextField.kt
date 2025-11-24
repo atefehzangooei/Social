@@ -8,6 +8,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 
@@ -15,7 +17,8 @@ import com.appcoding.social.ui.theme.Dimens
 fun AuthTextField(
     value : String,
     onValueChanged : (String) -> Unit,
-    placeHolder : String){
+    placeHolder : String,
+    type : String){
 
     OutlinedTextField(
         modifier = Modifier
@@ -31,7 +34,12 @@ fun AuthTextField(
             unfocusedPlaceholderColor = Colors.outline_textfield_border,
             focusedIndicatorColor = Colors.outline_textfield_border,
             unfocusedIndicatorColor = Colors.outline_textfield_border
-        )
+        ),
+        visualTransformation =
+        if(type == "password")
+            PasswordVisualTransformation()
+        else
+        VisualTransformation.None
 
     )
 

@@ -108,9 +108,15 @@ fun ForgetPassword(navController: NavHostController) {
                         verticalArrangement = Arrangement.Center
                     )
                     {
-                        AuthTextField(username,viewModel::onUsernameChanged,"نام کاربری")
+                        AuthTextField(username,
+                            viewModel::onUsernameChanged,
+                            "نام کاربری",
+                            "username")
                         Spacer(modifier = Modifier.size(Dimens.login_spacer))
-                        AuthTextField(phone, viewModel::onPhoneChanged, "شماره موبایل")
+                        AuthTextField(phone,
+                            viewModel::onPhoneChanged,
+                            "شماره موبایل",
+                            "phone")
                         Spacer(modifier = Modifier.size(Dimens.login_spacer))
 
                         Row(modifier = Modifier.fillMaxWidth())

@@ -300,7 +300,7 @@ class MainDataVM @Inject constructor(
             else post
         }
         viewModelScope.launch {
-            _commentState.value = UiState(isLoading = true)
+            _commentState.value = UiState(isUploading = true)
             try {
                 val commentRequest = CommentRequest(
                     postId = postId,
@@ -322,4 +322,7 @@ class MainDataVM @Inject constructor(
         }
     }
 
+    fun addPost(post : PostResponse){
+        _posts.value  = listOf(post) + _posts.value
+    }
 }

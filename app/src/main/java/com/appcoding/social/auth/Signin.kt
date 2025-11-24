@@ -112,9 +112,15 @@ fun SignIn(navController: NavHostController) {
                             verticalArrangement = Arrangement.Center
                         )
                         {
-                            AuthTextField(username, viewModel::onUsernameChanged, "نام کاربری")
+                            AuthTextField(username,
+                                viewModel::onUsernameChanged,
+                                "نام کاربری",
+                                "username")
                             Spacer(modifier = Modifier.size(Dimens.login_spacer))
-                            AuthTextField(password, viewModel::onPasswordChanged, "رمز عبور")
+                            AuthTextField(password,
+                                viewModel::onPasswordChanged,
+                                "رمز عبور",
+                                "password")
                             Spacer(modifier = Modifier.size(Dimens.login_spacer))
 
                             Row(modifier = Modifier.fillMaxWidth())
