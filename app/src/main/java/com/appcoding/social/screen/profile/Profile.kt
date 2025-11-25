@@ -89,7 +89,7 @@ fun ProfileScreen(userid : Long,
                     posts = posts,
                     extraList = listOf(userInfo),
                     extraContent = {userinfo -> DisplayUserInfo(userInfo, myProfile) },
-                    content = { post, index -> ProfilePostCard(post, index, navController) },
+                    content = { post, index -> ProfilePostCard(post, index, userid, userInfo.username, navController) },
                     isRefreshing = state.isRefreshing,
                     onRefresh = {
                         viewModel.onRefresh(userid)

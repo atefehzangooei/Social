@@ -64,6 +64,8 @@ fun DisplayUserInfo(userInfo : UserInfo?, myProfile: Boolean){
 @Composable
 fun ProfilePostCard(post : PostResponse,
                     index : Int,
+                    userid : Long,
+                    username : String,
                     navController: NavHostController){
 
     var selectedIndex by remember { mutableIntStateOf(-1) }
@@ -79,12 +81,10 @@ fun ProfilePostCard(post : PostResponse,
 
     if(selectedIndex > -1){
         Log.d("start from index", "selected index = $index")
-        navController.navigate("start_from_index/${index}")
-       /* StartFromIndex(posts = posts,
-            index = selectedIndex,
-            navController = navController)*/
+        navController.navigate("start_from_index/$userid/$username/$index"){
+            popUpTo("profile"){ saveState = true }
+        }
     }
-          //Toast.makeText(LocalContext.current, "selected index = $selectedIndex", Toast.LENGTH_LONG).show()
 }
 
 
