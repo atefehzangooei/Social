@@ -170,6 +170,8 @@ fun Bio(bio : String, link : String){
 @Composable
 fun Username(username : String){
 
+    Spacer(modifier = Modifier.size(10.dp))
+
     Text(modifier = Modifier
         .fillMaxWidth()
         .padding(Dimens.profile_activity_padding),
@@ -189,7 +191,9 @@ fun ProfileInfo(user : UserInfo?){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(Dimens.profile_activity_padding),
+                .padding(start = Dimens.profile_activity_padding,
+                    end =  Dimens.profile_activity_padding,
+                    top =  Dimens.profile_activity_padding),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {

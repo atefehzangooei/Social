@@ -241,9 +241,7 @@ fun PostCard_ProfileInfo(post : PostResponse, navController: NavHostController) 
             modifier = Modifier
                 .size(Dimens.home_profile_image_size)
                 .clip(CircleShape)
-                .clickable {
-                    navController.navigate("profile/${post.userId}")
-                },
+                .clickable {},
             contentScale = ContentScale.Crop
         )
 
@@ -252,7 +250,11 @@ fun PostCard_ProfileInfo(post : PostResponse, navController: NavHostController) 
         Text(
             text = post.username,
             style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .clickable {
+                navController.navigate("profile/${post.userId}")
+            }
         )
     }
 }

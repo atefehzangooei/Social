@@ -89,7 +89,7 @@ fun CommentBottomSheet(postId : Long,
                         contentAlignment = Alignment.Center)
                     {
                         Text(text = "نظری ثبت نشده است !",
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.bodyLarge,
                             color = Color.Black)
                     }
                 }
