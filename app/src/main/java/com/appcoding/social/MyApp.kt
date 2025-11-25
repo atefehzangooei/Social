@@ -108,7 +108,8 @@ fun MyApp(userid : Long, navController : NavHostController) {
                         0 -> HomeScreen(userid, navController)
                         1 -> SearchPost()
                         3 -> SearchPost()
-                        4 -> ProfileScreen(userid)
+                        4 -> ProfileScreen(userid = userid,
+                            navController = navController)
                     }
                 }
                 OpenAnimated(isAddScreenVisible) {

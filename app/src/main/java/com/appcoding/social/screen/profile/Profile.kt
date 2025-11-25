@@ -15,18 +15,25 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.appcoding.social.screen.components.LoadingDataProgress
 import com.appcoding.social.screen.components.PullToRefreshLazyList
 import com.appcoding.social.screen.components.RightToLeftLayout
+import com.appcoding.social.viewmodel.MainDataVM
 import com.appcoding.social.viewmodel.ProfileScreenVM
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileScreen(userid : Long) {
+fun ProfileScreen(userid : Long,
+                  navController: NavHostController) {
 
     RightToLeftLayout {
 
-        val viewModel : ProfileScreenVM = hiltViewModel()
+        val parentEntry = remember(navController.currentBackStackEntry) {
+            navController.getBackStackEntry("nav_graph")
+        }
+
+        val viewModel : ProfileScreenVM = hiltViewModel(parentEntry)
 
         val userInfo by viewModel.userInfo.collectAsState()
         val posts by viewModel.userPosts.collectAsState()
@@ -81,8 +88,8 @@ fun ProfileScreen(userid : Long) {
                 PullToRefreshLazyList(
                     posts = posts,
                     extraList = listOf(userInfo),
-                    extraContent = {userinfo -> DisplayUserInfo(userInfo,myProfile) },
-                    content = {post, index -> ProfilePostCard(post, index) },
+                    extraContent = {userinfo -> DisplayUserInfo(userInfo, myProfile) },
+                    content = { post, index -> ProfilePostCard(post, index, navController) },
                     isRefreshing = state.isRefreshing,
                     onRefresh = {
                         viewModel.onRefresh(userid)

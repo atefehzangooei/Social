@@ -1,5 +1,6 @@
 package com.appcoding.social.screen.profile
 
+import android.util.Log
 import android.widget.Toast
 import androidx.collection.mutableIntSetOf
 import androidx.compose.foundation.Image
@@ -43,6 +44,7 @@ import coil.compose.AsyncImage
 import com.appcoding.social.models.PostResponse
 import com.appcoding.social.models.UserInfo
 import com.appcoding.social.screen.components.RightToLeftLayout
+import com.appcoding.social.screen.components.StartFromIndex
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 
@@ -60,7 +62,9 @@ fun DisplayUserInfo(userInfo : UserInfo?, myProfile: Boolean){
 
 
 @Composable
-fun ProfilePostCard(post : PostResponse, index : Int){
+fun ProfilePostCard(post : PostResponse,
+                    index : Int,
+                    navController: NavHostController){
 
     var selectedIndex by remember { mutableIntStateOf(-1) }
 
@@ -73,8 +77,14 @@ fun ProfilePostCard(post : PostResponse, index : Int){
         contentScale = ContentScale.Crop
     )
 
-    if(selectedIndex > -1)
-          Toast.makeText(LocalContext.current, "selected index = $selectedIndex", Toast.LENGTH_LONG).show()
+    if(selectedIndex > -1){
+        Log.d("start from index", "selected index = $index")
+        navController.navigate("start_from_index/${index}")
+       /* StartFromIndex(posts = posts,
+            index = selectedIndex,
+            navController = navController)*/
+    }
+          //Toast.makeText(LocalContext.current, "selected index = $selectedIndex", Toast.LENGTH_LONG).show()
 }
 
 

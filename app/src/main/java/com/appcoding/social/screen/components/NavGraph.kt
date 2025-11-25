@@ -49,14 +49,14 @@ fun AppNavHost(navController: NavHostController, startDestination : String = "sp
             arguments = listOf(navArgument("userid") { type = NavType.LongType })
         ) { backStackEntry ->
             val userid = backStackEntry.arguments!!.getLong("userid")
-            ProfileScreen(userid)
+            ProfileScreen(userid, navController)
         }
 
-        /*composable("displaysearch/{userid}",
-            arguments = listOf(navArgument("userid"){type = NavType.LongType})
+        composable("start_from_index/{index}",
+            arguments = listOf(navArgument("index"){type = NavType.LongType})
         ){backStackEntry ->
-            val userid = backStackEntry.arguments!!.getLong("userid")
-            DisplaySearchPosts()
-        }*/
+            val index = backStackEntry.arguments!!.getInt("index")
+            StartFromIndex(index,navController)
+        }
     }
 }
