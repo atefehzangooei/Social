@@ -56,14 +56,11 @@ fun StartFromIndex(userid : Long,
     val posts by viewModel.userPosts.collectAsState()
 
 
-    /*LaunchedEffect(Unit){
-        listState.scrollToItem(index)
-    }*/
     Column(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically)
         {
             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,

@@ -19,7 +19,6 @@ import androidx.navigation.NavHostController
 import com.appcoding.social.screen.components.LoadingDataProgress
 import com.appcoding.social.screen.components.PullToRefreshLazyList
 import com.appcoding.social.screen.components.RightToLeftLayout
-import com.appcoding.social.viewmodel.MainDataVM
 import com.appcoding.social.viewmodel.ProfileScreenVM
 import kotlinx.coroutines.launch
 
@@ -88,8 +87,8 @@ fun ProfileScreen(userid : Long,
                 PullToRefreshLazyList(
                     posts = posts,
                     extraList = listOf(userInfo),
-                    extraContent = {userinfo -> DisplayUserInfo(userInfo, myProfile) },
-                    content = { post, index -> ProfilePostCard(post, index, userid, userInfo.username, navController) },
+                    extraContent = {userInfo -> DisplayUserInfo(userInfo, myProfile) },
+                    content = { post, index -> ProfilePostCard(post, index, userid, userInfo!!.username, navController) },
                     isRefreshing = state.isRefreshing,
                     onRefresh = {
                         viewModel.onRefresh(userid)
