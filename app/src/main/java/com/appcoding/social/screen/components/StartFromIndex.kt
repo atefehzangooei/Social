@@ -5,9 +5,11 @@ import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -57,6 +59,9 @@ fun StartFromIndex(userid : Long,
 
 
     Column(modifier = Modifier.fillMaxSize()) {
+
+        Spacer(modifier = Modifier.size(15.dp))
+
         Row(modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp),
@@ -66,7 +71,11 @@ fun StartFromIndex(userid : Long,
             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                contentDescription = "back to profile",
                 tint = Color.Black,
-                modifier = Modifier.clickable { navController.navigate("profile/${userid}")})
+                modifier = Modifier
+                    .clickable { navController.navigate("profile/${userid}"){
+                        popUpTo("profile/$userid"){ saveState = true }
+                    }
+                    })
 
            Text(text = username,
                style = MaterialTheme.typography.bodyMedium,

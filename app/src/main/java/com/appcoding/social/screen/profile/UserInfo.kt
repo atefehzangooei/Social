@@ -51,6 +51,7 @@ import com.appcoding.social.ui.theme.Dimens
 @Composable
 fun DisplayUserInfo(userInfo : UserInfo?, myProfile: Boolean){
     Column(modifier = Modifier.fillMaxWidth()) {
+
         Username(userInfo!!.username)
         ProfileInfo(userInfo)
         Bio(userInfo.bio, userInfo.link)
@@ -82,7 +83,8 @@ fun ProfilePostCard(post : PostResponse,
     if(selectedIndex > -1){
         Log.d("start from index", "selected index = $index")
         navController.navigate("start_from_index/$userid/$username/$index"){
-            popUpTo("profile"){ saveState = true }
+            launchSingleTop = true
+
         }
     }
 }

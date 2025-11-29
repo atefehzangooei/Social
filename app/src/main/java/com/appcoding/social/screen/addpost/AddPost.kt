@@ -289,34 +289,6 @@ fun  AddPostScreen(onBack: () -> Unit) {
 
         Box(modifier = Modifier.fillMaxSize()) {
 
-            Row(
-                modifier = Modifier
-                    .width(screenWidth() / 2)
-                    .wrapContentHeight()
-                    .padding(20.dp)
-                    .background(Color.Black)
-                    .padding(10.dp)
-                    .align(Alignment.BottomStart)
-                    .clip(RoundedCornerShape(Dimens.add_post_corner)),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TextButton(onClick = {}) {
-
-                    Text(text = "Post",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White)
-
-                }
-
-                TextButton(onClick = {}) {
-                    Text(text = "Story",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White)
-                }
-            }
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -397,6 +369,36 @@ fun  AddPostScreen(onBack: () -> Unit) {
                         }
                     }
                 }
+
+
+            Row(
+                modifier = Modifier
+                    .width(screenWidth() / 2)
+                    .wrapContentHeight()
+                    .padding(20.dp)
+                    .background(Color.Black)
+                    .padding(10.dp)
+                    .align(Alignment.BottomStart)
+                    .clip(RoundedCornerShape(Dimens.add_post_corner)),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(onClick = {}) {
+
+                    Text(text = "Post",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White)
+
+                }
+
+                TextButton(onClick = {}) {
+                    Text(text = "Story",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White)
+                }
+            }
         }
         if(next){
             AddPostScreenNext(onBack = {next = false}, selectedImageUri = selectedImageUri)
