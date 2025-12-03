@@ -12,6 +12,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -168,7 +170,6 @@ fun sharePost(
     val dataViewModel : MainDataVM = hiltViewModel()
 
 
-
     Column(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White),
@@ -254,6 +255,7 @@ fun  AddPostScreen(onBack: () -> Unit) {
     var images by remember { mutableStateOf(emptyList<Uri>()) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var next by remember { mutableStateOf(false) }
+    var selected by remember { mutableStateOf("post") }
 
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -284,6 +286,7 @@ fun  AddPostScreen(onBack: () -> Unit) {
     BackHandler(enabled = true) {
         onBack()
     }
+
 
     RightToLeftLayout {
 
@@ -378,25 +381,30 @@ fun  AddPostScreen(onBack: () -> Unit) {
                     .padding(20.dp)
                     .background(Color.Black)
                     .padding(10.dp)
+                    .border(width = 1.dp,
+                        color = Colors.addpost_row_border,
+                        shape = RoundedCornerShape(Dimens.add_post_corner))
                     .align(Alignment.BottomStart)
                     .clip(RoundedCornerShape(Dimens.add_post_corner)),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = {}) {
+                TextButton(onClick = { selected = "post"}
+                ) {
 
                     Text(text = "Post",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White)
+                        color = if(selected == "post") Color.White else Colors.addpost_disable_color)
 
                 }
 
-                TextButton(onClick = {}) {
+                TextButton(onClick = { selected = "story"}) {
                     Text(text = "Story",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White)
+                        color = if(selected == "story") Color.White else Colors.addpost_disable_color
+                    )
                 }
             }
         }

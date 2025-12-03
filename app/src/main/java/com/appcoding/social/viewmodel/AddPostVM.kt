@@ -60,7 +60,6 @@ class AddPostVM @Inject constructor(
         }
     }
 
-
     private fun uploadPost(neveshtak: String, imageFile: File){
 
         // جلوگیری از آپلود دوباره وسط کار

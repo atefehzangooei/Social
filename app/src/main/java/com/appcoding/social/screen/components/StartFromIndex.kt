@@ -71,6 +71,7 @@ fun StartFromIndex(userid : Long,
             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                contentDescription = "back to profile",
                 tint = Color.Black,
+
                 modifier = Modifier
                     .clickable { navController.navigate("profile/${userid}"){
                         popUpTo("profile/$userid"){ saveState = true }
