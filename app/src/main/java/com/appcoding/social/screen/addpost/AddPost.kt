@@ -193,7 +193,7 @@ fun sharePost(
 
         if(state.success){
             if(uploadedPost != null)
-            dataViewModel.addPost(uploadedPost!!)
+                dataViewModel.addPost(uploadedPost!!)
         }
     }
 
