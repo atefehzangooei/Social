@@ -55,6 +55,7 @@ import com.appcoding.social.screen.components.PullToRefreshLazyList
 import com.appcoding.social.screen.components.RightToLeftLayout
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
+import com.appcoding.social.viewmodel.AddPostVM
 import com.appcoding.social.viewmodel.MainDataVM
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
@@ -68,6 +69,7 @@ fun MainData(navController: NavHostController) {
     }
 
     val viewModel: MainDataVM = hiltViewModel(parentEntry)
+    val viewModelAddPost: AddPostVM = hiltViewModel(parentEntry)
 
     val posts by viewModel.posts.collectAsState()
     val stories by viewModel.stories.collectAsState()
@@ -76,6 +78,8 @@ fun MainData(navController: NavHostController) {
     val userid by viewModel.userid.collectAsState()
     val lastSeenId by viewModel.lastSeenId.collectAsState()
     val profileImage by viewModel.profileImage.collectAsState()
+
+    val addPostState by viewModelAddPost.state.collectAsState()
 
     val listState = rememberLazyListState()
     val snackScope = rememberCoroutineScope()
@@ -117,7 +121,8 @@ fun MainData(navController: NavHostController) {
                 viewModel.onRefresh()
             },
             lazyListState = listState,
-            tag = "main"
+            tag = "main",
+            addPostState = addPostState
         )
     }
 

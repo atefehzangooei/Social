@@ -113,7 +113,8 @@ fun MyApp(userid : Long, navController : NavHostController) {
                     }
                 }
                 OpenAnimated(isAddScreenVisible) {
-                    AddPostScreen(onBack = { isAddScreenVisible = false })
+                    AddPostScreen(onBack = { isAddScreenVisible = false },
+                        navController)
                 }
 
             }

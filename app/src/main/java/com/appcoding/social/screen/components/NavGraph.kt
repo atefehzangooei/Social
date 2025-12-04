@@ -26,7 +26,7 @@ fun AppNavHost(navController: NavHostController, startDestination : String = "sp
         composable("signup"){ SignUp(navController) }
        // composable("main"){ MyApp(navController) }
         composable("forgetpassword"){ ForgetPassword(navController) }
-        composable("post_screen"){ MainData(navController) }
+       // composable("post_screen"){ MainData(navController) }
 
         composable(
             route = "story/{userid}",

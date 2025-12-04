@@ -40,6 +40,9 @@ class AddPostVM @Inject constructor(
     private val _uploadedPost = MutableStateFlow<PostResponse?>(null)
     val uploadedPost : StateFlow<PostResponse?> = _uploadedPost
 
+    private val _userid = MutableStateFlow(-1L)
+    val userid : StateFlow<Long> = _userid
+
 
     fun onNeveshtakChanged(value : String) { _neveshtak.value = value }
 
@@ -65,8 +68,9 @@ class AddPostVM @Inject constructor(
         // جلوگیری از آپلود دوباره وسط کار
         if (_state.value.isUploading) return
         viewModelScope.launch {
+            _userid.value = userPreferences.getUserIdFlow().first() ?: 0L
             val post = PostRequest(
-                userId = userPreferences.getUserIdFlow().first() ?: 0L,
+                userId = _userid.value,
                 caption = neveshtak,
                 date = "",
                 time = ""

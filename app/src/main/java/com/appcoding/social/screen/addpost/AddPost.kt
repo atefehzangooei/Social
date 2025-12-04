@@ -66,9 +66,11 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.appcoding.social.R
 import com.appcoding.social.screen.components.RightToLeftLayout
+import com.appcoding.social.screen.components.UploadPostProgress
 import com.appcoding.social.screen.components.checkReadPermission
 import com.appcoding.social.screen.components.screenWidth
 import com.appcoding.social.ui.theme.Colors
@@ -79,12 +81,18 @@ import com.appcoding.social.viewmodel.UiState
 
 
 @Composable
-fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
+fun AddPostScreenNext(onBack: () -> Unit,
+                      selectedImageUri: Uri?,
+                      navController: NavHostController){
 
-    val viewModel : AddPostVM = hiltViewModel()
+    val parentEntry = remember(navController.currentBackStackEntry) {
+        navController.getBackStackEntry("nav_graph")
+    }
+    val viewModel : AddPostVM = hiltViewModel(parentEntry)
 
     val neveshtak by viewModel.neveshtak.collectAsState()
     val state by viewModel.state.collectAsState()
+    val userid by viewModel.userid.collectAsState()
 
     BackHandler(enabled = true) {
         onBack()
@@ -112,23 +120,9 @@ fun AddPostScreenNext(onBack: () -> Unit, selectedImageUri: Uri?){
             sharePost(neveshtak, selectedImageUri, viewModel)
 
             if(state.isUploading) {
-                val boxWidth = screenWidth() - 40.dp
-                Box(
-                    modifier = Modifier
-                        .width(boxWidth)
-                        .wrapContentHeight()
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Colors.upload_progress_background)
-                        .align(Alignment.Center)
-                ) {
-                    LinearProgressIndicator(
-                        progress = { state.progress / 100f },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp)
-                            .align(Alignment.Center)
-
-                    )
+              // UploadPostProgress(state)
+                navController.navigate("main/$userid"){
+                    popUpTo("main"){ inclusive = true }
                 }
             }
         }
@@ -249,7 +243,8 @@ fun NextTopBar(onBack: () -> Unit) {
 
 
 @Composable
-fun  AddPostScreen(onBack: () -> Unit) {
+fun  AddPostScreen(onBack: () -> Unit,
+                   navController: NavHostController) {
 
     val context = LocalContext.current
     var images by remember { mutableStateOf(emptyList<Uri>()) }
@@ -409,7 +404,9 @@ fun  AddPostScreen(onBack: () -> Unit) {
             }
         }
         if(next){
-            AddPostScreenNext(onBack = {next = false}, selectedImageUri = selectedImageUri)
+            AddPostScreenNext(onBack = {next = false},
+                selectedImageUri = selectedImageUri,
+                navController)
         }
 
     }
