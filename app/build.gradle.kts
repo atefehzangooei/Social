@@ -104,11 +104,12 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
    // ksp(libs.androidx.hilt.compiler)
 
-   // implementation(libs.accompanist.pager)
-   // implementation(libs.accompanist.pager.indicators)
+    //camera
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.extensions)
+
 }
 
-/*
-hilt {
-    enableAggregatingTask = false
-}*/
