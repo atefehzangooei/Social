@@ -1,13 +1,15 @@
 package com.appcoding.social.screen.addpost
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import com.appcoding.social.Manifest
+import androidx.navigation.ActivityNavigatorExtras
 
 
 @Composable
 fun AddStory(){
-    val context = LocalContext.current
-    val cameraPermission = Manifest.permission.CAMERA
-
+    CameraPermissionWrapper {
+        CameraPreview()
+    }
 }
