@@ -10,6 +10,7 @@ import com.appcoding.social.MyApp
 import com.appcoding.social.auth.ForgetPassword
 import com.appcoding.social.auth.SignIn
 import com.appcoding.social.auth.SignUp
+import com.appcoding.social.screen.addpost.AddStory
 import com.appcoding.social.screen.home.MainData
 import com.appcoding.social.screen.home.StoryPager
 import com.appcoding.social.screen.home.StoryViewer
@@ -26,7 +27,7 @@ fun AppNavHost(navController: NavHostController, startDestination : String = "sp
         composable("signup"){ SignUp(navController) }
        // composable("main"){ MyApp(navController) }
         composable("forgetpassword"){ ForgetPassword(navController) }
-       // composable("post_screen"){ MainData(navController) }
+        //composable("post_screen"){ MainData(navController) }
 
         composable(
             route = "story/{userid}",
@@ -64,5 +65,6 @@ fun AppNavHost(navController: NavHostController, startDestination : String = "sp
             val username = backStackEntry.arguments!!.getString("username")
             StartFromIndex(userid, username!!, index,navController)
         }
+        composable("addstory") { AddStory() }
     }
 }

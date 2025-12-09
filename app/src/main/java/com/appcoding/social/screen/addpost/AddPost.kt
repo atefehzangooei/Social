@@ -394,7 +394,9 @@ fun  AddPostScreen(onBack: () -> Unit,
 
                 }
 
-                TextButton(onClick = { selected = "story"}) {
+                TextButton(onClick = {
+                    selected = "story"
+                }) {
                     Text(text = "Story",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
@@ -407,6 +409,9 @@ fun  AddPostScreen(onBack: () -> Unit,
             AddPostScreenNext(onBack = {next = false},
                 selectedImageUri = selectedImageUri,
                 navController)
+        }
+        if(selected == "story"){
+            navController.navigate("addstory")
         }
 
     }
