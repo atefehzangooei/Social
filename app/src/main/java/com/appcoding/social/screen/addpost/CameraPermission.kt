@@ -17,7 +17,6 @@ import com.google.accompanist.permissions.shouldShowRationale
 fun CameraPermissionWrapper(
     onPermissionGranted : @Composable () -> Unit
 ){
-    val context = LocalContext.current
     val cameraPermission = Manifest.permission.CAMERA
 
     val permissionState = rememberPermissionState(cameraPermission)

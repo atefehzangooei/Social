@@ -345,8 +345,6 @@ fun  AddPostScreen(onBack: () -> Unit,
 
                     }
 
-
-
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(4),
                         modifier = Modifier.fillMaxSize()
