@@ -37,5 +37,6 @@ object Dimens {
     val story_home_add = 20.dp
     val home_padding_between_story= 14.dp
     val add_post_corner = 20.dp
+    val add_story_image_corner = 20.dp
 
 }
