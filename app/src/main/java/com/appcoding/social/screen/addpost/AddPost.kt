@@ -341,8 +341,6 @@ fun  AddPostScreen(onBack: () -> Unit,
                             modifier = Modifier.size(screenWidth()),
                             contentScale = ContentScale.Crop
                         )
-
-
                     }
 
                     LazyVerticalGrid(
@@ -371,7 +369,6 @@ fun  AddPostScreen(onBack: () -> Unit,
                 modifier = Modifier
                     .width(screenWidth() / 2)
                     .wrapContentHeight()
-                    .padding(20.dp)
                     .background(Color.Black)
                     .padding(10.dp)
                     .border(width = 1.dp,
@@ -425,7 +422,6 @@ fun getGalleryImages(context: Context): List<Uri> {
         MediaStore.Images.Media.DATE_ADDED
     )
 
-    // مرتب سازی بر اساس تاریخ ایجاد (نزولی - جدیدترین اول)
     val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
 
     context.contentResolver.query(

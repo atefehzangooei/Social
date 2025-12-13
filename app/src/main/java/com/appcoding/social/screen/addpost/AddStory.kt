@@ -6,17 +6,24 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +41,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.ActivityNavigatorExtras
 import coil.compose.rememberAsyncImagePainter
 import com.appcoding.social.screen.components.checkReadPermission
+import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
 import kotlinx.coroutines.selects.select
 
@@ -42,7 +50,7 @@ import kotlinx.coroutines.selects.select
 fun AddStory(){
     CameraPermissionWrapper {
         CameraPreview(onSwipUp = {
-            val selectedImageUri = DisplayGalleyImages()
+            val selectedImageUri = AddImageToStory()
             if(selectedImageUri != null){
 
             }
@@ -51,13 +59,11 @@ fun AddStory(){
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DisplayGalleyImages() : Uri?{
+fun AddImageToStory() : Uri?{
 
     val context = LocalContext.current
     var images by remember { mutableStateOf(emptyList<Uri>()) }
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val lazyGridState = rememberLazyGridState()
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -77,26 +83,23 @@ fun DisplayGalleyImages() : Uri?{
             == PackageManager.PERMISSION_GRANTED
         ) {
             images = getGalleryImages(context)
+
         } else {
             permissionLauncher.launch(permission)
         }
     }
 
-    ModalBottomSheet(
-        sheetState = bottomSheetState,
-        containerColor = Color.Black,
-        scrimColor = Color.Black.copy(alpha = 0.5f),
-        onDismissRequest = {}
-    ) {
+    if(images.isNotEmpty()) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
             state = lazyGridState,
             modifier = Modifier.fillMaxSize()
         ) {
-            items(images){ imageUri ->
-                Image(painter = rememberAsyncImagePainter(model = imageUri),
+            items(images) { imageUri ->
+                Image(
+                    painter = rememberAsyncImagePainter(model = imageUri),
                     modifier = Modifier
-                        .padding(1.dp)
+                        .padding(2.dp)
                         .aspectRatio(0.5f)
                         .clip(RoundedCornerShape(Dimens.add_story_image_corner))
                         .clickable { selectedImageUri = imageUri },
@@ -109,4 +112,34 @@ fun DisplayGalleyImages() : Uri?{
 
     return selectedImageUri
 
+}
+
+@Composable
+fun AddImageToStory(selectedImageUri : Uri){
+
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.Black)
+
+    ) {
+        Image(modifier = Modifier
+            .fillMaxWidth()
+            .weight(3f),
+            contentDescription = "selected story image",
+            painter = rememberAsyncImagePainter(model = selectedImageUri)
+        )
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
+        ) {
+            IconButton(modifier = Modifier
+                .wrapContentSize()
+                .background(Colors.add_story_button_background),
+                onClick = {}
+            ) {
+                Text(text = "اشتراک گذاری")
+            }
+        }
+    }
 }
