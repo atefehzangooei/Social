@@ -69,13 +69,6 @@ fun AppNavHost(navController: NavHostController, startDestination : String = "sp
         }
         composable("addstory") { AddStory(navController) }
 
-        composable("addimagestory/{selectedImageUri}",
-            arguments = listOf(
-                navArgument("selectedImageUri"){type = NavType.StringType}
-            )
-        ) { backStackEntry ->
-            val selectedImageUri = backStackEntry.arguments!!.getString("selectedImageUri")
-            AddImageToStory(Uri.parse(selectedImageUri))
-        }
+        composable("addimagestory") { AddImageToStory(navController) }
     }
 }

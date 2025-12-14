@@ -11,7 +11,7 @@ class AddStoryVM : ViewModel() {
     private val _selectedImageUri = MutableStateFlow<Uri?>(null)
     val selectedImageUri : StateFlow<Uri?> = _selectedImageUri
 
-     fun onSelectedImage(uri : Uri){
-
+     fun onSelectedImage(imageUri : Uri){
+         _selectedImageUri.value = imageUri
     }
 }
