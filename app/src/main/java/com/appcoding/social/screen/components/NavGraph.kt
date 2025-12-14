@@ -1,5 +1,6 @@
 package com.appcoding.social.screen.components
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -10,6 +11,7 @@ import com.appcoding.social.MyApp
 import com.appcoding.social.auth.ForgetPassword
 import com.appcoding.social.auth.SignIn
 import com.appcoding.social.auth.SignUp
+import com.appcoding.social.screen.addpost.AddImageToStory
 import com.appcoding.social.screen.addpost.AddStory
 import com.appcoding.social.screen.home.MainData
 import com.appcoding.social.screen.home.StoryPager
@@ -65,6 +67,15 @@ fun AppNavHost(navController: NavHostController, startDestination : String = "sp
             val username = backStackEntry.arguments!!.getString("username")
             StartFromIndex(userid, username!!, index,navController)
         }
-        composable("addstory") { AddStory() }
+        composable("addstory") { AddStory(navController) }
+
+        composable("addimagestory/{selectedImageUri}",
+            arguments = listOf(
+                navArgument("selectedImageUri"){type = NavType.StringType}
+            )
+        ) { backStackEntry ->
+            val selectedImageUri = backStackEntry.arguments!!.getString("selectedImageUri")
+            AddImageToStory(Uri.parse(selectedImageUri))
+        }
     }
 }

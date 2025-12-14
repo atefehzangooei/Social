@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
@@ -27,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,34 +40,37 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.ActivityNavigatorExtras
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.appcoding.social.screen.components.checkReadPermission
 import com.appcoding.social.ui.theme.Colors
 import com.appcoding.social.ui.theme.Dimens
+import com.appcoding.social.viewmodel.AddStoryVM
 import kotlinx.coroutines.selects.select
 
 
 @Composable
-fun AddStory(){
+fun AddStory(navController : NavHostController){
     CameraPermissionWrapper {
         CameraPreview(onSwipUp = {
-            val selectedImageUri = AddImageToStory()
-            if(selectedImageUri != null){
-
-            }
+            AddStoryDisplayImageGallery(navController)
         })
     }
 }
 
 
 @Composable
-fun AddImageToStory() : Uri?{
+fun AddStoryDisplayImageGallery(navController: NavHostController) {
+
+    val viewModel : AddStoryVM = viewModel()
+
+    val selectedImageUri by viewModel.selectedImageUri.collectAsState()
 
     val context = LocalContext.current
-    var images by remember { mutableStateOf(emptyList<Uri>()) }
     val lazyGridState = rememberLazyGridState()
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var images by remember { mutableStateOf(emptyList<Uri>()) }
 
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -102,7 +107,7 @@ fun AddImageToStory() : Uri?{
                         .padding(2.dp)
                         .aspectRatio(0.5f)
                         .clip(RoundedCornerShape(Dimens.add_story_image_corner))
-                        .clickable { selectedImageUri = imageUri },
+                        .clickable { viewModel.onSelectedImage(imageUri) },
                     contentDescription = "story images",
                     contentScale = ContentScale.Crop
                 )
@@ -110,9 +115,14 @@ fun AddImageToStory() : Uri?{
         }
     }
 
-    return selectedImageUri
+     if(selectedImageUri != null){
+         navController.navigate("addimagestory/${selectedImageUri?.toString()}"){
+             popUpTo("addstory"){ inclusive = true }
+         }
+     }
 
 }
+
 
 @Composable
 fun AddImageToStory(selectedImageUri : Uri){
@@ -133,7 +143,7 @@ fun AddImageToStory(selectedImageUri : Uri){
             .fillMaxWidth()
             .weight(1f)
         ) {
-            IconButton(modifier = Modifier
+            Button(modifier = Modifier
                 .wrapContentSize()
                 .background(Colors.add_story_button_background),
                 onClick = {}

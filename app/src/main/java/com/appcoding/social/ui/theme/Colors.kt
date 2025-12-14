@@ -30,5 +30,5 @@ object Colors{
     val upload_progress_background = Color(0xFFADADAD)
     val addpost_disable_color = Color(0xFF6B6B6B)
     val addpost_row_border = Color(0xFF151515)
-    val add_story_button_background = Color(0xFF252525)
+    val add_story_button_background = Color(0xFFC5C5C5)
 }

@@ -386,7 +386,6 @@ fun  AddPostScreen(onBack: () -> Unit,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = if(selected == "post") Color.White else Colors.addpost_disable_color)
-
                 }
 
                 TextButton(onClick = {
