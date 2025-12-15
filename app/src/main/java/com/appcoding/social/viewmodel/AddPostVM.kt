@@ -67,7 +67,8 @@ class AddPostVM @Inject constructor(
 
         if (_state.value.isUploading) return
         viewModelScope.launch {
-            _userid.value = userPreferences.getUserIdFlow().first() ?: 0L
+            _userid.value = userPreferences.getUserIdFlow().first() ?: -1L
+
             val post = PostRequest(
                 userId = _userid.value,
                 caption = neveshtak,

@@ -1,9 +1,11 @@
 package com.appcoding.social.data.api
 
+import com.appcoding.social.models.StoryRequest
 import com.appcoding.social.models.StoryResponse
 import com.appcoding.social.models.StringMessage
 import com.appcoding.social.models.UserStory
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -16,10 +18,8 @@ interface StoryApi {
     suspend fun getStoryOfFollowers(@Path("userId") userId : Long) : List<StoryResponse>
 
     @POST("story/add")
-    suspend fun addStory(@Part imageFile : MultipartBody.Part,
-                         @Part("userId") userId : Long,
-                         @Part("date") date : String,
-                         @Part("time") time : String) : StoryResponse
+    suspend fun uploadStory(@Part image: MultipartBody.Part,
+                         @Part("story") story: RequestBody) : StoryResponse
 
     @DELETE("story/delete/{storyId}")
     suspend fun deleteStory(@Path("storyId") storyId : Long) : StringMessage
