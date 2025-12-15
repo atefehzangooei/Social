@@ -11,20 +11,27 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -39,15 +46,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.ActivityNavigatorExtras
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.appcoding.social.screen.components.RightToLeftLayout
 import com.appcoding.social.screen.components.checkReadPermission
@@ -74,7 +84,7 @@ fun AddStoryDisplayImageGallery(navController: NavHostController) {
         navController.getBackStackEntry("nav_graph")
     }
 
-    val viewModel : AddStoryVM = viewModel(parentEntry)
+    val viewModel : AddStoryVM = hiltViewModel(parentEntry)
 
     val selectedImageUri by viewModel.selectedImageUri.collectAsState()
 
@@ -140,7 +150,10 @@ fun AddImageToStory(navController: NavHostController){
     val parentEntry = remember(navController.currentBackStackEntry){
         navController.getBackStackEntry("nav_graph")
     }
-    val viewModel : AddStoryVM = viewModel(parentEntry)
+    val viewModel : AddStoryVM = hiltViewModel(parentEntry)
+    val selectedImageUri by viewModel.selectedImageUri.collectAsState()
+    val profileImage by viewModel.profileImage.collectAsState()
+
 
     RightToLeftLayout {
 
@@ -148,13 +161,14 @@ fun AddImageToStory(navController: NavHostController){
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black)
+                .padding(vertical = 15.dp)
 
         ) {
             Image(
                 modifier = Modifier
                     .fillMaxSize(),
                 contentDescription = "selected story image",
-                painter = rememberAsyncImagePainter(model = viewModel.selectedImageUri)
+                painter = rememberAsyncImagePainter(model = selectedImageUri)
             )
 
             Row(
@@ -163,13 +177,27 @@ fun AddImageToStory(navController: NavHostController){
                     .wrapContentHeight()
                     .background(Color.Black)
                     .padding(15.dp)
-                    .align(Alignment.BottomEnd)
+                    .align(Alignment.BottomEnd),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(modifier = Modifier
-                    .wrapContentSize()
-                    .background(Colors.add_story_button_background),
-                    onClick = {}
+                    .wrapContentSize(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Colors.add_story_button_background
+                    ),
+                    onClick = {viewModel.shareStory()}
                 ) {
+                    AsyncImage(model = profileImage,
+                        contentDescription = "profile image",
+                        modifier = Modifier
+                            .size(Dimens.add_story_profile_image)
+                            .shadow(elevation = 2.dp, shape = CircleShape, clip = true)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Inside
+                        )
+
+                    Spacer(modifier = Modifier.size(10.dp))
+
                     Text(text = "اشتراک گذاری",
                         color = Color.Black,
                         style = MaterialTheme.typography.bodyMedium)

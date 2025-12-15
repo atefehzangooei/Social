@@ -19,7 +19,7 @@ interface StoryApi {
     suspend fun addStory(@Part imageFile : MultipartBody.Part,
                          @Part("userId") userId : Long,
                          @Part("date") date : String,
-                         @Part("time") time : String)
+                         @Part("time") time : String) : StoryResponse
 
     @DELETE("story/delete/{storyId}")
     suspend fun deleteStory(@Path("storyId") storyId : Long) : StringMessage

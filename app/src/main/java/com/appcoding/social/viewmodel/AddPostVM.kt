@@ -65,7 +65,6 @@ class AddPostVM @Inject constructor(
 
     private fun uploadPost(neveshtak: String, imageFile: File){
 
-        // جلوگیری از آپلود دوباره وسط کار
         if (_state.value.isUploading) return
         viewModelScope.launch {
             _userid.value = userPreferences.getUserIdFlow().first() ?: 0L
@@ -79,11 +78,9 @@ class AddPostVM @Inject constructor(
             try {
                 _state.value = UiState(isUploading = true)
 
-                // PostRequest → JSON
                 val json = Gson().toJson(post)
                 val postPart = json.toRequestBody("application/json".toMediaType())
 
-                // Image با Progress
                 val requestBody = UploadProgressRequestBody(
                     file = imageFile,
                     contentType = "image/jpeg".toMediaTypeOrNull(),
@@ -92,15 +89,12 @@ class AddPostVM @Inject constructor(
                     }
                 )
 
-                // image file → Multipart
                 val imagePart = MultipartBody.Part.createFormData(
                     name = "image",
                     filename = imageFile.name,
                     body = requestBody
-                   // body = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
                 )
 
-                // API call
                 _uploadedPost.value = postRepository.uploadPost(imagePart, postPart)
 
                 _state.value = UiState(

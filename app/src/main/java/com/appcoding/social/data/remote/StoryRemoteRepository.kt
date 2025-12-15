@@ -16,7 +16,7 @@ class StoryRemoteRepository @Inject constructor(private val api : StoryApi) {
     suspend fun addStory(imageFile : MultipartBody.Part,
                          userId : Long,
                          date : String,
-                         time : String){
+                         time : String) : StoryResponse {
         return api.addStory(imageFile, userId, date, time)
     }
 
