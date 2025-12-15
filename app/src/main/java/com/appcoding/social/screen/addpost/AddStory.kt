@@ -2,6 +2,7 @@ package com.appcoding.social.screen.addpost
 
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.FileUtils
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -59,6 +60,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.appcoding.social.screen.components.MyFileUtils
 import com.appcoding.social.screen.components.RightToLeftLayout
 import com.appcoding.social.screen.components.checkReadPermission
 import com.appcoding.social.ui.theme.Colors
@@ -147,12 +149,16 @@ fun AddStoryDisplayImageGallery(navController: NavHostController) {
 @Composable
 fun AddImageToStory(navController: NavHostController){
 
+    val context = LocalContext.current
     val parentEntry = remember(navController.currentBackStackEntry){
         navController.getBackStackEntry("nav_graph")
     }
     val viewModel : AddStoryVM = hiltViewModel(parentEntry)
     val selectedImageUri by viewModel.selectedImageUri.collectAsState()
     val profileImage by viewModel.profileImage.collectAsState()
+    val state by viewModel.storyState.collectAsState()
+    val uploadedStory by viewModel.uploadedStory.collectAsState()
+    val myFileUtils = MyFileUtils(context)
 
 
     RightToLeftLayout {
@@ -185,7 +191,13 @@ fun AddImageToStory(navController: NavHostController){
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Colors.add_story_button_background
                     ),
-                    onClick = {viewModel.shareStory()}
+                    onClick = {
+                        selectedImageUri.let { safeUri ->
+                            val imageFile = myFileUtils.uriToFile(safeUri!!)
+                            viewModel.uploadStory(imageFile)
+                        }
+
+                    }
                 ) {
                     AsyncImage(model = profileImage,
                         contentDescription = "profile image",

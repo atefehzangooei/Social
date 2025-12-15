@@ -120,7 +120,6 @@ fun AddPostScreenNext(onBack: () -> Unit,
             sharePost(neveshtak, selectedImageUri, viewModel)
 
             if(state.isUploading) {
-              // UploadPostProgress(state)
                 navController.navigate("main/$userid"){
                     popUpTo("main"){ inclusive = true }
                 }
