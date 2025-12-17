@@ -3,6 +3,7 @@ package com.appcoding.social.screen.addpost
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.FileUtils
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -194,9 +195,9 @@ fun AddImageToStory(navController: NavHostController){
                     onClick = {
                         selectedImageUri.let { safeUri ->
                             val imageFile = myFileUtils.uriToFile(safeUri!!)
+                            Log.d("upload story","isFile = ${imageFile.isFile}")
                             viewModel.uploadStory(imageFile)
                         }
-
                     }
                 ) {
                     AsyncImage(model = profileImage,
@@ -214,6 +215,10 @@ fun AddImageToStory(navController: NavHostController){
                         color = Color.Black,
                         style = MaterialTheme.typography.bodyMedium)
                 }
+            }
+
+            if(state.isUploading){
+
             }
         }
     }

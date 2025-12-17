@@ -1,6 +1,7 @@
 package com.appcoding.social.viewmodel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -44,18 +45,23 @@ class AddStoryVM @Inject constructor(
     fun uploadStory(imageFile : File){
         if(_storyState.value.isUploading) return
         viewModelScope.launch {
+            Log.d("upload story", "is uploading")
             _storyState.value = UiState(isUploading = true)
 
             val userid = userPreferences.getUserIdFlow().first() ?: -1L
 
             val newStory = StoryRequest(
-                userid = userid,
+                userId = userid,
                 date = "",
                 time = ""
             )
             try{
+                Log.d("upload story", "craete json")
+
                 val json = Gson().toJson(newStory)
                 val storyPart = json.toRequestBody(("application/json".toMediaType()))
+
+                Log.d("upload story", "create request body")
 
                 val requestBody = UploadProgressRequestBody(
                     file = imageFile,
@@ -65,6 +71,7 @@ class AddStoryVM @Inject constructor(
                     }
                 )
 
+                Log.d("upload story", "image part")
 
                 val imagePart = MultipartBody.Part.createFormData(
                     name = "image",
@@ -72,7 +79,10 @@ class AddStoryVM @Inject constructor(
                     body = requestBody
                 )
 
+
                 _uploadedStory.value = storyRepository.uploadStory(imagePart, storyPart)
+
+                Log.d("upload story", "uploaded new story")
 
                 _storyState.value = UiState(
                     isUploading = false,
@@ -81,6 +91,8 @@ class AddStoryVM @Inject constructor(
                 )
             }
             catch(e : Exception){
+                Log.d("upload story", e.toString())
+
                 _storyState.value = UiState(
                     isUploading = false,
                     success = false,
