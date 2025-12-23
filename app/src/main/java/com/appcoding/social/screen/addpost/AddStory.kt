@@ -217,9 +217,9 @@ fun AddImageToStory(navController: NavHostController){
                 }
             }
 
-            if(state.isUploading){
+           // if(state.isUploading){
 
-            }
+           // }
         }
     }
 }
