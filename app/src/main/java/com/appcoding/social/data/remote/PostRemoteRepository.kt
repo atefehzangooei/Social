@@ -37,4 +37,10 @@ class PostRemoteRepository @Inject constructor(private val api : PostApi) {
                            size : Int) : List<PostResponse>{
         return api.searchPost(text, userId, lastSeenId, size)
     }
+
+    suspend fun getAllPosts(userId: Long,
+                            lastSeenId: Long?,
+                            size: Int) : List<PostResponse> {
+        return api.getAllPosts(userId, lastSeenId, size)
+    }
 }

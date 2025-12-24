@@ -82,7 +82,7 @@ fun ProfilePostCard(post : PostResponse,
 
     if(selectedIndex > -1){
         Log.d("start from index", "selected index = $index")
-        navController.navigate("start_from_index/$userid/$username/$index"){
+        navController.navigate("start_from_index/$userid/$username/$index/profile"){
             launchSingleTop = true
 
         }

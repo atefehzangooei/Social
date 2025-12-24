@@ -40,7 +40,11 @@ class SearchPostVM @Inject constructor(
     private val _posts = MutableStateFlow<List<PostResponse>>(emptyList())
     val posts : StateFlow<List<PostResponse>> = _posts
 
+    private val _myUserid = MutableStateFlow(-1L)
+    val myUserid : StateFlow<Long?> = _myUserid
+
     private val _lastSeenId = MutableStateFlow<Long?>(-1L)
+    private val _searchLastSeenId = MutableStateFlow<Long?>(-1L)
 
     fun onSearchTextChanged(newText : String){
         _searchText.value = newText
@@ -55,20 +59,22 @@ class SearchPostVM @Inject constructor(
         _isFocused.value = false
         _searchText.value = ""
         _isTyping.value = false
+        _lastSeenId.value = -1
+        _searchLastSeenId.value = -1
+        explore()
     }
 
     fun keyboardSearchAction(){
         _searchAction.value = true
     }
 
-    fun getPosts(){
+    fun explore(){
         viewModelScope.launch {
-            val myUserid = userPreferences.getUserIdFlow().first() ?: 0L
+            _myUserid.value = userPreferences.getUserIdFlow().first() ?: -1L
             _state.value = UiState(isLoading = true)
-            try {
-                val response = postRepository.searchPost(
-                    text = _searchText.value,
-                    userId = myUserid,
+            try{
+                val response = postRepository.getAllPosts(
+                    userId = _myUserid.value,
                     lastSeenId = _lastSeenId.value,
                     size = pageSizeExplore
                 )
@@ -78,6 +84,33 @@ class SearchPostVM @Inject constructor(
                     _posts.value = response
 
                 _lastSeenId.value = response.lastOrNull()?.id
+                _state.value = UiState(success = true)
+
+            }
+            catch (ex : Exception){
+                _state.value = UiState(message = ex.toString())
+            }
+        }
+    }
+
+
+    fun getPosts(){
+        viewModelScope.launch {
+            //val myUserid = userPreferences.getUserIdFlow().first() ?: -1L
+            _state.value = UiState(isLoading = true)
+            try {
+                val response = postRepository.searchPost(
+                    text = _searchText.value,
+                    userId = _myUserid.value,
+                    lastSeenId = _searchLastSeenId.value,
+                    size = pageSizeExplore
+                )
+                if(_searchLastSeenId.value !!> -1)
+                    _posts.value += response
+                else
+                    _posts.value = response
+
+                _searchLastSeenId.value = response.lastOrNull()?.id
                 _state.value = UiState(success = true)
 
             } catch (e: Exception) {

@@ -44,6 +44,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.appcoding.social.R
 import com.appcoding.social.models.PostResponse
@@ -57,9 +58,12 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SearchPost() {
+fun SearchPost(navController: NavHostController) {
 
-    val viewModel : SearchPostVM = hiltViewModel()
+    val parentEntry = remember(navController.currentBackStackEntry){
+        navController.getBackStackEntry("nav_graph")
+    }
+    val viewModel : SearchPostVM = hiltViewModel(parentEntry)
 
     val searchText by viewModel.searchText.collectAsState()
     val isFocused by viewModel.isFocused.collectAsState()
@@ -67,6 +71,7 @@ fun SearchPost() {
     val searchAction by viewModel.searchAction.collectAsState()
     val posts by viewModel.posts.collectAsState()
     val state by viewModel.state.collectAsState()
+    val myUserId by viewModel.myUserid.collectAsState()
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -74,6 +79,10 @@ fun SearchPost() {
     val gridState = rememberLazyStaggeredGridState()
 
     RightToLeftLayout {
+
+        LaunchedEffect(Unit) {
+            viewModel.explore()
+        }
 
     LaunchedEffect(searchAction) {
         if(searchAction) {
@@ -167,7 +176,7 @@ fun SearchPost() {
                         }
 
                         if(state.success){
-                            DisplayStaggeredList(posts)
+                            DisplayStaggeredList(posts, navController, myUserId!!)
                         }
                     }
             }
@@ -177,7 +186,11 @@ fun SearchPost() {
 
 
 @Composable
-fun DisplayStaggeredList(posts : List<PostResponse>){
+fun DisplayStaggeredList(posts : List<PostResponse>,
+                         navController: NavHostController,
+                         myUserid : Long){
+
+    val username = ""
 
     LazyVerticalStaggeredGrid (modifier = Modifier
         .fillMaxSize(),
@@ -193,7 +206,8 @@ fun DisplayStaggeredList(posts : List<PostResponse>){
                      .border(width = 1.dp, color = Color.White)
                      .aspectRatio(
                          if(index % 10 in listOf(0,7)) 0.5f else 1f
-                     ),
+                     )
+                     .clickable { navController.navigate("start_from_index/$myUserid/$username/$index/explore") },
                  contentScale = ContentScale.Crop
              )
 /*

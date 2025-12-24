@@ -74,14 +74,15 @@ fun StoryCard(story : StoryResponse, userid : Long, navController: NavHostContro
         .wrapContentSize()
         .padding(end = Dimens.home_padding_between_story)
     ) {
-        Image(painter = painterResource(R.drawable.no_image),
+       AsyncImage(model = story.profileImage,
             contentDescription = "user story",
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(Dimens.story_home_display)
-                .clip(CircleShape)
                 .border(width = 2.dp, color = Color.Magenta, CircleShape)
-                //.padding(2.dp)
+                .padding(2.dp)
+                .border(width = 2.dp, color = Color.White, CircleShape)
+                .clip(CircleShape)
                 .clickable {
                     navController.navigate("story/${story.userId}")
                 })
@@ -91,7 +92,10 @@ fun StoryCard(story : StoryResponse, userid : Long, navController: NavHostContro
                 modifier = Modifier
                     .size(Dimens.story_home_add)
                     .border(width = 2.dp, color = Color.White, shape = CircleShape)
-                    .align(Alignment.BottomEnd))
+                    .align(Alignment.BottomEnd)
+                    .clickable { navController.navigate("addstory") }
+
+            )
         }
     }
 
@@ -113,7 +117,6 @@ fun StoryPager(userid: Long, navController: NavHostController){
     val snackbarHostState = remember { SnackbarHostState()}
     val snackeScope = rememberCoroutineScope()
     var pagerIndex by remember{ mutableStateOf(0) }
-
 
 
     val pagerState = rememberPagerState(initialPage = 0, pageCount = {stories.size})
@@ -178,8 +181,7 @@ fun StoryViewer(userid: Long, userStory : List<UserStory>){
                         AsyncImage(
                             model = userStory[activeIndex].image,
                             contentDescription = "story",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+                            modifier = Modifier.fillMaxSize()
                         )
 
                         Column(

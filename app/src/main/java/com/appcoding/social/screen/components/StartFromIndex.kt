@@ -38,12 +38,14 @@ import com.appcoding.social.screen.home.PostCard
 import com.appcoding.social.screen.profile.ProfileScreen
 import com.appcoding.social.viewmodel.MainDataVM
 import com.appcoding.social.viewmodel.ProfileScreenVM
+import com.appcoding.social.viewmodel.SearchPostVM
 
 @Composable
 fun StartFromIndex(userid : Long,
                    username : String,
                    index : Int,
-                   navController: NavHostController){
+                   navController: NavHostController,
+                   tag : String){
 
     val listState = rememberLazyListState(
         initialFirstVisibleItemIndex = index
@@ -54,8 +56,10 @@ fun StartFromIndex(userid : Long,
     }
 
     val viewModelMain : MainDataVM = hiltViewModel(parentEntry)
-    val viewModel : ProfileScreenVM = hiltViewModel(parentEntry)
-    val posts by viewModel.userPosts.collectAsState()
+    val viewModelProfile : ProfileScreenVM = hiltViewModel(parentEntry)
+    val viewModelExplore : SearchPostVM = hiltViewModel(parentEntry)
+    val userPosts by viewModelProfile.userPosts.collectAsState()
+    val posts by viewModelExplore.posts.collectAsState()
 
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -73,9 +77,13 @@ fun StartFromIndex(userid : Long,
                 tint = Color.Black,
 
                 modifier = Modifier
-                    .clickable { navController.navigate("profile/${userid}"){
-                        popUpTo("profile/$userid"){ saveState = true }
-                    }
+                    .clickable {
+                        if(tag == "profile") {
+                            navController.navigate("profile/${userid}") {
+                                popUpTo("profile/$userid") { saveState = true }
+                            }
+                        }
+
                     })
 
            Text(text = username,
@@ -90,12 +98,23 @@ fun StartFromIndex(userid : Long,
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            items(posts, key = { it.id }) { post ->
-                PostCard(
-                    post = post,
-                    navController = navController,
-                    viewModel = viewModelMain
-                )
+            if(tag == "profile") {
+                items(userPosts, key = { it.id }) { post ->
+                    PostCard(
+                        post = post,
+                        navController = navController,
+                        viewModel = viewModelMain
+                    )
+                }
+            }
+            else{
+                items(posts, key = { it.id }) { post ->
+                    PostCard(
+                        post = post,
+                        navController = navController,
+                        viewModel = viewModelMain
+                    )
+                }
             }
         }
     }

@@ -106,8 +106,8 @@ fun MyApp(userid : Long, navController : NavHostController) {
                 else {
                     when (selectedIndex) {
                         0 -> HomeScreen(userid, navController)
-                        1 -> SearchPost()
-                        3 -> SearchPost()
+                        1 -> SearchPost(navController)
+                        3 -> SearchPost(navController)
                         4 -> ProfileScreen(userid = userid,
                             navController = navController)
                     }

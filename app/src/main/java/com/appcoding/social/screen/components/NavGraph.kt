@@ -55,17 +55,19 @@ fun AppNavHost(navController: NavHostController, startDestination : String = "sp
             ProfileScreen(userid, navController)
         }
 
-        composable("start_from_index/{userid}/{username}/{index}",
+        composable("start_from_index/{userid}/{username}/{index}/{tag}",
             arguments = listOf(
                 navArgument("index"){type = NavType.IntType},
                 navArgument("userid"){type = NavType.LongType},
-                navArgument("username"){type = NavType.StringType}
+                navArgument("username"){type = NavType.StringType},
+                navArgument("tag"){type = NavType.StringType}
             )
         ){backStackEntry ->
             val index = backStackEntry.arguments!!.getInt("index")
             val userid = backStackEntry.arguments!!.getLong("userid")
             val username = backStackEntry.arguments!!.getString("username")
-            StartFromIndex(userid, username!!, index,navController)
+            val tag = backStackEntry.arguments!!.getString("tag")
+            StartFromIndex(userid, username!!, index, navController, tag!!)
         }
         composable("addstory") { AddStory(navController) }
 

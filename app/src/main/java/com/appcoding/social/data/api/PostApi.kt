@@ -11,6 +11,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import java.io.LineNumberInputStream
 
 interface PostApi {
 
@@ -38,5 +39,9 @@ interface PostApi {
                            @Path("lastSeenId") lastSeenId: Long?,
                            @Path("size") size : Int) : List<PostResponse>
 
+    @GET("posts/allposts/{userId}/{lastSeenId}/{size}")
+    suspend fun getAllPosts(@Path("userId") userId : Long,
+                            @Path("lastSeenId") lastSeenId: Long?,
+                            @Path("size") size : Int) : List<PostResponse>
 
 }
